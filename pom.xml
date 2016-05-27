@@ -1,0 +1,178 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.jom</groupId>
+    <artifactId>jom</artifactId>
+    <version>0.1.16</version>
+    <name>JOM (Java Optimization Modeler)</name>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <releaseVersion>${project.version}</releaseVersion> <!-- The JOM version in the release -->
+        <generalJOMReleasesDir>c:/jom/releases</generalJOMReleasesDir> <!-- The local folder where all the JOM releases are stored  -->
+        <releaseDestThisVersion>${generalJOMReleasesDir}/jom-${releaseVersion}/</releaseDestThisVersion> <!-- The local folder where this release os stored -->
+        <updateJavadoc>true</updateJavadoc>
+    </properties>
+
+    <dependencies>
+        <!-- http://mvnrepository.com/artifact/net.java.dev.jna/jna -->
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+
+        <!-- http://mvnrepository.com/artifact/net.sourceforge.parallelcolt/parallelcolt -->
+        <dependency>
+            <groupId>net.sourceforge.parallelcolt</groupId>
+            <artifactId>parallelcolt</artifactId>
+            <version>0.10.1</version>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>ppm</id>
+
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-project-info-reports-plugin</artifactId>
+                        <version>2.9</version>
+                    </plugin>
+
+                    <!-- This applies in COMPILE -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.5.1</version>
+                        <configuration> <!-- To guarantee that we use 1.8 in compiling  -->
+                            <source>1.8</source>
+                            <target>1.8</target>
+                            <failOnError>false</failOnError>
+                        </configuration>
+                    </plugin>
+
+                    <!-- Load on the fly during the package phase the files in the lib folder  -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.10</version>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>./lib</outputDirectory>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>false</overWriteSnapshots>
+                                    <overWriteIfNewer>true</overWriteIfNewer>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <id>cleaning</id>
+                                <phase>clean</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <delete dir="${project.basedir}/target"/>
+                                        <property name="releaseVersion" value="${releaseVersion}"/>
+                                        <property name="generalJOMReleasesDir" value="${generalJOMReleasesDir}"/>
+                                        <property name="releaseDestThisVersion" value="${releaseDestThisVersion}"/>
+                                        <!-- Delete the release destination directory  -->
+                                        <delete includeemptydirs="true" quiet="true">
+                                            <fileset dir="${releaseDestThisVersion}" includes="**"
+                                                     defaultexcludes="false"/>
+                                        </delete>
+                                        <!-- Delete the ZIP file with all the release  -->
+                                        <delete file="${generalJOMReleasesDir}/jom-${releaseVersion}.zip" quiet="true"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>packaging</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <!-- Copy the source files in the release/src directory  -->
+                                        <copy todir="${releaseDestThisVersion}/src" overwrite="true">
+                                            <fileset dir="${project.basedir}/src/main/java"
+                                                     includes="com/jom/*.java , com/jom/javaluator/*.java , examples/*.java"/>
+                                        </copy>
+
+                                        <!-- Create the jar file and copy it into the release directory -->
+                                        <copy todir="${releaseDestThisVersion}">
+                                            <fileset dir="${project.build.directory}"
+                                                     includes="jom-${releaseVersion}.jar"/>
+                                        </copy>
+
+                                        <!-- Create the complete ZIP file with everything -->
+                                        <zip destfile="${generalJOMReleasesDir}/jom-${releaseVersion}.zip"
+                                             basedir="${releaseDestThisVersion}" update="false"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>javadoc</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <ant antfile="./javadocJOM.xml"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <version>2.8.2</version>
+                        <configuration>
+                            <skip>false</skip> <!-- Ignoring Maven's default deploy plugin (it is not doing what we want, since it creates a big jar) -->
+                        </configuration>
+                    </plugin>
+
+                    <!-- Difference between site and deploy -->
+                    <!-- Site creates a web page and uploads it to a repo. In this case, the web content is the project. -->
+                    <!-- Deploy just uploads the project content to a repo. With deploy we cannot customize the files to upload as ant -->
+
+
+                </plugins>
+            </build>
+	        <distributionManagement>
+	                <!-- FTP Repository -->
+	                <site>
+	                    <id>ftp-repository</id>
+	                    <url></url>
+	                </site>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
+</project>
+

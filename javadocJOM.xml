@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<project default="buildJavadoc">
+	<target name="condition">
+		<condition property="doBuildJavadoc">
+			<istrue value="${updateJavadoc}"/>
+		</condition>
+	</target>
+
+	<target name="buildJavadoc" if="doBuildJavadoc" depends="condition">
+		<!-- Create the javadoc and copy it into the release/javadoc -->
+		<javadoc access="public" author="true"
+				 classpath="./lib/parallelcolt-0.10.1.jar;"
+				 destdir="${releaseDestThisVersion}/javadoc"
+				 nodeprecated="false"
+				 nodeprecatedlist="false" noindex="false" nonavbar="false"
+				 notree="false" source="1.7"
+				 sourcefiles="src/main/java/com/jom/DoubleMatrixND.java,src/main/java/com/jom/OptimizationProblem.java,src/main/java/com/jom/Expression.java,src/main/java/com/jom/JOMException.java"
+				 splitindex="true" use="true" version="true"/>
+	</target>
+</project>
+
