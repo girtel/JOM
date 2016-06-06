@@ -1,34 +1,22 @@
 /*******************************************************************************
- * Copyright (c) 2015 Pablo Pavon Mariño.
+ * Copyright (c) 2015 Pablo Pavon Mariï¿½o.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl.html
- * 
+ * <p>
  * Contributors:
- *     Pablo Pavon Mariño - initial API and implementation
+ * Pablo Pavon Mariï¿½o - initial API and implementation
  ******************************************************************************/
-
-
-
- 
-
-
-
 
 package com.jom.javaluator;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** A String tokenizer that accepts delimiters that are greater than one character.
- * 
+ *
  * @author Jean-Marc Astesana
  * @see <a href="../../../license.html">License information</a> */
 public class Tokenizer
@@ -38,7 +26,7 @@ public class Tokenizer
 	private String tokenDelimiters;
 
 	/** Constructor.
-	 * 
+	 *
 	 * @param delimiters the delimiters */
 	Tokenizer(List<String> delimiters)
 	{
@@ -90,7 +78,7 @@ public class Tokenizer
 	}
 
 	/** Converts a string into tokens.
-	 * 
+	 *
 	 * @param string The string to be split into tokens
 	 * @return The tokens */
 	public Iterator<String> tokenize(String string)
@@ -145,7 +133,7 @@ public class Tokenizer
 	}
 
 	/** Tests whether a String list contains only 1 character length elements.
-	 * 
+	 *
 	 * @param delimiters The list to test
 	 * @return true if it contains only one char length elements (or no elements) */
 	private boolean onlyOneChar(List<String> delimiters)

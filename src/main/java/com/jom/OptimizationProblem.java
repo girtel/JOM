@@ -1,31 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2015 Pablo Pavon Mariño.
+ * Copyright (c) 2015 Pablo Pavon Mariï¿½o.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl.html
- * 
+ * <p>
  * Contributors:
- *     Pablo Pavon Mariño - initial API and implementation
+ * Pablo Pavon Mariï¿½o - initial API and implementation
  ******************************************************************************/
 
-
-
- 
-
-
-
-
 package com.jom;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import cern.colt.Arrays;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
@@ -33,14 +17,17 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.jet.math.tdouble.DoubleFunctions;
 
+import java.util.*;
+import java.util.Map.Entry;
 
-/** This class contains the methods for handling optimization problems, defining their input parameters (if any), decision variables, 
+/** This class contains the methods for handling optimization problems, defining their input parameters (if any), decision variables,
  * objetive function and constraints, choosing and calling a solver to obtain a numerical solution, and retrieving that solution. 
  * @author Pablo Pavon MariÃ±o
  * @see http://www.net2plan.com/jom
  */
-public class OptimizationProblem 
+public class OptimizationProblem
 {
+	final static int MAX_NUMBER_DIMENSIONS_INPUTPARAMETER = 10;
 	private HashMap<String, _INTERNAL_ConstraintArray> constraints;
 	private HashMap<String, _INTERNAL_DecisionVariableArray> decisionVariables;
 	private _INTERNAL_ExpressionParser evaluator;
@@ -53,44 +40,19 @@ public class OptimizationProblem
 	private _INTERNAL_SolverIO solverIO;
 	private TimeInfo timeInfo;
 	private boolean toMinimize;
-	final static int MAX_NUMBER_DIMENSIONS_INPUTPARAMETER = 10;
-	
-	private class TimeInfo 
-	{
-		List<Long> accumTimeSettingDVs;
-		long accumTimeSettingObj;
-		long accumTimeSolvingTheProblem;
-		long creationTime;
-		List<Long> timeSettingConstraints; 
-		TimeInfo () { reset (); }
-		public String toString ()
-		{
-			double secsSettingDVs = 0; for (Long num : accumTimeSettingDVs) secsSettingDVs += num*1E-9; 
-			double secsSettingCons = 0; for (Long num : timeSettingConstraints) secsSettingCons += num*1E-9; 
-			String s = "Setting DVs (secs): " + secsSettingDVs + "\n";
-			s = s + "Setting Obj (secs): " + accumTimeSettingObj*1e-9 + "\n";
-			s = s + "Setting Constraints (secs): " + secsSettingCons + ": [";
-			for (Long num : timeSettingConstraints) s = s + num*1E-9 + " ";
-			s = s + "] \n";
-			s = s + "Solving the problem (secs): " + accumTimeSolvingTheProblem*1e-9 + "\n";
-			s = s + "Elapsed time since the object was created: " + (System.nanoTime() - creationTime)*1E-9 + "\n";
-			return s;
-		}
-		void reset () { creationTime = System.nanoTime(); accumTimeSettingDVs = new ArrayList<Long> (); accumTimeSettingObj = 0; timeSettingConstraints = new ArrayList<Long> (); accumTimeSolvingTheProblem = 0; }
-	}
-	
+
 	/** Creates an optimization problem object
-	 *  
+	 *
 	 */
 	public OptimizationProblem()
 	{
 		this.inputParameters = new LinkedHashMap<String, DoubleMatrixND>();
 		this.decisionVariables = new LinkedHashMap<String, _INTERNAL_DecisionVariableArray>();
-		this.initialSolution = new LinkedHashMap<String, DoubleMatrixND> ();
+		this.initialSolution = new LinkedHashMap<String, DoubleMatrixND>();
 		this.constraints = new LinkedHashMap<String, _INTERNAL_ConstraintArray>();
 		this.evaluator = null;
 		this.solverIO = null;
-		this.timeInfo = new TimeInfo ();
+		this.timeInfo = new TimeInfo();
 
 		this.toMinimize = false;
 		this.objectiveFunction = null;
@@ -98,7 +60,7 @@ public class OptimizationProblem
 
 		this.lpNumScalarConstraints = 0;
 		this.nlpNumScalarConstraints = 0;
-		
+
 		/* So that the JVM does not execute its JNA library (if any), but the one of jna.jar */
 		System.setProperty("jna.nosys", "true");
 	}
@@ -106,46 +68,53 @@ public class OptimizationProblem
 	/** Returns an informative string about the JOM library
 	 * @return the string
 	 */
-	public String about () { return "Java Optimization Modeler v. 0.1.13\nAuthor: Pablo Pavon Mariï¿½o. \nDate: September 2015. \nJOM is open-source, licensed by GNU Lesser General Public License v3.0\n"; }
+	public String about(){ return "Java Optimization Modeler v. 0.1.13\nAuthor: Pablo Pavon Mariï¿½o. \nDate: September 2015. \nJOM is open-source, "
+			+ "licensed by GNU Lesser General Public License v3.0\n"; }
 
-	/** Adds (an array of) constraints to the optimization problem. No identifier is assigned, so after the problem is solved, it is not possible to access the multipliers and other constraint-related info. 
-	 * Constraints have the form: expression-left-hand-side connector expression-right-hand-side. 
-	 * Expressions are strings that can be evaluated to arrayed expressions of the defined input parameters and decision variables. Connectors must be of the type less-equal (<= or =<), greater-equal (>= or =>) or equal (==).  
-	 * @param expression The string expression of the constraint. 
-	 * @return The Expression object holding the expression (lhs - rhs), where lhs and rhs are the expression in the left-hand-side and right-hand-side of the constraint 
+	/** Adds (an array of) constraints to the optimization problem. No identifier is assigned, so after the problem is solved, it is not possible to
+	 *  access the multipliers and other constraint-related info.
+	 * Constraints have the form: expression-left-hand-side connector expression-right-hand-side.
+	 * Expressions are strings that can be evaluated to arrayed expressions of the defined input parameters and decision variables. Connectors must
+	 * be of the type less-equal (<= or =<), greater-equal (>= or =>) or equal (==).
+	 * @param expression The string expression of the constraint.
+	 * @return The Expression object holding the expression (lhs - rhs), where lhs and rhs are the expression in the left-hand-side and
+	 * right-hand-side of the constraint
 	 */
 	public Expression addConstraint(String expression)
 	{
-		String identifier = new Double (Math.random ()).toString ();
+		String identifier = new Double(Math.random()).toString();
 		while (this.constraints.containsKey(identifier))
-			identifier = new Double (Math.random ()).toString ();
+			identifier = new Double(Math.random()).toString();
 		return this.addConstraint(expression, identifier);
 	}
 
-	/** Adds (an array of) constraints to the optimization problem. 
-	 * Constraints have the form: expression-left-hand-side connector expression-right-hand-side. 
-	 * Expressions are strings that can be evaluated to arrayed expressions of the defined input parameters and decision variables. Connectors must be of the type less-equal (<= or =<), greater-equal (>= or =>) or equal (==).  
-	 * @param expression The string expression of the constraint. 
-	 * @param identifier A unique string given to identify this constraint 
-	 * @return The Expression object holding the expression (lhs - rhs), where lhs and rhs are the expression in the left-hand-side and right-hand-side of the constraint 
+	/** Adds (an array of) constraints to the optimization problem.
+	 * Constraints have the form: expression-left-hand-side connector expression-right-hand-side.
+	 * Expressions are strings that can be evaluated to arrayed expressions of the defined input parameters and decision variables. Connectors must
+	 * be of the type less-equal (<= or =<), greater-equal (>= or =>) or equal (==).
+	 * @param expression The string expression of the constraint.
+	 * @param identifier A unique string given to identify this constraint
+	 * @return The Expression object holding the expression (lhs - rhs), where lhs and rhs are the expression in the left-hand-side and
+	 * right-hand-side of the constraint
 	 */
 	public Expression addConstraint(String expression, String identifier)
 	{
 		long initTime = System.nanoTime();
 
-		if (evaluator == null) this.evaluator = new _INTERNAL_ExpressionParser (this , inputParameters , decisionVariables); 
+		if (evaluator == null) this.evaluator = new _INTERNAL_ExpressionParser(this, inputParameters, decisionVariables);
 		if (this.constraints.containsKey(identifier)) throw new JOMException("This constraint identifier already exists");
 
-		_INTERNAL_ConstraintArray cs = new _INTERNAL_ConstraintArray(evaluator, identifier, expression, this.lpNumScalarConstraints + this.nlpNumScalarConstraints); // PABLO: Changed this
+		_INTERNAL_ConstraintArray cs = new _INTERNAL_ConstraintArray(evaluator, identifier, expression, this.lpNumScalarConstraints + this
+				.nlpNumScalarConstraints); // PABLO: Changed this
 
 		this.constraints.put(identifier, cs);
 		if (cs.isLinear())
 			this.lpNumScalarConstraints += cs.getNumScalarConstraints();
 		else
 			this.nlpNumScalarConstraints += cs.getNumScalarConstraints();
-		
-		checkProblemSizeLimitation (this.numScalarDecisionVariables , this.lpNumScalarConstraints , this.nlpNumScalarConstraints);
-		timeInfo.timeSettingConstraints.add (System.nanoTime() - initTime);
+
+		checkProblemSizeLimitation(this.numScalarDecisionVariables, this.lpNumScalarConstraints, this.nlpNumScalarConstraints);
+		timeInfo.timeSettingConstraints.add(System.nanoTime() - initTime);
 		return cs.getLhsMinusRhs();
 	}
 
@@ -156,7 +125,7 @@ public class OptimizationProblem
 		addDecisionVariable(name, isInteger, size, (DoubleMatrixND) null, (DoubleMatrixND) null);
 	}
 
-	/** addDecisionVariable(String name, boolean isInteger, int[] size, DoubleMatrixND x_l, DoubleMatrixND x_u), but now the lower (upper) bounds 
+	/** addDecisionVariable(String name, boolean isInteger, int[] size, DoubleMatrixND x_l, DoubleMatrixND x_u), but now the lower (upper) bounds
 	 * for all the decision variables in the array are equal to x_l (x_u).
 	 */
 	public void addDecisionVariable(String name, boolean isInteger, int[] size, double x_l, double x_u)
@@ -167,26 +136,28 @@ public class OptimizationProblem
 	/** Adds an array of decision variables to the optimization problem
 	 * @param name Name of the array of decision variables, as it will used in the expressions.
 	 * @param isInteger True if the decision variables in the array are all constrained to be integer
-	 * @param size One coordinate per dimension of the array, each coordinate is the size of the array in the respective dimension. 
+	 * @param size One coordinate per dimension of the array, each coordinate is the size of the array in the respective dimension.
 	 * @param x_l The lower bounds of the variables are created as new DoubleMatrixND (size,x_l)
 	 * @param x_u The upper bounds of the variables are created as new DoubleMatrixND (size,x_u)
 	 */
-	public void addDecisionVariable(String name, boolean isInteger, int[] size, double [] x_l, double [] x_u)
+	public void addDecisionVariable(String name, boolean isInteger, int[] size, double[] x_l, double[] x_u)
 	{
 		long initTime = System.nanoTime();
-		if (objectiveFunctionOrConstraintsAdded ()) throw new JOMException("Decision variables cannot be added after objective function or constraints are set");
-		
+		if (objectiveFunctionOrConstraintsAdded())
+			throw new JOMException("Decision variables cannot be added after objective function or constraints are set");
+
 		int numberNewElements = IntMatrixND.prod(IntFactory1D.dense.make(size));
-		_INTERNAL_DecisionVariableArray v = new _INTERNAL_DecisionVariableArray(name, isInteger, IntFactory1D.dense.make(size) , new DoubleMatrixND (size , x_l), new DoubleMatrixND (size , x_u) , this.numScalarDecisionVariables);
+		_INTERNAL_DecisionVariableArray v = new _INTERNAL_DecisionVariableArray(name, isInteger, IntFactory1D.dense.make(size), new DoubleMatrixND
+				(size, x_l), new DoubleMatrixND(size, x_u), this.numScalarDecisionVariables);
 		decisionVariables.put(name, v);
 		this.numScalarDecisionVariables += numberNewElements;
-		checkProblemSizeLimitation (this.numScalarDecisionVariables , this.lpNumScalarConstraints , this.nlpNumScalarConstraints);
+		checkProblemSizeLimitation(this.numScalarDecisionVariables, this.lpNumScalarConstraints, this.nlpNumScalarConstraints);
 	}
 
 	/** Adds an array of decision variables to the optimization problem
 	 * @param name Name of the array of decision variables, as it will used in the expressions.
 	 * @param isInteger True if the decision variables in the array are all constrained to be integer
-	 * @param size One coordinate per dimension of the array, each coordinate is the size of the array in the respective dimension. 
+	 * @param size One coordinate per dimension of the array, each coordinate is the size of the array in the respective dimension.
 	 * @param x_l The lower bounds of the variables are created as new DoubleMatrixND (size,x_l)
 	 * @param x_u The upper bounds of the variables are created as new DoubleMatrixND (size,x_u)
 	 */
@@ -198,35 +169,44 @@ public class OptimizationProblem
 	/** Adds an array of decision variables to the optimization problem
 	 * @param name Name of the array of decision variables, as it will used in the expressions.
 	 * @param isInteger True if the decision variables in the array are all constrained to be integer
-	 * @param size One coordinate per dimension of the array, each coordinate is the size of the array in the respective dimension. 
+	 * @param size One coordinate per dimension of the array, each coordinate is the size of the array in the respective dimension.
 	 * @param x_l An array of doubles of the same size of the decision variables, with the lower bounds of the variables.
 	 * @param x_u An array of doubles of the same size of the decision variables, with the upper bounds of the variables.
 	 */
 	public void addDecisionVariable(String name, boolean isInteger, int[] size, DoubleMatrixND x_l, DoubleMatrixND x_u)
 	{
 		long initTime = System.nanoTime();
-		if (objectiveFunctionOrConstraintsAdded ()) throw new JOMException("Decision variables cannot be added after objective function or constraints are set");
-		
+		if (objectiveFunctionOrConstraintsAdded())
+			throw new JOMException("Decision variables cannot be added after objective function or constraints are set");
+
 		int numberNewElements = IntMatrixND.prod(IntFactory1D.dense.make(size));
-		_INTERNAL_DecisionVariableArray v = new _INTERNAL_DecisionVariableArray(name, isInteger, IntFactory1D.dense.make(size) , x_l, x_u, this.numScalarDecisionVariables);
+		_INTERNAL_DecisionVariableArray v = new _INTERNAL_DecisionVariableArray(name, isInteger, IntFactory1D.dense.make(size), x_l, x_u, this
+				.numScalarDecisionVariables);
 		decisionVariables.put(name, v);
 		this.numScalarDecisionVariables += numberNewElements;
-		checkProblemSizeLimitation (this.numScalarDecisionVariables , this.lpNumScalarConstraints , this.nlpNumScalarConstraints);
+		checkProblemSizeLimitation(this.numScalarDecisionVariables, this.lpNumScalarConstraints, this.nlpNumScalarConstraints);
 	}
 
-	
-	/** Returns true if the problem was attempted to be solved, and the solver declares that the problem has no feasible solutions. If the method "solve" was not invoked yet, throws an exception
+	/** Returns true if the problem was attempted to be solved, and the solver declares that the problem has no feasible solutions. If the method
+	 * "solve" was not invoked yet, throws an exception
 	 * @return See above
 	 */
-	public boolean feasibleSolutionDoesNotExist () { if (!this.solverIO.problemAlreadyAttemptedTobeSolved) throw new JOMException("The problem has not been solved yet"); else return this.solverIO.out.feasibleSolutionDoesNotExist; }
+	public boolean feasibleSolutionDoesNotExist()
+	{
+		if (!this.solverIO.problemAlreadyAttemptedTobeSolved) throw new JOMException("The problem has not been solved yet");
+		else return this.solverIO.out.feasibleSolutionDoesNotExist;
+	}
 
-	/** Returns true if the problem was attempted to be solved, and the solver declares that the problem is unbounded. If the method "solve" was not invoked yet, throws an exception
+	/** Returns true if the problem was attempted to be solved, and the solver declares that the problem is unbounded. If the method "solve" was not
+	 *  invoked yet, throws an exception
 	 * @return See above
 	 */
-	public boolean foundUnboundedSolution () { if (!this.solverIO.problemAlreadyAttemptedTobeSolved) throw new JOMException("The problem has not been solved yet"); else return this.solverIO.out.foundUnboundedSolution; }
+	public boolean foundUnboundedSolution()
+	{
+		if (!this.solverIO.problemAlreadyAttemptedTobeSolved) throw new JOMException("The problem has not been solved yet");
+		else return this.solverIO.out.foundUnboundedSolution;
+	}
 
-
-	
 	/** Obtains the value (an array of doubles) of the input parameter previously set
 	 * @param name Name of the input parameter as it appears in the expressions
 	 * @return The value of the input parameter
@@ -236,42 +216,48 @@ public class OptimizationProblem
 		return inputParameters.get(name);
 	}
 
-	/** Returns the multipliers of the automatic constraints: x_l <= varName added to the problem, where x_l is the array of lower bounds provided, associated to the decision variable. 
-	 * @param decisionVariableName The name of the decision variable 
+	/** Returns the multipliers of the automatic constraints: x_l <= varName added to the problem, where x_l is the array of lower bounds provided,
+	 * associated to the decision variable.
+	 * @param decisionVariableName The name of the decision variable
 	 * @return The multipliers as an array of the same size of the decision variables
 	 */
 	public DoubleMatrixND getMultiplierOfLowerBoundConstraintToPrimalVariables(String decisionVariableName)
 	{
 		_INTERNAL_DecisionVariableArray dv = this.decisionVariables.get(decisionVariableName);
 		if (dv == null) throw new JOMException("Unknown decision variable name: " + decisionVariableName);
-		DoubleMatrix1D values = this.solverIO.out.multiplierOfLowerBoundConstraintToPrimalVariables.viewSelection(dv.getVarIds().elements().toArray());
+		DoubleMatrix1D values = this.solverIO.out.multiplierOfLowerBoundConstraintToPrimalVariables.viewSelection(dv.getVarIds().elements().toArray
+				());
 		return new DoubleMatrixND(dv.getVarIds().getSize(), values.copy());
 	}
 
-	/** Returns the multipliers of the automatic constraints: varName <= x_u added to the problem, where x_u is the array of upper bounds provided, associated to the decision variable. 
-	 * @param decisionVariableName The name of the decision variable 
+	/** Returns the multipliers of the automatic constraints: varName <= x_u added to the problem, where x_u is the array of upper bounds provided,
+	 * associated to the decision variable.
+	 * @param decisionVariableName The name of the decision variable
 	 * @return The multipliers as an array of the same size of the decision variables
 	 */
 	public DoubleMatrixND getMultiplierOfUpperBoundConstraintToPrimalVariables(String decisionVariableName)
 	{
 		_INTERNAL_DecisionVariableArray dv = this.decisionVariables.get(decisionVariableName);
 		if (dv == null) throw new JOMException("Unknown decision variable name: " + decisionVariableName);
-		DoubleMatrix1D values = this.solverIO.out.multiplierOfUpperBoundConstraintToPrimalVariables.viewSelection(dv.getVarIds().elements().toArray());
+		DoubleMatrix1D values = this.solverIO.out.multiplierOfUpperBoundConstraintToPrimalVariables.viewSelection(dv.getVarIds().elements().toArray
+				());
 		return new DoubleMatrixND(dv.getVarIds().getSize(), values.copy());
 	}
 
 	/** Returns the multipliers of the given constraint
-	 * @param constraintIdentifier The unique identifier of the constraint  
+	 * @param constraintIdentifier The unique identifier of the constraint
 	 * @return The multipliers as an array of the same size of the constraints
 	 */
 	public DoubleMatrixND getMultipliersOfConstraint(String constraintIdentifier)
 	{
 		_INTERNAL_ConstraintArray cs = this.constraints.get(constraintIdentifier);
 		if (cs == null) throw new JOMException("Unknown constraint set name: " + constraintIdentifier);
-		return new DoubleMatrixND(cs.getSize(), this.solverIO.out.multiplierOfConstraint.viewPart(cs.getIndex_0_FirstConstraint(), cs.getNumScalarConstraints()));
+		return new DoubleMatrixND(cs.getSize(), this.solverIO.out.multiplierOfConstraint.viewPart(cs.getIndex_0_FirstConstraint(), cs
+				.getNumScalarConstraints()));
 	}
 
-	/** Gets the number of scalar constraints in the problem that are linear (with integer variables or not). Arrayed constraints are counted as many times as its number of constituting scalar elements.
+	/** Gets the number of scalar constraints in the problem that are linear (with integer variables or not). Arrayed constraints are counted as
+	 * many times as its number of constituting scalar elements.
 	 * @return The number of linear scalar constraints
 	 */
 	public int getNumLinearScalarConstraints()
@@ -279,7 +265,8 @@ public class OptimizationProblem
 		return this.lpNumScalarConstraints;
 	}
 
-	/** Gets the number of scalar constraints in the problem that are non linear (with integer variables or not). Arrayed constraints are counted as many times as its number of constituting scalar elements.
+	/** Gets the number of scalar constraints in the problem that are non linear (with integer variables or not). Arrayed constraints are counted as
+	 *  many times as its number of constituting scalar elements.
 	 * @return The number of non-linear scalar constraints
 	 */
 	public int getNumNonLinearScalarConstraints()
@@ -287,7 +274,8 @@ public class OptimizationProblem
 		return this.nlpNumScalarConstraints;
 	}
 
-	/** Gets the number of scalar decision variables. Arrayed decision variables are counted as many times as its number of constituting scalar elements.
+	/** Gets the number of scalar decision variables. Arrayed decision variables are counted as many times as its number of constituting scalar
+	 * elements.
 	 * @return The number of scalar decision variables
 	 */
 	public int getNumScalarDecisionVariables()
@@ -295,9 +283,8 @@ public class OptimizationProblem
 		return this.numScalarDecisionVariables;
 	}
 
-
 	/** Gets the objective function expression set in the problem
-	 * @return The objective expression of the objective function 
+	 * @return The objective expression of the objective function
 	 */
 	public Expression getObjectiveFunction()
 	{
@@ -311,13 +298,13 @@ public class OptimizationProblem
 	{
 		return this.solverIO.out.primalCost;
 	}
-	
-	/** Returns the primal solution obtained after solving the problem for the given (array of) decision variables. If the 
-	 * decision variable is constrained to be integer, it is rounded. In this case, we are assuming that non-integer values returned by the solver 
-	 * were caused by negligible numerical errors. Recall that, after the solver ends, JOM checks if its exit code signals an error-free execution. 
-	 * Thus, if the solver returns an "everything ok" code, numerical errors in integer variables should be negligible.      
+
+	/** Returns the primal solution obtained after solving the problem for the given (array of) decision variables. If the
+	 * decision variable is constrained to be integer, it is rounded. In this case, we are assuming that non-integer values returned by the solver
+	 * were caused by negligible numerical errors. Recall that, after the solver ends, JOM checks if its exit code signals an error-free execution.
+	 * Thus, if the solver returns an "everything ok" code, numerical errors in integer variables should be negligible.
 	 * @param decisionVariable The name of the decision variable
-	 * @return An array of the same size of the decision variables, with the solution  
+	 * @return An array of the same size of the decision variables, with the solution
 	 */
 	public DoubleMatrixND getPrimalSolution(String decisionVariable)
 	{
@@ -327,8 +314,8 @@ public class OptimizationProblem
 		if (dv.getIsInteger()) values.assign(DoubleFunctions.round(1));
 		return new DoubleMatrixND(dv.getVarIds().getSize(), values.copy());
 	}
-	
-	/** Returns the slack of the given constraints. It should be zero for equality constraints.  
+
+	/** Returns the slack of the given constraints. It should be zero for equality constraints.
 	 * @param constraintIdentifier
 	 * @return An array of the same size of the constraints, with the slack values
 	 */
@@ -337,12 +324,12 @@ public class OptimizationProblem
 		_INTERNAL_ConstraintArray cs = this.constraints.get(constraintIdentifier);
 
 		if (cs == null) throw new JOMException("Unknown constraint set name: " + constraintIdentifier);
-		return new DoubleMatrixND(cs.getSize(), this.solverIO.out.primalValuePerConstraint.viewPart(cs.getIndex_0_FirstConstraint(), cs.getNumScalarConstraints()));
+		return new DoubleMatrixND(cs.getSize(), this.solverIO.out.primalValuePerConstraint.viewPart(cs.getIndex_0_FirstConstraint(), cs
+				.getNumScalarConstraints()));
 	}
-	
-	
+
 	/** Returns true if the given name corresponds to an input parameter defined for the problem
-	 * @return True if the previous statement is true, false otherwise 
+	 * @return True if the previous statement is true, false otherwise
 	 */
 	public boolean isInputParameter(String name)
 	{
@@ -352,18 +339,18 @@ public class OptimizationProblem
 	/** Returns true if the problem has one or more decision variables constrained to be integer, false otherwise
 	 * @return See above.
 	 */
-	public boolean isIntegerProblem ()
+	public boolean isIntegerProblem()
 	{
 		for (Entry<String, _INTERNAL_DecisionVariableArray> entry : decisionVariables.entrySet())
-			if (entry.getValue ().getIsInteger()) return true;
+			if (entry.getValue().getIsInteger()) return true;
 		return false;
 	}
 
-	
-	/** Returns true if the problem is linear (with some/all integer variables or not). False if the objective function or one or more constraints are non-linear.
+	/** Returns true if the problem is linear (with some/all integer variables or not). False if the objective function or one or more constraints
+	 * are non-linear.
 	 * @return See above
 	 */
-	public boolean isLinearProblem ()
+	public boolean isLinearProblem()
 	{
 		if (!this.objectiveFunction.isLinear()) return false;
 		return (this.getNumNonLinearScalarConstraints() == 0);
@@ -379,44 +366,44 @@ public class OptimizationProblem
 
 	/** Help function (not needed usually for solving optimization problems) to generate an Expression object from its String representation.
 	 * @param expression The string expression.
-	 * @return The Expression object 
+	 * @return The Expression object
 	 */
-	public Expression parseExpression (String expression)
+	public Expression parseExpression(String expression)
 	{
-		if (evaluator == null) this.evaluator = new _INTERNAL_ExpressionParser (this , inputParameters , decisionVariables); 
+		if (evaluator == null) this.evaluator = new _INTERNAL_ExpressionParser(this, inputParameters, decisionVariables);
 		return this.evaluator.evaluate(expression, new Object());
 	}
 
-	
-	/** Resets the timers that track the amount of time involved in each part of the computation, to write the time report with the 
+	/** Resets the timers that track the amount of time involved in each part of the computation, to write the time report with the
 	 */
-	public void resetTimer () { timeInfo.reset(); }
+	public void resetTimer(){ timeInfo.reset(); }
 
-	
-	/** Sets the initial solution of the optimization algorithm solving the problem (can be used for setting the starting solution in IPOPT solver). 
+	/** Sets the initial solution of the optimization algorithm solving the problem (can be used for setting the starting solution in IPOPT solver).
 	 * @param decisionVariableName Name of the decision variable
 	 * @param initialValue Initial solution. All the scalar decision variables in the array of decision variables have this same initial value.
 	 */
-	public void setInitialSolution (String decisionVariableName , double initialValue)
+	public void setInitialSolution(String decisionVariableName, double initialValue)
 	{
 		_INTERNAL_DecisionVariableArray dv = this.decisionVariables.get(decisionVariableName);
 		if (dv == null) throw new JOMException("Unknown decision variable name: " + decisionVariableName);
-		this.initialSolution.put(decisionVariableName, new DoubleMatrixND (dv.getSize().toArray() , initialValue , "dense"));
+		this.initialSolution.put(decisionVariableName, new DoubleMatrixND(dv.getSize().toArray(), initialValue, "dense"));
 	}
 
-	/** Sets the initial solution of the optimization algorithm solving the problem (to be used by some solvers like IPOPT). 
+	/** Sets the initial solution of the optimization algorithm solving the problem (to be used by some solvers like IPOPT).
 	 * @param decisionVariableName Name of the decision variable
 	 * @param initialValue Initial solution. Array of the same size as the decision variable
 	 */
-	public void setInitialSolution (String decisionVariableName , DoubleMatrixND initialValue)
+	public void setInitialSolution(String decisionVariableName, DoubleMatrixND initialValue)
 	{
 		_INTERNAL_DecisionVariableArray dv = this.decisionVariables.get(decisionVariableName);
 		if (dv == null) throw new JOMException("Unknown decision variable name: " + decisionVariableName);
-		if (!initialValue.getSize().equals(dv.getSize())) throw new JOMException("Size mismatch: the decision variable size is different to the provided constant size");
+		if (!initialValue.getSize().equals(dv.getSize()))
+			throw new JOMException("Size mismatch: the decision variable size is different to the provided constant size");
 		this.initialSolution.put(decisionVariableName, initialValue);
 	}
 
-	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old values are lost
+	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old
+	 *  values are lost
 	 * @param name Name of the input parameter as it appears in the expressions.
 	 * @param value The scalar value of the input parameter, converted to an N-DIM array object of size (1,1)
 	 */
@@ -424,50 +411,58 @@ public class OptimizationProblem
 	{
 		boolean newInputParameterName = !(inputParameters.containsKey(name));
 		inputParameters.put(name, new DoubleMatrixND(value));
-		if ((this.evaluator != null) && newInputParameterName) 
-			this.evaluator = new _INTERNAL_ExpressionParser (this , inputParameters , decisionVariables); // create again the evaluator, since it has a new parameter name to consider in the parsing
+		if ((this.evaluator != null) && newInputParameterName)
+			this.evaluator = new _INTERNAL_ExpressionParser(this, inputParameters, decisionVariables); // create again the evaluator, since it has a
+		// new parameter name to consider in the parsing
 	}
 
-	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old values are lost
+	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old
+	 *  values are lost
 	 * @param name Name of the input parameter as it appears in the expressions.
 	 * @param values The 1D array of values of the input parameter, converted to an N-DIM array object of size (1,values.length)
 	 * @param rowColumnVector "row" for a row vector, "column" for a column vector
 	 */
-	public void setInputParameter(String name, double[] values , String rowColumnVector)
+	public void setInputParameter(String name, double[] values, String rowColumnVector)
 	{
 		boolean newInputParameterName = !(inputParameters.containsKey(name));
 		if (rowColumnVector.toLowerCase().equals("row"))
-			inputParameters.put(name, new DoubleMatrixND(new int[] { 1, values.length }, values));
+			inputParameters.put(name, new DoubleMatrixND(new int[]{1, values.length}, values));
 		else if (rowColumnVector.toLowerCase().equals("column"))
-			inputParameters.put(name, new DoubleMatrixND(new int[] { values.length , 1}, values));
-		else 
+			inputParameters.put(name, new DoubleMatrixND(new int[]{values.length, 1}, values));
+		else
 			throw new JOMException("Indicate \"row\" or \"column\" in the rowColumnVector parameter");
-		if ((this.evaluator != null) && newInputParameterName) 
-			this.evaluator = new _INTERNAL_ExpressionParser (this , inputParameters , decisionVariables);  // create again the evaluator, since it has a new parameter name to consider in the parsing
+		if ((this.evaluator != null) && newInputParameterName)
+			this.evaluator = new _INTERNAL_ExpressionParser(this, inputParameters, decisionVariables);  // create again the evaluator, since it has
+		// a new parameter name to consider in the parsing
 	}
 
-	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old values are lost
+	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old
+	 *  values are lost
 	 * @param name Name of the input parameter as it appears in the expressions.
 	 * @param values The 1D array of values of the input parameter, converted to an N-DIM array object of size (1,values.length)
 	 * @param rowColumnVector "row" for a row vector, "column" for a column vector
 	 */
-	public void setInputParameter(String name, DoubleMatrix1D values , String rowColumnVector)
+	public void setInputParameter(String name, DoubleMatrix1D values, String rowColumnVector)
 	{
-		setInputParameter(name, values.toArray() , rowColumnVector);
+		setInputParameter(name, values.toArray(), rowColumnVector);
 	}
-	
-	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old values are lost
+
+	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old
+	 *  values are lost
 	 * @param name Name of the input parameter as it appears in the expressions.
 	 * @param values A collection with values of type Number (e.g. Double, Integer, Long...) of the input parameter
 	 * @param rowColumnVector "row" for a row vector, "column" for a column vector
 	 */
-	public void setInputParameter(String name, Collection<? extends Number> values , String rowColumnVector)
+	public void setInputParameter(String name, Collection<? extends Number> values, String rowColumnVector)
 	{
-		double [] doubleVals = new double [values.size ()]; int counter = 0; for (Number val : values) doubleVals [counter ++] = val.doubleValue();
-		setInputParameter(name, doubleVals , rowColumnVector);
+		double[] doubleVals = new double[values.size()];
+		int counter = 0;
+		for (Number val : values) doubleVals[counter++] = val.doubleValue();
+		setInputParameter(name, doubleVals, rowColumnVector);
 	}
-	
-	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old values are lost
+
+	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old
+	 *  values are lost
 	 * @param name Name of the input parameter as it appears in the expressions.
 	 * @param values The 2D array of values of the input parameter, converted to an N-DIM array object of the same size
 	 */
@@ -475,33 +470,40 @@ public class OptimizationProblem
 	{
 		boolean newInputParameterName = !(inputParameters.containsKey(name));
 		inputParameters.put(name, new DoubleMatrixND(values));
-		if ((this.evaluator != null) && newInputParameterName) 
-			this.evaluator = new _INTERNAL_ExpressionParser (this , inputParameters , decisionVariables);  // create again the evaluator, since it has a new parameter name to consider in the parsing
+		if ((this.evaluator != null) && newInputParameterName)
+			this.evaluator = new _INTERNAL_ExpressionParser(this, inputParameters, decisionVariables);  // create again the evaluator, since it has
+		// a new parameter name to consider in the parsing
 	}
 
-	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old values are lost
+	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old
+	 *  values are lost
 	 * @param name Name of the input parameter as it appears in the expressions.
 	 * @param array The array of values of the input parameter
 	 */
 	public void setInputParameter(String name, DoubleMatrixND array)
 	{
-		if (array.getNumDim() > MAX_NUMBER_DIMENSIONS_INPUTPARAMETER) throw new JOMException("The maximum number of dimensions for an input parameter array is " + MAX_NUMBER_DIMENSIONS_INPUTPARAMETER + ". You can increase this number setting the MAX_NUMBER_DIMENSIONS_INPUTPARAMETER option");
+		if (array.getNumDim() > MAX_NUMBER_DIMENSIONS_INPUTPARAMETER)
+			throw new JOMException("The maximum number of dimensions for an input parameter array is " + MAX_NUMBER_DIMENSIONS_INPUTPARAMETER + ". "
+					+ "You can increase this number setting the MAX_NUMBER_DIMENSIONS_INPUTPARAMETER option");
 		boolean newInputParameterName = !(inputParameters.containsKey(name));
 		inputParameters.put(name, array);
-		if ((this.evaluator != null) && newInputParameterName) 
-			this.evaluator = new _INTERNAL_ExpressionParser (this , inputParameters , decisionVariables);  // create again the evaluator, since it has a new parameter name to consider in the parsing
+		if ((this.evaluator != null) && newInputParameterName)
+			this.evaluator = new _INTERNAL_ExpressionParser(this, inputParameters, decisionVariables);  // create again the evaluator, since it has
+		// a new parameter name to consider in the parsing
 	}
 
-	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old values are lost
+	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old
+	 *  values are lost
 	 * @param name Name of the input parameter as it appears in the expressions.
 	 * @param array The array of values of the input parameter
 	 */
 	public void setInputParameter(String name, DoubleMatrix2D array)
 	{
-		setInputParameter(name, new DoubleMatrixND (array));
+		setInputParameter(name, new DoubleMatrixND(array));
 	}
 
-	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old values are lost
+	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old
+	 *  values are lost
 	 * @param name Name of the input parameter as it appears in the expressions.
 	 * @param value The scalar value of the input parameter, casted to double, and converted to an N-DIM array object of size (1,1)
 	 */
@@ -509,50 +511,56 @@ public class OptimizationProblem
 	{
 		boolean newInputParameterName = !(inputParameters.containsKey(name));
 		inputParameters.put(name, new DoubleMatrixND(value));
-		if ((this.evaluator != null) && newInputParameterName) 
-			this.evaluator = new _INTERNAL_ExpressionParser (this , inputParameters , decisionVariables); // create again the evaluator, since it has a new parameter name to consider in the parsing
+		if ((this.evaluator != null) && newInputParameterName)
+			this.evaluator = new _INTERNAL_ExpressionParser(this, inputParameters, decisionVariables); // create again the evaluator, since it has a
+		// new parameter name to consider in the parsing
 	}
 
-	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old values are lost
+	/** Sets the value of the (arrayed) input parameter identified by its name. If an input parameter with the same name was previously set, the old
+	 *  values are lost
 	 * @param name Name of the input parameter as it appears in the expressions.
-	 * @param values The 1D array of values of the input parameter, casted to double, and converted to an N-DIM array object of size (1,values.length)
+	 * @param values The 1D array of values of the input parameter, casted to double, and converted to an N-DIM array object of size (1,values
+	 *                  .length)
 	 * @param rowColumnVector "row" for a row vector, "column" for a column vector
 	 */
-	public void setInputParameter(String name, int[] values , String rowColumnVector)
+	public void setInputParameter(String name, int[] values, String rowColumnVector)
 	{
 		boolean newInputParameterName = !(inputParameters.containsKey(name));
 		if (rowColumnVector.toLowerCase().equals("row"))
-			inputParameters.put(name, new DoubleMatrixND(new int[] { 1, values.length }, values));
+			inputParameters.put(name, new DoubleMatrixND(new int[]{1, values.length}, values));
 		else if (rowColumnVector.toLowerCase().equals("column"))
-			inputParameters.put(name, new DoubleMatrixND(new int[] { values.length , 1}, values));
-		else 
+			inputParameters.put(name, new DoubleMatrixND(new int[]{values.length, 1}, values));
+		else
 			throw new JOMException("Indicate \"row\" or \"column\" in the rowColumnVector parameter");
-		if ((this.evaluator != null) && newInputParameterName) 
-			this.evaluator = new _INTERNAL_ExpressionParser (this , inputParameters , decisionVariables);  // create again the evaluator, since it has a new parameter name to consider in the parsing
+		if ((this.evaluator != null) && newInputParameterName)
+			this.evaluator = new _INTERNAL_ExpressionParser(this, inputParameters, decisionVariables);  // create again the evaluator, since it has
+		// a new parameter name to consider in the parsing
 	}
 
-	/** Sets the value of the (arrayed) input parameter identified by its name. The String should be evaluated to a constant Expression. 
+	/** Sets the value of the (arrayed) input parameter identified by its name. The String should be evaluated to a constant Expression.
 	 * @param name Name of the input parameter as it appears in the expressions.
-	 * @param expression array The expression is evaluated using a common parseExpression. If it is not constant, an Exception is raised. 
+	 * @param expression array The expression is evaluated using a common parseExpression. If it is not constant, an Exception is raised.
 	 */
 	public void setInputParameter(String name, String expression)
 	{
 		boolean newInputParameterName = !(inputParameters.containsKey(name));
 		inputParameters.put(name, this.parseExpression(expression).evaluateConstant());
-		if ((this.evaluator != null) && newInputParameterName) 
-			this.evaluator = new _INTERNAL_ExpressionParser (this , inputParameters , decisionVariables);  // create again the evaluator, since it has a new parameter name to consider in the parsing
+		if ((this.evaluator != null) && newInputParameterName)
+			this.evaluator = new _INTERNAL_ExpressionParser(this, inputParameters, decisionVariables);  // create again the evaluator, since it has
+		// a new parameter name to consider in the parsing
 	}
 
-	
-	/** Sets the objective function of the optimization problem, and its direction (maximice or minimice). If an objective function and direction was previously set, they are lost.
+	/** Sets the objective function of the optimization problem, and its direction (maximice or minimice). If an objective function and direction
+	 * was previously set, they are lost.
 	 * @param minMax "Minimize" if the target is to minimize this expression, "Maximize" if the target is to maximize this expression
-	 * @param expression The string expression of the objective function, that should successfully parsed as an scalar expression of the decision variables and input parameters of the problem
+	 * @param expression The string expression of the objective function, that should successfully parsed as an scalar expression of the decision
+	 *                      variables and input parameters of the problem
 	 * @return The Expression object associated to the objective function
 	 */
 	public Expression setObjectiveFunction(String minMax, String expression)
 	{
 		long initTime = System.nanoTime();
-		
+
 		if (minMax.toLowerCase() == "minimize")
 			toMinimize = true;
 		else if (minMax.toLowerCase() == "maximize")
@@ -560,50 +568,64 @@ public class OptimizationProblem
 		else
 			throw new JOMException("Invalid optimization target. Please choose \"minimize\" or \"maximize\"");
 
-		if (evaluator == null) this.evaluator = new _INTERNAL_ExpressionParser (this , inputParameters , decisionVariables); 
+		if (evaluator == null) this.evaluator = new _INTERNAL_ExpressionParser(this, inputParameters, decisionVariables);
 
 		Expression exp = this.evaluator.evaluate(expression, new Object());
 		if (exp.getNumScalarExpressions() != 1) throw new JOMException("The objective function must be an scalar function");
 		this.objectiveFunction = exp;
-		
+
 		timeInfo.accumTimeSettingObj += System.nanoTime() - initTime;
-		checkProblemSizeLimitation (this.numScalarDecisionVariables , this.lpNumScalarConstraints , this.nlpNumScalarConstraints);
+		checkProblemSizeLimitation(this.numScalarDecisionVariables, this.lpNumScalarConstraints, this.nlpNumScalarConstraints);
 		return exp;
 	}
-	
+
 	/** Returns true if the problem was solved, and the solution obtained is feasible. If the method "solve" was not invoked yet, throws an exception
 	 * @return See above
 	 */
-	public boolean solutionIsFeasible () { if (!this.solverIO.problemAlreadyAttemptedTobeSolved) throw new JOMException("The problem has not been solved yet"); else return this.solverIO.out.solutionIsFeasible; }
-	
-	/** Returns true if the problem was solved, and the solution obtained is optimal according to the solver. If the method "solve" was not invoked yet, throws an exception
+	public boolean solutionIsFeasible()
+	{
+		if (!this.solverIO.problemAlreadyAttemptedTobeSolved) throw new JOMException("The problem has not been solved yet");
+		else return this.solverIO.out.solutionIsFeasible;
+	}
+
+	/** Returns true if the problem was solved, and the solution obtained is optimal according to the solver. If the method "solve" was not invoked
+	 * yet, throws an exception
 	 * @return See above
 	 */
-	public boolean solutionIsOptimal () { if (!this.solverIO.problemAlreadyAttemptedTobeSolved) throw new JOMException("The problem has not been solved yet"); else return this.solverIO.out.solutionIsOptimal; }
-	
-	/** Calls the indicated solver to solve the optimization problem in its current state (e.g. current objective function and input parameters set). 
-	 * @param solverName The name of the solver to be used. Current supported solvers are GLPK (solverName "glpk") and CPLEX (solverName "cplex") for mixed integer linear problems 
+	public boolean solutionIsOptimal()
+	{
+		if (!this.solverIO.problemAlreadyAttemptedTobeSolved) throw new JOMException("The problem has not been solved yet");
+		else return this.solverIO.out.solutionIsOptimal;
+	}
+
+	/** Calls the indicated solver to solve the optimization problem in its current state (e.g. current objective function and input parameters
+	 * set).
+	 * @param solverName The name of the solver to be used. Current supported solvers are GLPK (solverName "glpk") and CPLEX (solverName "cplex")
+	 *                      for mixed integer linear problems
 	 * and IPOPT (solverName "ipopt") for non-linear non-integer problems.
-	 * @param paramValuePairs Parameters to be passed to the solver to tune its operation. An even number of Object objects is 
+	 * @param paramValuePairs Parameters to be passed to the solver to tune its operation. An even number of Object objects is
 	 * to be passed. For each object pair, first Object must be a String with the name of the parameter, second a general Object with its value.
-	 * If no name-value pairs are set, solver default values are used. For the "solverLibraryName" parameter, passing a value equal to an empty string "" 
+	 * If no name-value pairs are set, solver default values are used. For the "solverLibraryName" parameter, passing a value equal to an empty
+	 *                           string ""
 	 * is equivalent to not passing this parameter.
-	 * See the documentation for further information. 
+	 * See the documentation for further information.
 	 */
 	public void solve(String solverName, Object... paramValuePairs)
 	{
 		long initTime = System.nanoTime();
-		
-		this.solverIO = new _INTERNAL_SolverIO(this, this.objectiveFunction, this.toMinimize, this.decisionVariables, this.constraints , this.initialSolution);
 
-		HashMap<String,Object> params = createParametersMapInitilizingDefaults (solverName , paramValuePairs , this.solverIO);
-		
+		this.solverIO = new _INTERNAL_SolverIO(this, this.objectiveFunction, this.toMinimize, this.decisionVariables, this.constraints, this
+				.initialSolution);
+
+		HashMap<String, Object> params = createParametersMapInitilizingDefaults(solverName, paramValuePairs, this.solverIO);
+
 		if (solverName.equalsIgnoreCase("glpk"))
 		{
 			if (this.solverIO.in.lhsMinusRhsAccumulatedConstraint != null)
 			{
 				if (!this.solverIO.in.lhsMinusRhsAccumulatedConstraint.isLinear()) throw new JOMException("The problem is not linear");
-				if ((this.nlpNumScalarConstraints != 0) && this.solverIO.in.lhsMinusRhsAccumulatedConstraint.isLinear()) throw new JOMException("Unexpected error");
+				if ((this.nlpNumScalarConstraints != 0) && this.solverIO.in.lhsMinusRhsAccumulatedConstraint.isLinear())
+					throw new JOMException("Unexpected error");
 			}
 			if (!this.solverIO.in.objectiveFunction.isLinear()) throw new JOMException("The problem is not linear");
 			_SOLVERWRAPPER_GLPK solver = new _SOLVERWRAPPER_GLPK(solverIO, params);
@@ -611,14 +633,15 @@ public class OptimizationProblem
 			solver.glpk_errorMessage_solve(solverIO, errorCode);
 		} else if (solverName.equalsIgnoreCase("cplex"))
 		{
-				if (this.solverIO.in.lhsMinusRhsAccumulatedConstraint != null)
-				{
-					if (!this.solverIO.in.lhsMinusRhsAccumulatedConstraint.isLinear()) throw new JOMException("The problem is not linear");
-					if ((this.nlpNumScalarConstraints != 0) && this.solverIO.in.lhsMinusRhsAccumulatedConstraint.isLinear()) throw new JOMException("Unexpected error");
-				}
-				if (!this.solverIO.in.objectiveFunction.isLinear()) throw new JOMException("The problem is not linear");
-				_SOLVERWRAPPER_CPLEX solver = new _SOLVERWRAPPER_CPLEX(solverIO, params);
-				int errorCode = solver.solve();
+			if (this.solverIO.in.lhsMinusRhsAccumulatedConstraint != null)
+			{
+				if (!this.solverIO.in.lhsMinusRhsAccumulatedConstraint.isLinear()) throw new JOMException("The problem is not linear");
+				if ((this.nlpNumScalarConstraints != 0) && this.solverIO.in.lhsMinusRhsAccumulatedConstraint.isLinear())
+					throw new JOMException("Unexpected error");
+			}
+			if (!this.solverIO.in.objectiveFunction.isLinear()) throw new JOMException("The problem is not linear");
+			_SOLVERWRAPPER_CPLEX solver = new _SOLVERWRAPPER_CPLEX(solverIO, params);
+			int errorCode = solver.solve();
 		} else if (solverName.equalsIgnoreCase("ipopt"))
 		{
 			// int errorCode = ExampleJNA_IPOPT.solveIPOPTExample ();
@@ -630,23 +653,46 @@ public class OptimizationProblem
 
 		if (this.solutionIsFeasible()) solverIO.checkFeasibility();
 		if (this.solutionIsOptimal()) solverIO.checkOptimality();
-		
-		timeInfo.accumTimeSolvingTheProblem += System.nanoTime() - initTime; 
+
+		timeInfo.accumTimeSolvingTheProblem += System.nanoTime() - initTime;
 	}
-	
-	/** Return a printed report with the time spended in the different parts of the problem: defining the variables, objective, constraints and solving.
+
+	/** Return a printed report with the time spended in the different parts of the problem: defining the variables, objective, constraints and
+	 * solving.
 	 * @return a formatted string with the report
 	 */
-	public String timeReport () { return this.timeInfo.toString(); }
-	
-	/** Returns a formatted string with some information of the optimization problem
+	public String timeReport(){ return this.timeInfo.toString(); }
+
+	void checkProblemSizeLimitation(int numVarIds, int lpConstraints, int nlpConstraints)
+	{
+		if (numVarIds < 0) throw new JOMException("The number of decision variables must be a number between 0 and " + Integer.MAX_VALUE);
+		if (lpConstraints < 0) throw new JOMException("The number of linear constraints must be a number between 0 and " + Integer.MAX_VALUE);
+		if ((nlpConstraints > 0) && (numVarIds * (lpConstraints + nlpConstraints) >= Integer.MAX_VALUE))
+			throw new JOMException("For problems with non linear constraints, the number of decision variables multiplied by the number of "
+					+ "constraints is limited to " + Integer.MAX_VALUE);
+	}
+
+	_INTERNAL_ConstraintArray getConstraintSetInfo(int constraintIndex)
+	{
+		/* Decision variables are both constants (full array) and functions (to define ranges) */
+		Iterator it = constraints.entrySet().iterator();
+		while (it.hasNext())
+		{
+			Map.Entry pairs = (Map.Entry) it.next();
+			String name = (String) pairs.getKey();
+			_INTERNAL_ConstraintArray cs = (_INTERNAL_ConstraintArray) pairs.getValue();
+			if ((cs.getIndex_0_FirstConstraint() <= constraintIndex) && (cs.getIndex_0_LastConstraint() >= constraintIndex)) return cs;
+		}
+		return null;
+	}	/** Returns a formatted string with some information of the optimization problem
 	 * @return The string
 	 */
-	public String toString ()
+	public String toString()
 	{
 		String s = "--------------------- PRINT MODEL ---\n";
 		s = s + "----------- DECISION VARIABLES: \n";
-		if (decisionVariables == null) s = s + "NO DECISION VARIABLES DEFINED"; else
+		if (decisionVariables == null) s = s + "NO DECISION VARIABLES DEFINED";
+		else
 		{
 			for (Entry<String, _INTERNAL_DecisionVariableArray> entry : decisionVariables.entrySet())
 			{
@@ -662,11 +708,13 @@ public class OptimizationProblem
 			s += this.objectiveFunction.toString() + "\n";
 
 		if (solverIO == null) return s;
-		
-		s = s + "----------- CONSTRAINTS: number = " + this.solverIO.in.numConstraints + "(linear: " + this.solverIO.in.numLpConstraints + ", non-linear: " + solverIO.in.numNlpConstraints + ")\n";
+
+		s = s + "----------- CONSTRAINTS: number = " + this.solverIO.in.numConstraints + "(linear: " + this.solverIO.in.numLpConstraints + ", "
+				+ "non-linear: " + solverIO.in.numNlpConstraints + ")\n";
 
 		/* Decision variables are both constants (full array) and functions (to define ranges) */
-		if (this.constraints == null) s = s + "-- no constraints defined --"; else
+		if (this.constraints == null) s = s + "-- no constraints defined --";
+		else
 		{
 			for (Entry<String, _INTERNAL_ConstraintArray> entry : this.constraints.entrySet())
 			{
@@ -674,10 +722,11 @@ public class OptimizationProblem
 				if (cs == null)
 					s = s + " -- null constraint set --";
 				else
-					s = s + cs.getName() + ": " + cs.getOriginalExpression() + " (" + cs.getNumScalarConstraints() + " scalar constraints, indexes: " + cs.getIndex_0_FirstConstraint() + "->" + cs.getIndex_0_LastConstraint() + ")\n"; 
+					s = s + cs.getName() + ": " + cs.getOriginalExpression() + " (" + cs.getNumScalarConstraints() + " scalar constraints, indexes: "
+							+ "" + cs.getIndex_0_FirstConstraint() + "->" + cs.getIndex_0_LastConstraint() + ")\n";
 			}
 		}
-		
+
 		s = s + "----------- LP SCALAR CONSTRAINTS: number = " + this.lpNumScalarConstraints + "\n";
 		/* Decision variables are both constants (full array) and functions (to define ranges) */
 		for (int cont = 0; cont < this.lpNumScalarConstraints; cont++)
@@ -685,13 +734,23 @@ public class OptimizationProblem
 			double lb = solverIO.in.constraintLowerBound.get(cont);
 			double ub = solverIO.in.constraintUpperBound.get(cont);
 			_INTERNAL_ConstraintArray cs = getConstraintSetInfo(cont);
-			s = s + cs.getName() + ":  " + ((lb == -Double.MAX_VALUE) ? "-inf" : lb) + " <= " + solverIO.in.lhsMinusRhsAccumulatedConstraint.getAffineExpression().toStringLinearScalarExpression(cont) + " <= " + ((ub == Double.MAX_VALUE) ? "inf" : ub) + "\n";
+			s = s + cs.getName() + ":  " + ((lb == -Double.MAX_VALUE) ?
+					"-inf" :
+					lb) + " <= " + solverIO.in.lhsMinusRhsAccumulatedConstraint.getAffineExpression().toStringLinearScalarExpression(cont) + " <= "
+					+ (
+					(ub == Double.MAX_VALUE) ?
+							"inf" :
+							ub) + "\n";
 		}
 
 		s = s + "----------- SOLUTION: \n";
-		if (!solverIO.problemAlreadyAttemptedTobeSolved) { s = s + " -- NOT SOLVED YET --"; return s; }
-		
-		s = s + "* statusCode = " + solverIO.out.statusCode  + "\n";
+		if (!solverIO.problemAlreadyAttemptedTobeSolved)
+		{
+			s = s + " -- NOT SOLVED YET --";
+			return s;
+		}
+
+		s = s + "* statusCode = " + solverIO.out.statusCode + "\n";
 		s = s + "* statusMessage = " + solverIO.out.statusMessage + "\n";
 		s = s + "* foundFeasibleSolution = " + solverIO.out.solutionIsFeasible + "\n";
 		s = s + "* solutionIsOptimal = " + solverIO.out.solutionIsOptimal + "\n";
@@ -699,7 +758,7 @@ public class OptimizationProblem
 		s = s + "* foundUnboundedSolution = " + solverIO.out.foundUnboundedSolution + "\n";
 		if (solverIO.out.solutionIsFeasible) s = s + "* primal cost = " + solverIO.out.primalCost + "\n";
 		s = s + "----------- PRIMAL SOLUTION: \n";
-		
+
 		if (solverIO.out.solutionIsFeasible)
 		{
 			for (Entry<String, _INTERNAL_DecisionVariableArray> entry : decisionVariables.entrySet())
@@ -712,29 +771,7 @@ public class OptimizationProblem
 				s = s + var + ", Values = " + Arrays.toString(solverIO.out.primalSolution.viewPart(firstVarId, numDecVar).toArray()) + "\n";
 			}
 		}
-			return s;
-	}
-	
-	
-	void checkProblemSizeLimitation (int numVarIds , int lpConstraints , int nlpConstraints)
-	{
-		if (numVarIds < 0) throw new JOMException("The number of decision variables must be a number between 0 and " + Integer.MAX_VALUE);
-		if (lpConstraints < 0) throw new JOMException("The number of linear constraints must be a number between 0 and " + Integer.MAX_VALUE);
-		if ((nlpConstraints > 0) && (numVarIds * (lpConstraints + nlpConstraints) >= Integer.MAX_VALUE )) throw new JOMException("For problems with non linear constraints, the number of decision variables multiplied by the number of constraints is limited to " + Integer.MAX_VALUE);
-	}
-
-	_INTERNAL_ConstraintArray getConstraintSetInfo(int constraintIndex)
-	{
-		/* Decision variables are both constants (full array) and functions (to define ranges) */
-		Iterator it = constraints.entrySet().iterator();
-		while (it.hasNext())
-		{
-			Map.Entry pairs = (Map.Entry) it.next();
-			String name = (String) pairs.getKey();
-			_INTERNAL_ConstraintArray cs = (_INTERNAL_ConstraintArray) pairs.getValue();
-			if ((cs.getIndex_0_FirstConstraint() <= constraintIndex) && (cs.getIndex_0_LastConstraint() >= constraintIndex)) return cs;
-		}
-		return null;
+		return s;
 	}
 
 	/************ PACKAGE METHODS ********************/
@@ -742,7 +779,6 @@ public class OptimizationProblem
 	{
 		return decisionVariables.get(name);
 	}
-
 
 	_INTERNAL_DecisionVariableArray getVarInfo(int varIdThisCoef)
 	{
@@ -757,31 +793,33 @@ public class OptimizationProblem
 		}
 		return null;
 	}
-	
-	private HashMap<String,Object> createParametersMapInitilizingDefaults (String solverName , Object [] paramValuePairs , _INTERNAL_SolverIO solverIO)
+
+	private HashMap<String, Object> createParametersMapInitilizingDefaults(String solverName, Object[] paramValuePairs, _INTERNAL_SolverIO solverIO)
 	{
 		int numParameters = (int) (paramValuePairs.length / 2);
-		if ( (((double) paramValuePairs.length) / 2) !=  (double) numParameters) throw new JOMException("A parameter has not assigned its value");
-		HashMap<String, Object> params = new HashMap<String, Object> ();
-		for (int contParam = 0 ; contParam < numParameters ; contParam ++)
+		if ((((double) paramValuePairs.length) / 2) != (double) numParameters) throw new JOMException("A parameter has not assigned its value");
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		for (int contParam = 0; contParam < numParameters; contParam++)
 		{
-			Object paramName = paramValuePairs [contParam * 2];
-			Object value = paramValuePairs [contParam * 2 + 1];
+			Object paramName = paramValuePairs[contParam * 2];
+			Object value = paramValuePairs[contParam * 2 + 1];
 			if (!(paramName instanceof String)) throw new JOMException("Parameter name must be a String");
 			params.put((String) paramName, value);
 		}
-		
-		if (!solverName.equalsIgnoreCase("glpk") && !solverName.equalsIgnoreCase("ipopt") && !solverName.equalsIgnoreCase("cplex")) throw new JOMException("Unknown solver name");
-		
+
+		if (!solverName.equalsIgnoreCase("glpk") && !solverName.equalsIgnoreCase("ipopt") && !solverName.equalsIgnoreCase("cplex"))
+			throw new JOMException("Unknown solver name");
+
 		/* Check if the chosen solver can solve the type of problem */
 		if (solverName.equalsIgnoreCase("cplex") && !solverIO.isLinearProblem()) throw new JOMException("CPLEX cannot solve non linear problems");
 		if (solverName.equalsIgnoreCase("glpk") && !solverIO.isLinearProblem()) throw new JOMException("GLPK cannot solve non linear problems");
-		if (solverName.equalsIgnoreCase("ipopt") && solverIO.in.hasIntegerVariables) throw new JOMException("IPOPT cannot solve problems with integer variables");
-		
+		if (solverName.equalsIgnoreCase("ipopt") && solverIO.in.hasIntegerVariables)
+			throw new JOMException("IPOPT cannot solve problems with integer variables");
+
 		/* Default COMMON: String solverLibraryName */
 		/* A "" in solverLibraryName is equivalent to not having this parameter */
 		String val_solverLibraryName = (String) params.get("solverLibraryName");
-		if (val_solverLibraryName != null) if (val_solverLibraryName.trim().equalsIgnoreCase("")) params.remove("solverLibraryName");  
+		if (val_solverLibraryName != null) if (val_solverLibraryName.trim().equalsIgnoreCase("")) params.remove("solverLibraryName");
 		if (!params.containsKey("solverLibraryName"))
 		{
 			if (solverName.equalsIgnoreCase("glpk"))
@@ -791,16 +829,14 @@ public class OptimizationProblem
 				if (os.startsWith("Windows") && arch.contains("64")) params.put("solverLibraryName", "glpk.dll"); // win64
 				else if (os.startsWith("Windows") && !arch.contains("64")) params.put("solverLibraryName", "glpk.dll"); // win32
 				else params.put("solverLibraryName", "libglpk"); // Linux
-			}
-			else if (solverName.equalsIgnoreCase("ipopt"))
+			} else if (solverName.equalsIgnoreCase("ipopt"))
 			{
 				String os = System.getProperty("os.name");
 				String arch = System.getProperty("os.arch");
 				if (os.startsWith("Windows") && arch.contains("64")) params.put("solverLibraryName", "ipopt.dll"); // win64
 				else if (os.startsWith("Windows") && !arch.contains("64")) params.put("solverLibraryName", "ipopt.dll"); // win32
 				else params.put("solverLibraryName", "libipopt"); // Linux
-			}
-			else if (solverName.equalsIgnoreCase("cplex"))
+			} else if (solverName.equalsIgnoreCase("cplex"))
 			{
 				String os = System.getProperty("os.name");
 				String arch = System.getProperty("os.arch");
@@ -808,29 +844,29 @@ public class OptimizationProblem
 				else if (os.startsWith("Windows") && !arch.contains("64")) params.put("solverLibraryName", "cplex.dll"); // win32
 				else params.put("solverLibraryName", "cplex"); // Linux
 			}
-		}		
+		}
 		/* Default COMMON: String maxSolverTimeInSeconds */
 		/* A "" in maxSolverTimeInSeconds is equivalent to not having this parameter */
-		Double val_maxSolverTimeInSeconds = params.get("maxSolverTimeInSeconds") == null? null : ((Number) params.get("maxSolverTimeInSeconds")).doubleValue();
+		Double val_maxSolverTimeInSeconds = params.get("maxSolverTimeInSeconds") == null ?
+				null :
+				((Number) params.get("maxSolverTimeInSeconds")).doubleValue();
 		if (val_maxSolverTimeInSeconds != null)
 			if (solverName.equalsIgnoreCase("glpk"))
 			{
 				final Integer numMilisecondsTimeLimit = (int) Math.ceil(1000 * val_maxSolverTimeInSeconds);
-				if (val_maxSolverTimeInSeconds > 0) params.put("tm_lim" , numMilisecondsTimeLimit);
+				if (val_maxSolverTimeInSeconds > 0) params.put("tm_lim", numMilisecondsTimeLimit);
 				params.remove("maxSolverTimeInSeconds");
-			}
-			else if (solverName.equalsIgnoreCase("ipopt"))
+			} else if (solverName.equalsIgnoreCase("ipopt"))
 			{
-				if (val_maxSolverTimeInSeconds > 0) params.put("max_cpu_time" , val_maxSolverTimeInSeconds);
+				if (val_maxSolverTimeInSeconds > 0) params.put("max_cpu_time", val_maxSolverTimeInSeconds);
 				params.remove("maxSolverTimeInSeconds");
-			}
-			else if (solverName.equalsIgnoreCase("cplex"))
+			} else if (solverName.equalsIgnoreCase("cplex"))
 			{
-				if (val_maxSolverTimeInSeconds > 0) params.put("" + _JNA_CPLEX.CPX_PARAM_TILIM , val_maxSolverTimeInSeconds);
+				if (val_maxSolverTimeInSeconds > 0) params.put("" + _JNA_CPLEX.CPX_PARAM_TILIM, val_maxSolverTimeInSeconds);
 				params.remove("maxSolverTimeInSeconds");
 			}
 
-		
+
 		/* Default GLPK SPECIFIC: String glpkSolverType */
 		if (solverName.equalsIgnoreCase("glpk"))
 		{
@@ -852,20 +888,58 @@ public class OptimizationProblem
 		if (solverName.equalsIgnoreCase("cplex"))
 		{
 			/* Print level defaults to 0 */
-			String key_tuningDisplay = new Integer (_JNA_CPLEX.CPX_PARAM_TUNINGDISPLAY).toString();
-			String key_screenOnOff = new Integer (_JNA_CPLEX.CPX_PARAM_SCRIND).toString();
-			
-			if (!params.containsKey(key_tuningDisplay)) params.put(key_tuningDisplay , new Integer (0)); // print_level defaults to 0
-			if (!params.containsKey(key_screenOnOff)) 
+			String key_tuningDisplay = new Integer(_JNA_CPLEX.CPX_PARAM_TUNINGDISPLAY).toString();
+			String key_screenOnOff = new Integer(_JNA_CPLEX.CPX_PARAM_SCRIND).toString();
+
+			if (!params.containsKey(key_tuningDisplay)) params.put(key_tuningDisplay, new Integer(0)); // print_level defaults to 0
+			if (!params.containsKey(key_screenOnOff))
 				if ((Integer) params.get(key_tuningDisplay) != 0)
-					params.put(key_screenOnOff ,  new Integer (_JNA_CPLEX.CPX_ON));
+					params.put(key_screenOnOff, new Integer(_JNA_CPLEX.CPX_ON));
 				else
-					params.put(key_screenOnOff ,  new Integer (_JNA_CPLEX.CPX_OFF));
+					params.put(key_screenOnOff, new Integer(_JNA_CPLEX.CPX_OFF));
 		}
-		
+
 		return params;
 	}
 
-	private boolean objectiveFunctionOrConstraintsAdded () { return ((this.objectiveFunction != null) || (this.constraints.size() != 0));}
-	
+	private boolean objectiveFunctionOrConstraintsAdded(){ return ((this.objectiveFunction != null) || (this.constraints.size() != 0));}
+
+	private class TimeInfo
+	{
+		List<Long> accumTimeSettingDVs;
+		long       accumTimeSettingObj;
+		long       accumTimeSolvingTheProblem;
+		long       creationTime;
+		List<Long> timeSettingConstraints;
+
+		TimeInfo(){ reset(); }
+
+		public String toString()
+		{
+			double secsSettingDVs = 0;
+			for (Long num : accumTimeSettingDVs) secsSettingDVs += num * 1E-9;
+			double secsSettingCons = 0;
+			for (Long num : timeSettingConstraints) secsSettingCons += num * 1E-9;
+			String s = "Setting DVs (secs): " + secsSettingDVs + "\n";
+			s = s + "Setting Obj (secs): " + accumTimeSettingObj * 1e-9 + "\n";
+			s = s + "Setting Constraints (secs): " + secsSettingCons + ": [";
+			for (Long num : timeSettingConstraints) s = s + num * 1E-9 + " ";
+			s = s + "] \n";
+			s = s + "Solving the problem (secs): " + accumTimeSolvingTheProblem * 1e-9 + "\n";
+			s = s + "Elapsed time since the object was created: " + (System.nanoTime() - creationTime) * 1E-9 + "\n";
+			return s;
+		}
+
+		void reset()
+		{
+			creationTime = System.nanoTime();
+			accumTimeSettingDVs = new ArrayList<Long>();
+			accumTimeSettingObj = 0;
+			timeSettingConstraints = new ArrayList<Long>();
+			accumTimeSolvingTheProblem = 0;
+		}
+	}
+
+
+
 }

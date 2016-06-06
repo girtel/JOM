@@ -1,31 +1,23 @@
 /*******************************************************************************
- * Copyright (c) 2015 Pablo Pavon Mariño.
+ * Copyright (c) 2015 Pablo Pavon Mariï¿½o.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl.html
- * 
+ * <p>
  * Contributors:
- *     Pablo Pavon Mariño - initial API and implementation
+ * Pablo Pavon Mariï¿½o - initial API and implementation
  ******************************************************************************/
-
-
 
 package com.jom.javaluator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 import com.jom.JOMException;
 
-/** An abstract evaluator, able to evaluate infix expressions. <br> Some standard evaluators are included in the library, you can define your own by subclassing this class.
- * 
+import java.util.*;
+
+/** An abstract evaluator, able to evaluate infix expressions. <br> Some standard evaluators are included in the library, you can define your own
+ * by subclassing this class.
+ *
  * @param <T> The type of values handled by the evaluator
  * @author Jean-Marc Astesana
  * @see <a href="../../../license.html">License information</a> */
@@ -33,18 +25,19 @@ public abstract class AbstractEvaluator<T>
 {
 	protected final Tokenizer tokenizer; // CHANGE: protected so that it is
 
-	private final Map<String, Constant> constants;
-																				private final Map<String, BracketPair> expressionBrackets;
-	private final String functionArgumentSeparator;
-	private final Map<String, BracketPair> functionBrackets;
+	private final Map<String, Constant>       constants;
+	private final Map<String, BracketPair>    expressionBrackets;
+	private final String                      functionArgumentSeparator;
+	private final Map<String, BracketPair>    functionBrackets;
 	// available from child class
-																				// JOMEValuator
-	private final Map<String, Function> functions;
+	// JOMEValuator
+	private final Map<String, Function>       functions;
 	private final Map<String, List<Operator>> operators;
 
 	/** Constructor.
-	 * 
-	 * @param parameters The evaluator parameters. <br> Please note that there's no side effect between the evaluator and the parameters. So, changes made to the parameters after the call to this constructor are ignored by the instance. */
+	 *
+	 * @param parameters The evaluator parameters. <br> Please note that there's no side effect between the evaluator and the parameters. So,
+	 *                      changes made to the parameters after the call to this constructor are ignored by the instance. */
 	protected AbstractEvaluator(Parameters parameters)
 	{
 		// TODO if constants, operators, functions are duplicated => error
@@ -109,7 +102,7 @@ public abstract class AbstractEvaluator<T>
 	}
 
 	/** Evaluates an expression.
-	 * 
+	 *
 	 * @param expression The expression to evaluate.
 	 * @return the result of the evaluation.
 	 * @throws IllegalArgumentException if the expression is not correct. */
@@ -119,9 +112,12 @@ public abstract class AbstractEvaluator<T>
 	}
 
 	/** Evaluates an expression that contains variables.
-	 * 
+	 *
 	 * @param expression The expression to evaluate.
-	 * @param evaluationContext The context of the evaluation. <br> This context is an object that can contain useful dynamic data, for example the values of the variables used in the expression (Use an AbstractVariableSet to do that).<br> The context is not limited to variable values but can be used for any dynamic information. A good example is the <a href="javaluator.sourceforge.net">BooleanSetEvaluator</a> one.
+	 * @param evaluationContext The context of the evaluation. <br> This context is an object that can contain useful dynamic data, for example the
+	 *                             values of the variables used in the expression (Use an AbstractVariableSet to do that).<br> The context is not
+	 *                             limited to variable values but can be used for any dynamic information. A good example is the
+	 *                             <a href="javaluator.sourceforge.net">BooleanSetEvaluator</a> one.
 	 * @return the result of the evaluation.
 	 * @throws IllegalArgumentException if the expression is not correct.
 	 * @see AbstractVariableSet */
@@ -144,10 +140,12 @@ public abstract class AbstractEvaluator<T>
 				stack.push(token);
 				if (previous != null && previous.isFunction())
 				{
-					if (!functionBrackets.containsKey(token.getBrackets().getOpen())) throw new IllegalArgumentException("Invalid bracket after function: " + trimmed);
+					if (!functionBrackets.containsKey(token.getBrackets().getOpen()))
+						throw new IllegalArgumentException("Invalid bracket after function: " + trimmed);
 				} else
 				{
-					if (!expressionBrackets.containsKey(token.getBrackets().getOpen())) throw new IllegalArgumentException("Invalid bracket in expression: " + trimmed);
+					if (!expressionBrackets.containsKey(token.getBrackets().getOpen()))
+						throw new IllegalArgumentException("Invalid bracket in expression: " + trimmed);
 				}
 			} else if (token.isCloseBracket())
 			{
@@ -240,7 +238,8 @@ public abstract class AbstractEvaluator<T>
 					// Correct transformation from 1^2+3 is 12^3+
 					// The differing operator priority decides pop / push
 					// If 2 operators have equal priority then associativity decides.
-					if (sc.isOperator() && ((token.getAssociativity().equals(Operator.Associativity.LEFT) && (token.getPrecedence() <= sc.getPrecedence())) || (token.getPrecedence() < sc.getPrecedence())))
+					if (sc.isOperator() && ((token.getAssociativity().equals(Operator.Associativity.LEFT) && (token.getPrecedence() <= sc
+							.getPrecedence())) || (token.getPrecedence() < sc.getPrecedence())))
 					{
 						// Pop o2 off the stack, onto the output queue;
 						output(values, stack.pop(), evaluationContext);
@@ -265,7 +264,7 @@ public abstract class AbstractEvaluator<T>
 		while (!stack.isEmpty())
 		{
 			Token sc = stack.pop();
-			if (sc.isOpenBracket() || sc.isCloseBracket()) { throw new IllegalArgumentException("Parentheses mismatched"); }
+			if (sc.isOpenBracket() || sc.isCloseBracket()){ throw new IllegalArgumentException("Parentheses mismatched"); }
 			output(values, sc, evaluationContext);
 		}
 		if (values.size() != 1) throw new IllegalArgumentException();
@@ -273,7 +272,7 @@ public abstract class AbstractEvaluator<T>
 	}
 
 	/** Gets the constants supported by this evaluator.
-	 * 
+	 *
 	 * @return a collection of constants. */
 	public Collection<Constant> getConstants()
 	{
@@ -281,7 +280,7 @@ public abstract class AbstractEvaluator<T>
 	}
 
 	/** Gets the functions supported by this evaluator.
-	 * 
+	 *
 	 * @return a collection of functions. */
 	public Collection<Function> getFunctions()
 	{
@@ -289,7 +288,7 @@ public abstract class AbstractEvaluator<T>
 	}
 
 	/** Gets the operators supported by this evaluator.
-	 * 
+	 *
 	 * @return a collection of operators. */
 	public Collection<Operator> getOperators()
 	{
@@ -302,8 +301,9 @@ public abstract class AbstractEvaluator<T>
 		return result;
 	}
 
-	/** Evaluates a constant. <br> Subclasses that support constants must override this method. The default implementation throws a JOMException meaning that implementor forget to implement this method while creating a subclass that accepts constants.
-	 * 
+	/** Evaluates a constant. <br> Subclasses that support constants must override this method. The default implementation throws a JOMException
+	 * meaning that implementor forget to implement this method while creating a subclass that accepts constants.
+	 *
 	 * @param constant The constant
 	 * @param evaluationContext The context of the evaluation
 	 * @return The constant's value */
@@ -312,8 +312,9 @@ public abstract class AbstractEvaluator<T>
 		throw new JOMException("Syntax error in the JOM expression. Unknown constant '" + constant.getName() + "'");
 	}
 
-	/** Evaluates a function. <br> Subclasses that support functions must override this method. The default implementation throws a JOMException meaning that implementor forget to implement this method while creating a subclass that accepts functions.
-	 * 
+	/** Evaluates a function. <br> Subclasses that support functions must override this method. The default implementation throws a JOMException
+	 * meaning that implementor forget to implement this method while creating a subclass that accepts functions.
+	 *
 	 * @param function The function
 	 * @param arguments The function's arguments
 	 * @param evaluationContext The context of the evaluation
@@ -323,19 +324,23 @@ public abstract class AbstractEvaluator<T>
 		throw new JOMException("Syntax error in the JOM expression. Unknown function  '" + function.getName() + "'");
 	}
 
-	/** Evaluates an operation. <br> Subclasses that support operators must override this method. The default implementation throws a JOMException meaning that implementor forget to implement this method while creating a subclass that accepts operators.
-	 * 
+	/** Evaluates an operation. <br> Subclasses that support operators must override this method. The default implementation throws a JOMException
+	 * meaning that implementor forget to implement this method while creating a subclass that accepts operators.
+	 *
 	 * @param operator The operator
 	 * @param operands The operands
 	 * @param evaluationContext The context of the evaluation
 	 * @return The result of the operation */
 	protected T evaluate(Operator operator, Iterator<T> operands, Object evaluationContext)
 	{
-		throw new JOMException("Syntax error in the JOM expression. Unknown operator '"  + operator.getSymbol() + "'");
+		throw new JOMException("Syntax error in the JOM expression. Unknown operator '" + operator.getSymbol() + "'");
 	}
 
-	/** When a token can be more than one operator (homonym operators), this method guesses the right operator. <br> A very common case is the - sign in arithmetic computation which can be an unary or a binary operator, depending on what was the previous token. <br> <b>Warning:</b> maybe the arguments of this function are not enough to deal with all the cases. So, this part of the evaluation is in alpha state (method may change in the future).
-	 * 
+	/** When a token can be more than one operator (homonym operators), this method guesses the right operator. <br> A very common case is the -
+	 * sign in arithmetic computation which can be an unary or a binary operator, depending on what was the previous token. <br> <b>Warning:</b>
+	 * maybe the arguments of this function are not enough to deal with all the cases. So, this part of the evaluation is in alpha state (method may
+	 * change in the future).
+	 *
 	 * @param previous The last parsed tokens (the previous token in the infix expression we are evaluating).
 	 * @param candidates The candidate tokens.
 	 * @return A token
@@ -351,15 +356,17 @@ public abstract class AbstractEvaluator<T>
 	}
 
 	/** Evaluates a literal (Converts it to a value).
-	 * 
+	 *
 	 * @param literal The literal to evaluate.
 	 * @return an instance of T.
 	 * @param evaluationContext The context of the evaluation
 	 * @throws IllegalArgumentException if the literal can't be converted to a value. */
 	protected abstract T toValue(String literal, Object evaluationContext);
 
-	/** Validates that homonym operators are valid. <br> Homonym operators are operators with the same name (like the unary - and the binary - operators) <br> This method is called when homonyms are passed to the constructor. <br> This default implementation only allows the case where there's two operators, one binary and one unary. Subclasses can override this method in order to accept others configurations.
-	 * 
+	/** Validates that homonym operators are valid. <br> Homonym operators are operators with the same name (like the unary - and the binary -
+	 * operators) <br> This method is called when homonyms are passed to the constructor. <br> This default implementation only allows the case
+	 * where there's two operators, one binary and one unary. Subclasses can override this method in order to accept others configurations.
+	 *
 	 * @param operators The operators to validate.
 	 * @throws IllegalArgumentException if the homonyms are not compatibles.
 	 * @see #guessOperator(Token, List) */
@@ -370,7 +377,10 @@ public abstract class AbstractEvaluator<T>
 
 	private void doFunction(Stack<T> values, Function function, int argCount, Object evaluationContext)
 	{
-		if (function.getMinimumArgumentCount() > argCount || function.getMaximumArgumentCount() < argCount) { throw new IllegalArgumentException("Invalid argument count for " + function.getName()); }
+		if (function.getMinimumArgumentCount() > argCount || function.getMaximumArgumentCount() < argCount)
+		{
+			throw new IllegalArgumentException("Invalid argument count for " + function.getName());
+		}
 		values.push(evaluate(function, getArguments(values, argCount), evaluationContext));
 	}
 
@@ -394,7 +404,7 @@ public abstract class AbstractEvaluator<T>
 		return result == null ? functionBrackets.get(token) : result;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings ( "unchecked" )
 	private void output(Stack<T> values, Token token, Object evaluationContext)
 	{
 		if (token.isLiteral())
@@ -402,7 +412,8 @@ public abstract class AbstractEvaluator<T>
 			String literal = token.getLiteral();
 			Constant ct = this.constants.get(literal);
 			T value = ct == null ? null : evaluate(ct, evaluationContext);
-			if (value == null && evaluationContext != null && (evaluationContext instanceof AbstractVariableSet)) value = ((AbstractVariableSet<T>) evaluationContext).get(literal);
+			if (value == null && evaluationContext != null && (evaluationContext instanceof AbstractVariableSet))
+				value = ((AbstractVariableSet<T>) evaluationContext).get(literal);
 			values.push(value != null ? value : toValue(literal, evaluationContext));
 		} else if (token.isOperator())
 		{

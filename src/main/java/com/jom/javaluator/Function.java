@@ -1,25 +1,18 @@
 /*******************************************************************************
- * Copyright (c) 2015 Pablo Pavon Mariño.
+ * Copyright (c) 2015 Pablo Pavon Mariï¿½o.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl.html
- * 
+ * <p>
  * Contributors:
- *     Pablo Pavon Mariño - initial API and implementation
+ * Pablo Pavon Mariï¿½o - initial API and implementation
  ******************************************************************************/
-
-
-
- 
-
-
-
 
 package com.jom.javaluator;
 
 /** A <a href="http://en.wikipedia.org/wiki/Function_(mathematics)">function</a>.
- * 
+ *
  * @author Jean-Marc Astesana
  * @see <a href="../../../license.html">License information</a> */
 public class Function
@@ -31,7 +24,7 @@ public class Function
 	private String name;
 
 	/** Constructor. <br> This constructor builds a function with a fixed arguments count.
-	 * 
+	 *
 	 * @param name The function's name
 	 * @param argumentCount The function's argument count.
 	 * @throw IllegalArgumentException if argumentCount is lower than 0 or if the function name is null or empty. */
@@ -40,12 +33,14 @@ public class Function
 		this(name, argumentCount, argumentCount);
 	}
 
-	/** Constructor. <br> This constructor builds a function with a variable arguments count. <br> For instance, a minimum function may have at least one argument.
-	 * 
+	/** Constructor. <br> This constructor builds a function with a variable arguments count. <br> For instance, a minimum function may have at
+	 * least one argument.
+	 *
 	 * @param name The function's name
 	 * @param minArgumentCount The function's minimum argument count.
 	 * @param maxArgumentCount The function's maximum argument count (Integer.MAX_VALUE to specify no upper limit).
-	 * @throw IllegalArgumentException if minArgumentCount is less than 0 or greater than maxArgumentCount or if the function name is null or empty. */
+	 * @throw IllegalArgumentException if minArgumentCount is less than 0 or greater than maxArgumentCount or if the function name is null or empty
+	 * . */
 	public Function(String name, int minArgumentCount, int maxArgumentCount)
 	{
 		if ((minArgumentCount < 0) || (minArgumentCount > maxArgumentCount)) throw new IllegalArgumentException("Invalid argument count");
@@ -56,7 +51,7 @@ public class Function
 	}
 
 	/** Gets the function's maximum argument count.
-	 * 
+	 *
 	 * @return an integer */
 	public int getMaximumArgumentCount()
 	{
@@ -64,7 +59,7 @@ public class Function
 	}
 
 	/** Gets the function's minimum argument count.
-	 * 
+	 *
 	 * @return an integer */
 	public int getMinimumArgumentCount()
 	{
@@ -72,7 +67,7 @@ public class Function
 	}
 
 	/** Gets the function's name.
-	 * 
+	 *
 	 * @return the name of the function */
 	public String getName()
 	{
