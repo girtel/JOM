@@ -1,39 +1,31 @@
-/*******************************************************************************
- * Copyright (c) 2015 Pablo Pavon Mariño.
+/**
+ * Copyright (c) 2015 Pablo Pavon Mariï¿½o.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl.html
- * 
+ * <p>
  * Contributors:
- *     Pablo Pavon Mariño - initial API and implementation
- ******************************************************************************/
-
-
-
- 
-
-
-
+ * Pablo Pavon Mariï¿½o - initial API and implementation
+ */
 
 /**
- * 
+ *
  */
 package com.jom;
-
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.jet.math.tdouble.DoubleFunctions;
 
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 
 /** @author Pablo */
 class _OPERATOR_NEG extends Expression
 {
 	private final Expression a;
-	private final boolean isLinear;
-	private final boolean isConstant;
+	private final boolean    isLinear;
+	private final boolean    isConstant;
 
 	_OPERATOR_NEG(OptimizationProblem model, Expression a)
 	{
@@ -44,9 +36,9 @@ class _OPERATOR_NEG extends Expression
 
 		this.isLinear = (a.isLinear());
 		this.isConstant = (a.isConstant());
-		this.affineExp = (isLinear)? a.getAffineExpression().operator_neg() : null;
+		this.affineExp = (isLinear) ? a.getAffineExpression().operator_neg() : null;
 
-		this.a = (this.isLinear())? null : a; // if linear do not store the expressions. This info is already in the linear coefs matrix
+		this.a = (this.isLinear()) ? null : a; // if linear do not store the expressions. This info is already in the linear coefs matrix
 	}
 
 	@Override
@@ -77,10 +69,9 @@ class _OPERATOR_NEG extends Expression
 	}
 
 	@Override
-	LinkedHashMap<Integer,HashSet<Integer>> nl_getActiveVarIds()
+	LinkedHashMap<Integer, HashSet<Integer>> nl_getActiveVarIds()
 	{
 		return a.getActiveVarIds();
 	}
-
 
 }

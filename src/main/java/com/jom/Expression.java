@@ -1,27 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2015 Pablo Pavon Mariño.
+ * Copyright (c) 2015 Pablo Pavon Mariï¿½o.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl.html
- * 
+ * <p>
  * Contributors:
- *     Pablo Pavon Mariño - initial API and implementation
+ * Pablo Pavon Mariï¿½o - initial API and implementation
  ******************************************************************************/
 
-
-
- 
-
-
-
-
 package com.jom;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tint.IntArrayList;
@@ -30,27 +18,36 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-/** Expressions objects represent a function of the decision variables defined in its related OptimizationProblem object. JOM creates Expression objects parsing Strings in the JOM syntax.
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+
+/** Expressions objects represent a function of the decision variables defined in its related OptimizationProblem object. JOM creates Expression
+ * objects parsing Strings in the JOM syntax.
  * @author Pablo Pavon MariÃ±o
  * @see http://www.net2plan.com/jom
  * */
 public abstract class Expression
 {
 	protected final OptimizationProblem model;
-	protected final int numVarIds;
-
-	private DoubleMatrixND cachedValueIfConstant;
+	protected final int                 numVarIds;
 	//protected ExpressionCurvatureInfo curvature;
 	protected _INTERNAL_AffineExpressionCoefs affineExp;
+	protected int   numScalarExpressions;
+	protected int   numDim; // reshaping can change this
+	protected int[] size; // reshaping can change this
+	private   DoubleMatrixND                  cachedValueIfConstant;
 
-	protected int numScalarExpressions;
-	protected int numDim; // reshaping can change this
-	protected int [] size; // reshaping can change this
-
-	Expression(OptimizationProblem model) 
-	{ 
-		this.model = model; this.numVarIds = model.getNumScalarDecisionVariables(); 
-		this.cachedValueIfConstant = null; this.affineExp = null; this.numDim = -1; this.numScalarExpressions = -1; this.size = null; 
+	Expression(OptimizationProblem model)
+	{
+		this.model = model;
+		this.numVarIds = model.getNumScalarDecisionVariables();
+		this.cachedValueIfConstant = null;
+		this.affineExp = null;
+		this.numDim = -1;
+		this.numScalarExpressions = -1;
+		this.size = null;
 	}
 
 	/* A constant scalar */
@@ -77,11 +74,11 @@ public abstract class Expression
 	}
 
 	/* General constructor to be called by overriding classes */
-	Expression(OptimizationProblem model, int [] size, _INTERNAL_AffineExpressionCoefs affineExpression)
+	Expression(OptimizationProblem model, int[] size, _INTERNAL_AffineExpressionCoefs affineExpression)
 	{
 		this.model = model;
 		this.numVarIds = model.getNumScalarDecisionVariables();
-		this.size = Arrays.copyOf(size ,  size.length);
+		this.size = Arrays.copyOf(size, size.length);
 		this.numScalarExpressions = IntMatrixND.prod(size);
 		this.numDim = size.length;
 		this.cachedValueIfConstant = null;
@@ -105,8 +102,8 @@ public abstract class Expression
 		this.numScalarExpressions = IntMatrixND.prod(size);
 		this.numDim = this.size.length;
 		this.cachedValueIfConstant = constant.copy();
-		this.affineExp = new _INTERNAL_AffineExpressionCoefs(model, size , constant.elements().toArray());
-		if (size.length  < 2) throw new JOMException("1-D vectors are not allowed. Try row vectors or column vectors");
+		this.affineExp = new _INTERNAL_AffineExpressionCoefs(model, size, constant.elements().toArray());
+		if (size.length < 2) throw new JOMException("1-D vectors are not allowed. Try row vectors or column vectors");
 	}
 
 	/* An array or subarray of decision variables */
@@ -155,8 +152,10 @@ public abstract class Expression
 		return cachedValueIfConstant.copy();
 	}
 
-	/** Evaluates this expression, in the point provided by the decision variables. For those variables for which value is not provided, zeros are assumed.
-	 * @param varNameVarValuePairs An even number of parameters, first in each pair is a String with the variable name, second a DoubleMatrixND object with its value
+	/** Evaluates this expression, in the point provided by the decision variables. For those variables for which value is not provided, zeros are
+	 * assumed.
+	 * @param varNameVarValuePairs An even number of parameters, first in each pair is a String with the variable name, second a DoubleMatrixND
+	 *                                object with its value
 	 * @return an array with the same size as the expression, with the values evaluated in each cell */
 	public final DoubleMatrixND evaluate(Object... varNameVarValuePairs)
 	{
@@ -165,7 +164,8 @@ public abstract class Expression
 		for (int cont = 0; cont < varNameVarValuePairs.length / 2; cont++)
 		{
 			if (!(varNameVarValuePairs[cont * 2] instanceof String)) throw new JOMException("Variable name must be a String");
-			if (!(varNameVarValuePairs[cont * 2 + 1] instanceof DoubleMatrixND)) throw new JOMException("Value name must be a DoubleMatrixND object");
+			if (!(varNameVarValuePairs[cont * 2 + 1] instanceof DoubleMatrixND)) throw new JOMException("Value name must be a DoubleMatrixND "
+					+ "object");
 			String varName = (String) varNameVarValuePairs[cont * 2];
 			DoubleMatrixND val = (DoubleMatrixND) varNameVarValuePairs[cont * 2 + 1];
 			_INTERNAL_DecisionVariableArray dv = this.model.getDecisionVariable(varName);
@@ -187,12 +187,16 @@ public abstract class Expression
 
 	final DoubleMatrix2D evaluateJacobian_internal(double[] valuesDVs)
 	{
-		if (!this.isLinear()) return this.nl_evaluateJacobian(valuesDVs); else return this.affineExp.getJacobian();
+		if (!this.isLinear()) return this.nl_evaluateJacobian(valuesDVs);
+		else return this.affineExp.getJacobian();
 	}
 
-	/** Evaluates the jacobian of this expression, in the point provided by the decision variables. For those variables for which value is not provided, zeros are assumed.
-	 * @param varNameVarValuePairs An even number of parameters, first in each pair is a String with the variable name, second a DoubleMatrixND object with its value
-	 * @return a DoubleMatrix2D array representing the jacobian matrix, with one row for each cell in the expression (in the position of its linear index), and one column per decision variable */
+	/** Evaluates the jacobian of this expression, in the point provided by the decision variables. For those variables for which value is not
+	 * provided, zeros are assumed.
+	 * @param varNameVarValuePairs An even number of parameters, first in each pair is a String with the variable name, second a DoubleMatrixND
+	 *                                object with its value
+	 * @return a DoubleMatrix2D array representing the jacobian matrix, with one row for each cell in the expression (in the position of its linear
+	 * index), and one column per decision variable */
 	public final DoubleMatrix2D evaluateJacobian(Object... varNameVarValuePairs)
 	{
 		if (varNameVarValuePairs.length % 2 != 0) throw new JOMException("Wrong number of parameters");
@@ -200,7 +204,8 @@ public abstract class Expression
 		for (int cont = 0; cont < varNameVarValuePairs.length / 2; cont++)
 		{
 			if (!(varNameVarValuePairs[cont * 2] instanceof String)) throw new JOMException("Variable name must be a String");
-			if (!(varNameVarValuePairs[cont * 2 + 1] instanceof DoubleMatrixND)) throw new JOMException("Value name must be a DoubleMatrixND object");
+			if (!(varNameVarValuePairs[cont * 2 + 1] instanceof DoubleMatrixND)) throw new JOMException("Value name must be a DoubleMatrixND "
+					+ "object");
 			String varName = (String) varNameVarValuePairs[cont * 2];
 			DoubleMatrixND val = (DoubleMatrixND) varNameVarValuePairs[cont * 2 + 1];
 			_INTERNAL_DecisionVariableArray dv = this.model.getDecisionVariable(varName);
@@ -211,7 +216,6 @@ public abstract class Expression
 		}
 		return this.evaluateJacobian_internal(x);
 	}
-
 
 	/** Returns the number of dimensions in this expression
 	 * @return the number of dimensions */
@@ -232,7 +236,7 @@ public abstract class Expression
 	final boolean isRowOrColumn2DExpression()
 	{
 		if (this.numDim != 2) return false;
-		return ((this.size [0] == 1) || (this.size [1] == 1));
+		return ((this.size[0] == 1) || (this.size[1] == 1));
 	}
 
 	/** Returns true if the expression has two dimensions, and is a 1x1 expression (a scalar)
@@ -242,18 +246,21 @@ public abstract class Expression
 		return ((this.numScalarExpressions == 1) && (this.numDim == 2));
 	}
 
-	/** Returns true if the expression has two dimensions, is a 1x1 expression (a scalar), and also is constant (does not depend on the decision variables)
+	/** Returns true if the expression has two dimensions, is a 1x1 expression (a scalar), and also is constant (does not depend on the decision
+	 * variables)
 	 * @return true or false as stated above */
 	final boolean isScalarConstant()
 	{
 		return (isScalar() && isConstant());
 	}
 
-	/** Resizes the array. The new size must have the same number of cells as the old one. The cell in index i in the old array has the same index in the new. Cell values are NOT copied.
+	/** Resizes the array. The new size must have the same number of cells as the old one. The cell in index i in the old array has the same index
+	 * in the new. Cell values are NOT copied.
 	 * @param newSize the new size of the array */
 	final void reshape(int[] newSize)
 	{
-		if (IntMatrixND.prod(this.size) != this.numScalarExpressions) throw new JOMException("Reshaping an expression cannot change its number of elements");
+		if (IntMatrixND.prod(this.size) != this.numScalarExpressions)
+			throw new JOMException("Reshaping an expression cannot change its number of elements");
 		this.size = newSize;
 		this.numDim = this.size.length;
 		if (this.affineExp != null)
@@ -273,7 +280,10 @@ public abstract class Expression
 	@Override
 	public String toString()
 	{
-		String s = "Expression " + ((this.isLinear()) ? "(linear)" : "(not linear)") + " size: " + Arrays.toString(size) + " (" + this.numScalarExpressions + " scalar expressions) , number variables model: " + numVarIds + "\n";
+		String s = "Expression " + ((this.isLinear()) ?
+				"(linear)" :
+				"(not linear)") + " size: " + Arrays.toString(size) + " (" + this.numScalarExpressions + " scalar expressions) , number variables "
+				+ "model: " + numVarIds + "\n";
 
 		if (!this.isLinear()) return s;
 
@@ -282,9 +292,9 @@ public abstract class Expression
 			IntMatrix1D coord = IntMatrixND.ind2sub(contCell, IntFactory1D.dense.make(size));
 			s = s + "  Cell " + Arrays.toString(coord.toArray()) + ": ";
 			s = s + this.affineExp.getCellConstantCoef(contCell);
-			LinkedHashMap<Integer,Double> c = this.affineExp.getScalarExpressionLinearCoefs (contCell);
+			LinkedHashMap<Integer, Double> c = this.affineExp.getScalarExpressionLinearCoefs(contCell);
 			if (c != null)
-				for (Entry<Integer,Double> e : c.entrySet())
+				for (Entry<Integer, Double> e : c.entrySet())
 				{
 					int thisActiveVarId = e.getKey();
 					double coef = e.getValue();
@@ -313,7 +323,7 @@ public abstract class Expression
 		return model;
 	}
 
-	final int [] getSize()
+	final int[] getSize()
 	{
 		return this.size;
 	}
@@ -323,26 +333,30 @@ public abstract class Expression
 		return this.affineExp;
 	}
 
-	void resize (int [] size)
+	void resize(int[] size)
 	{
 		this.size = size;
 		this.numDim = size.length;
 		this.numScalarExpressions = IntMatrixND.prod(size);
-		if (this.numScalarExpressions < 0) throw new JOMException("Wrong size of Expression object"); // maybe because of a big number greater than Integer.MAX_VALUE creates this
+		if (this.numScalarExpressions < 0)
+			throw new JOMException("Wrong size of Expression object"); // maybe because of a big number greater than Integer.MAX_VALUE creates this
 	}
-	
-	
+
 	/* TO BE IMPLEMENTED BY THE SUBCLASSES. CALLED WHEN THE EXPRESSION IS NOT LINEAR */
 	abstract DoubleMatrixND nl_evaluate(double[] valuesDVs);
 
 	abstract DoubleMatrix2D nl_evaluateJacobian(double[] valuesDVs);
 
-	abstract boolean isLinear ();
-	
-	abstract boolean isConstant ();
-	
-	abstract 	LinkedHashMap<Integer,HashSet<Integer>> nl_getActiveVarIds ();
-	
-	final LinkedHashMap<Integer,HashSet<Integer>> getActiveVarIds () { if (this.isLinear()) return this.affineExp.getNonZeroLinearCoefsCols(); else return this.nl_getActiveVarIds(); }
-	
+	abstract boolean isLinear();
+
+	abstract boolean isConstant();
+
+	abstract LinkedHashMap<Integer, HashSet<Integer>> nl_getActiveVarIds();
+
+	final LinkedHashMap<Integer, HashSet<Integer>> getActiveVarIds()
+	{
+		if (this.isLinear()) return this.affineExp.getNonZeroLinearCoefsCols();
+		else return this.nl_getActiveVarIds();
+	}
+
 }

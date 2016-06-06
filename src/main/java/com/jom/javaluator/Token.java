@@ -1,44 +1,32 @@
 /*******************************************************************************
- * Copyright (c) 2015 Pablo Pavon Mariño.
+ * Copyright (c) 2015 Pablo Pavon Mariï¿½o.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl.html
- * 
+ * <p>
  * Contributors:
- *     Pablo Pavon Mariño - initial API and implementation
+ * Pablo Pavon Mariï¿½o - initial API and implementation
  ******************************************************************************/
-
-
-
- 
-
-
-
 
 package com.jom.javaluator;
 
 /** A token. <br> When evaluating an expression, it is first split into tokens. These tokens can be operators, constants, etc ...
- * 
+ *
  * @author Jean-Marc Astesana
  * @see <a href="../../../license.html">License information</a> */
 public class Token
 {
-	private Object content;
-
-	private Kind kind;
-
 	static final Token FUNCTION_ARG_SEPARATOR = new Token(Kind.FUNCTION_SEPARATOR, null);
-
-	public enum Kind
-	{ // CHANGE: Kind was private (created some compilation errors)
-		CLOSE_BRACKET, FUNCTION, FUNCTION_SEPARATOR, LITERAL, OPEN_BRACKET, OPERATOR
-	}
+	private Object content;
+	private Kind kind;
 
 	private Token(Kind kind, Object content)
 	{
 		super();
-		if ((kind.equals(Kind.OPERATOR) && !(content instanceof Operator)) || (kind.equals(Kind.FUNCTION) && !(content instanceof Function)) || (kind.equals(Kind.LITERAL) && !(content instanceof String))) throw new IllegalArgumentException();
+		if ((kind.equals(Kind.OPERATOR) && !(content instanceof Operator)) || (kind.equals(Kind.FUNCTION) && !(content instanceof Function)) ||
+				(kind.equals(Kind.LITERAL) && !(content instanceof String)))
+			throw new IllegalArgumentException();
 		this.kind = kind;
 		this.content = content;
 	}
@@ -69,7 +57,7 @@ public class Token
 	}
 
 	/** Tests whether the token is a close bracket.
-	 * 
+	 *
 	 * @return true if the token is a close bracket */
 	public boolean isCloseBracket()
 	{
@@ -77,7 +65,7 @@ public class Token
 	}
 
 	/** Tests whether the token is a function.
-	 * 
+	 *
 	 * @return true if the token is a function */
 	public boolean isFunction()
 	{
@@ -85,7 +73,7 @@ public class Token
 	}
 
 	/** Tests whether the token is a function argument separator.
-	 * 
+	 *
 	 * @return true if the token is a function argument separator */
 	public boolean isFunctionArgumentSeparator()
 	{
@@ -93,7 +81,7 @@ public class Token
 	}
 
 	/** Tests whether the token is a literal or a constant or a variable name.
-	 * 
+	 *
 	 * @return true if the token is a literal, a constant or a variable name */
 	public boolean isLiteral()
 	{
@@ -101,7 +89,7 @@ public class Token
 	}
 
 	/** Tests whether the token is an open bracket.
-	 * 
+	 *
 	 * @return true if the token is an open bracket */
 	public boolean isOpenBracket()
 	{
@@ -109,7 +97,7 @@ public class Token
 	}
 
 	/** Tests whether the token is an operator.
-	 * 
+	 *
 	 * @return true if the token is an operator */
 	public boolean isOperator()
 	{
@@ -150,5 +138,10 @@ public class Token
 	int getPrecedence()
 	{
 		return getOperator().getPrecedence();
+	}
+
+	public enum Kind
+	{ // CHANGE: Kind was private (created some compilation errors)
+		CLOSE_BRACKET, FUNCTION, FUNCTION_SEPARATOR, LITERAL, OPEN_BRACKET, OPERATOR
 	}
 }
