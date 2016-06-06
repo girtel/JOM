@@ -1,20 +1,17 @@
-/*******************************************************************************
- * Copyright (c) 2015 Pablo Pavon Mariño.
+/**
+ * Copyright (c) 2015 Pablo Pavon Mariï¿½o.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl.html
- * 
+ * <p>
  * Contributors:
- *     Pablo Pavon Mariño - initial API and implementation
- ******************************************************************************/
-
-
-
- 
-
-
-
+ * Pablo Pavon Mariï¿½o - initial API and implementation
+ * <p>
+ * Code of the Java Optimization Modeler (JOM) library.
+ *
+ * @author Pablo Pavon-Marino
+ */
 
 /**
  * Code of the Java Optimization Modeler (JOM) library.

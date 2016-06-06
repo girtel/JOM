@@ -1,47 +1,35 @@
 /*******************************************************************************
- * Copyright (c) 2015 Pablo Pavon Mariño.
+ * Copyright (c) 2015 Pablo Pavon Mariï¿½o.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl.html
- * 
+ * <p>
  * Contributors:
- *     Pablo Pavon Mariño - initial API and implementation
+ * Pablo Pavon Mariï¿½o - initial API and implementation
  ******************************************************************************/
-
-
-
- 
-
-
-
 
 package com.jom;
 
-
-
-class _INTERNAL_ConstraintArray 
+class _INTERNAL_ConstraintArray
 {
-	private final String connector;
+	public static String[] ACCEPTEDSYMBOLS_EQUAL        = {"=="};
+	public static String[] ACCEPTEDSYMBOLS_GREATEREQUAL = {">=", "=>"};
+	public static String[] ACCEPTEDSYMBOLS_LESSEQUAL    = {"<=", "=<"};
+	public static String   SYMBOL_EQUAL                 = "==";
+	public static String   SYMBOL_GREATEREQUAL          = ">=";
+	public static String SYMBOL_LESSEQUAL = "<=";
+	private final String                     connector;
 	private final _INTERNAL_ExpressionParser evaluator;
-	private final int index_0_FirstConstraint;
-	private final String lhs;
-	private Expression lhsMinusRhs;
-	private final String name;
-
+	private final int                        index_0_FirstConstraint;
+	private final String                     lhs;
+	private final String                     name;
 	private final int numScalarConstraints;
-
 	private final String originalExpression;
 	private final String rhs;
-	private final int [] size;
+	private final int[]  size;
 	private final String stringLhsMinusRhs;
-	public static String[] ACCEPTEDSYMBOLS_EQUAL = { "==" };
-	public static String[] ACCEPTEDSYMBOLS_GREATEREQUAL = { ">=", "=>" };
-	public static String[] ACCEPTEDSYMBOLS_LESSEQUAL = { "<=", "=<" };
-	public static String SYMBOL_EQUAL = "==";
-	public static String SYMBOL_GREATEREQUAL = ">=";
-
-	public static String SYMBOL_LESSEQUAL = "<=";
+	private       Expression                 lhsMinusRhs;
 
 	_INTERNAL_ConstraintArray(_INTERNAL_ExpressionParser evaluator, String name, String expression, int index_0_FirstConstraint)
 	{
@@ -50,8 +38,8 @@ class _INTERNAL_ConstraintArray
 		this.index_0_FirstConstraint = index_0_FirstConstraint;
 		this.originalExpression = expression;
 		String[] parsedConstraint = parseConstraint(expression); // some syntax
-																															// errors are
-																															// checked here
+		// errors are
+		// checked here
 		this.lhs = parsedConstraint[0];
 		this.connector = parsedConstraint[1];
 		this.rhs = parsedConstraint[2];
@@ -107,7 +95,7 @@ class _INTERNAL_ConstraintArray
 		return rhs;
 	}
 
-	int [] getSize()
+	int[] getSize()
 	{
 		return size;
 	}
@@ -133,9 +121,9 @@ class _INTERNAL_ConstraintArray
 			String separator = ACCEPTEDSYMBOLS_LESSEQUAL[cont];
 			String[] result = constraintExpression.split(separator);
 			if (result.length == 1) continue;
-			if ((result.length == 0) || (result.length > 2)) throw new JOMException ("Syntax error in the JOM expression");
+			if ((result.length == 0) || (result.length > 2)) throw new JOMException("Syntax error in the JOM expression");
 			/* there are lhs and rhs */
-			if (lhs != null) throw new JOMException ("Syntax error in the JOM expression. More than one delimiter");
+			if (lhs != null) throw new JOMException("Syntax error in the JOM expression. More than one delimiter");
 			lhs = result[0];
 			rhs = result[1];
 			connector = SYMBOL_LESSEQUAL;
@@ -146,9 +134,9 @@ class _INTERNAL_ConstraintArray
 			String separator = ACCEPTEDSYMBOLS_GREATEREQUAL[cont];
 			String[] result = constraintExpression.split(separator);
 			if (result.length == 1) continue;
-			if ((result.length == 0) || (result.length > 2)) throw new JOMException ("Syntax error in the JOM expression");
+			if ((result.length == 0) || (result.length > 2)) throw new JOMException("Syntax error in the JOM expression");
 			/* there is lhs and rhs */
-			if (lhs != null) throw new JOMException ("Syntax error in the JOM expression. More than one delimiter");
+			if (lhs != null) throw new JOMException("Syntax error in the JOM expression. More than one delimiter");
 			lhs = result[0];
 			rhs = result[1];
 			connector = SYMBOL_GREATEREQUAL;
@@ -159,17 +147,17 @@ class _INTERNAL_ConstraintArray
 			String separator = ACCEPTEDSYMBOLS_EQUAL[cont];
 			String[] result = constraintExpression.split(separator);
 			if (result.length == 1) continue;
-			if ((result.length == 0) || (result.length > 2)) throw new JOMException ("Syntax error in the JOM expression");
+			if ((result.length == 0) || (result.length > 2)) throw new JOMException("Syntax error in the JOM expression");
 			/* there is lhs and rhs */
-			if (lhs != null) throw new JOMException ("Syntax error in the JOM expression. More than one delimiter");
+			if (lhs != null) throw new JOMException("Syntax error in the JOM expression. More than one delimiter");
 			lhs = result[0];
 			rhs = result[1];
 			connector = SYMBOL_EQUAL;
 		}
 
-		if (lhs == null) throw new JOMException ("Syntax error in the JOM expression");
+		if (lhs == null) throw new JOMException("Syntax error in the JOM expression");
 
-		return new String[] { lhs, connector, rhs };
+		return new String[]{lhs, connector, rhs};
 
 	}
 

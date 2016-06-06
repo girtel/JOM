@@ -1,20 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2015 Pablo Pavon Mariño.
+ * Copyright (c) 2015 Pablo Pavon Mariï¿½o.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser Public License v2.1
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/lgpl.html
- * 
+ * <p>
  * Contributors:
- *     Pablo Pavon Mariño - initial API and implementation
+ * Pablo Pavon Mariï¿½o - initial API and implementation
  ******************************************************************************/
-
-
-
- 
-
-
-
 
 package com.jom;
 
@@ -42,7 +35,7 @@ class IntMatrixND
 
 	public IntMatrixND(int value)
 	{
-		this(IntFactory1D.dense.make(new int[] { 1, 1 }), IntFactory1D.dense.make(1, value));
+		this(IntFactory1D.dense.make(new int[]{1, 1}), IntFactory1D.dense.make(1, value));
 	}
 
 	public IntMatrixND(int[] size)
@@ -122,7 +115,9 @@ class IntMatrixND
 
 	public IntMatrixND(IntMatrix1D size, int value, String type)
 	{
-		this(size, (type.equals("dense")) ? IntFactory1D.dense.make(IntMatrixND.prod(size), value) : IntFactory1D.sparse.make(IntMatrixND.prod(size), value));
+		this(size, (type.equals("dense")) ?
+				IntFactory1D.dense.make(IntMatrixND.prod(size), value) :
+				IntFactory1D.sparse.make(IntMatrixND.prod(size), value));
 	}
 
 	public IntMatrixND(IntMatrix1D size, int[] values)
@@ -155,23 +150,25 @@ class IntMatrixND
 
 	public IntMatrixND(IntMatrix2D values)
 	{
-		this(IntFactory1D.dense.make(new int[] { values.rows(), values.columns() }), values.copy().vectorize());
+		this(IntFactory1D.dense.make(new int[]{values.rows(), values.columns()}), values.copy().vectorize());
 	}
 
 	/* Converts the index of the cell into its coordinates (subindex), in an array of the given size */
 	public static IntMatrix1D ind2sub(int index, IntMatrix1D size)
 	{
-		IntMatrix2D res = IntMatrixND.ind2sub(IntFactory1D.dense.make(new int[] { index }), size);
+		IntMatrix2D res = IntMatrixND.ind2sub(IntFactory1D.dense.make(new int[]{index}), size);
 		return res.viewRow(0).copy();
 	}
-	/* Converts the indexes of the cells into their coordinates (subindex), in an array of the given size. i-th row of the returned array contains the subindexes of i-th cell */
+
+	/* Converts the indexes of the cells into their coordinates (subindex), in an array of the given size. i-th row of the returned array contains
+	the subindexes of i-th cell */
 	public static IntMatrix2D ind2sub(IntMatrix1D indexes, IntMatrix1D size)
 	{
 		int numCells = IntMatrixND.prod(size);
 		int numDim = (int) size.size();
 		int numIndexes = (int) indexes.size();
-		if (indexes.size () > 0) if (indexes.getMaxLocation()[0] > numCells - 1) { throw new RuntimeException("Index out of bounds in n-dim array"); }
-		if (indexes.size () > 0) if (indexes.getMinLocation()[0] < 0) { throw new RuntimeException("Index out of bounds in n-dim array"); }
+		if (indexes.size() > 0) if (indexes.getMaxLocation()[0] > numCells - 1){ throw new RuntimeException("Index out of bounds in n-dim array"); }
+		if (indexes.size() > 0) if (indexes.getMinLocation()[0] < 0){ throw new RuntimeException("Index out of bounds in n-dim array"); }
 
 		IntMatrix1D blockSizes = IntMatrixND.computeBlockSizes(size);
 		IntMatrix2D res = IntFactory2D.dense.make((int) indexes.size(), numDim);
@@ -187,7 +184,6 @@ class IntMatrixND
 		return res;
 	}
 
-	
 	public static IntMatrix1D kron(IntMatrix1D a, IntMatrix1D b)
 	{
 		IntMatrix1D res = IntFactory1D.sparse.make((int) (a.size() * b.size()));
@@ -223,19 +219,19 @@ class IntMatrixND
 		return res;
 	}
 
-	public static int prod(int [] v)
+	public static int prod(int[] v)
 	{
 		int accum = 1;
-		for (int cont = 0; cont < v.length ; cont++)
-			accum *= v [cont];
+		for (int cont = 0; cont < v.length; cont++)
+			accum *= v[cont];
 		return accum;
 	}
 
-	public static int prod(int [] v , int firstIndex , int numIndexes)
+	public static int prod(int[] v, int firstIndex, int numIndexes)
 	{
 		int accum = 1;
-		for (int cont = 0; cont < numIndexes ; cont++)
-			accum *= v [firstIndex + cont];
+		for (int cont = 0; cont < numIndexes; cont++)
+			accum *= v[firstIndex + cont];
 		return accum;
 	}
 
@@ -307,7 +303,8 @@ class IntMatrixND
 		return this;
 	}
 
-	/* Sets all cells to the state specified by values. values is required to have as many cells as this. The values are copied. So subsequent changes in values are not reflected in the matrix, and vice-versa. */
+	/* Sets all cells to the state specified by values. values is required to have as many cells as this. The values are copied. So subsequent
+	changes in values are not reflected in the matrix, and vice-versa. */
 	public IntMatrixND assign(int[] values)
 	{
 		this.x.assign(values);
@@ -321,7 +318,9 @@ class IntMatrixND
 		return this;
 	}
 
-	/* Replaces all cell values of the receiver with the values of another matrix. Both matrices must have the same size. If both matrices share the same cells (as is the case if they are views derived from the same matrix) and intersect in an ambiguous way, then replaces as if using an intermediate auxiliary deep copy of other. */
+	/* Replaces all cell values of the receiver with the values of another matrix. Both matrices must have the same size. If both matrices share the
+	 same cells (as is the case if they are views derived from the same matrix) and intersect in an ambiguous way, then replaces as if using an
+	 intermediate auxiliary deep copy of other. */
 	public IntMatrixND assign(IntMatrixND other)
 	{
 		if (!this.size.equals(other.getSize())) throw new RuntimeException("Wrong size of n-array");
@@ -337,7 +336,8 @@ class IntMatrixND
 	}
 
 	/* Assigns the result of a function to all cells with a given indexes */
-	/* function - a function object taking as first argument the current cell's value of this, and as second argument the current cell's value of y, */
+	/* function - a function object taking as first argument the current cell's value of this, and as second argument the current cell's value of
+	y, */
 	public IntMatrixND assign(IntMatrixND y, IntIntFunction function, IntArrayList indexList)
 	{
 		this.x.assign(y.elements(), function, indexList);
@@ -403,7 +403,7 @@ class IntMatrixND
 	{
 		return x.equals(value);
 	}
-	
+
 	/* Compares this object against the specified object. */
 	public boolean equals(IntMatrixND other)
 	{
@@ -417,7 +417,7 @@ class IntMatrixND
 	}
 
 	/* Returns the matrix cell value at the given subindexes */
-	public double get(int [] subindexes)
+	public double get(int[] subindexes)
 	{
 		return x.get(DoubleMatrixND.sub2ind(IntFactory1D.dense.make(subindexes), this.size));
 	}
@@ -431,13 +431,13 @@ class IntMatrixND
 	/* Return maximum value of this matrix together with its location. If the array is empty, returns and empty array */
 	public int[] getMaxLocation()
 	{
-		return x.size () > 0? this.x.getMaxLocation() : new int [] {};
+		return x.size() > 0 ? this.x.getMaxLocation() : new int[]{};
 	}
 
 	/* Return minimum value of this matrix together with its location. If the array is empty, returns and empty array */
 	public int[] getMinLocation()
 	{
-		return x.size () > 0 ? this.x.getMinLocation() : new int [] {};
+		return x.size() > 0 ? this.x.getMinLocation() : new int[]{};
 	}
 
 	/* Fills the indexes and values of cells having negative values into the specified lists. */
@@ -535,66 +535,67 @@ class IntMatrixND
 		x.setQuick(IntMatrixND.sub2ind(subindexes, this.size), value);
 	}
 
-	public Object toArray ()
+	public Object toArray()
 	{
 		switch (this.numDim)
 		{
-		case 1: return this.x.toArray();
-		case 2: 
+			case 1:
+				return this.x.toArray();
+			case 2:
 			{
-				int [][] res = new int [size.get(0)][size.get(1)];
+				int[][] res = new int[size.get(0)][size.get(1)];
 				int cont = 0;
-				for (int i1 = 0 ; i1 < size.get(1) ; i1 ++)
-					for (int i0 = 0 ; i0 < size.get(0) ; i0 ++)
-						res[i0][i1] = this.x.get(cont ++);
+				for (int i1 = 0; i1 < size.get(1); i1++)
+					for (int i0 = 0; i0 < size.get(0); i0++)
+						res[i0][i1] = this.x.get(cont++);
 				return res;
 			}
-		case 3:
+			case 3:
 			{
-				int [][][] res = new int [size.get(0)][size.get(1)][size.get(2)];
+				int[][][] res = new int[size.get(0)][size.get(1)][size.get(2)];
 				int cont = 0;
-				for (int i2 = 0 ; i2 < size.get(2) ; i2 ++)
-					for (int i1 = 0 ; i1 < size.get(1) ; i1 ++)
-						for (int i0 = 0 ; i0 < size.get(0) ; i0 ++)
-							res[i0][i1][i2] = this.x.get(cont ++);
+				for (int i2 = 0; i2 < size.get(2); i2++)
+					for (int i1 = 0; i1 < size.get(1); i1++)
+						for (int i0 = 0; i0 < size.get(0); i0++)
+							res[i0][i1][i2] = this.x.get(cont++);
 				return res;
 			}
-		case 4:
+			case 4:
 			{
-				int [][][][] res = new int [size.get(0)][size.get(1)][size.get(2)][size.get(3)];
+				int[][][][] res = new int[size.get(0)][size.get(1)][size.get(2)][size.get(3)];
 				int cont = 0;
-				for (int i3 = 0 ; i3 < size.get(3) ; i3 ++)
-					for (int i2 = 0 ; i2 < size.get(2) ; i2 ++)
-						for (int i1 = 0 ; i1 < size.get(1) ; i1 ++)
-							for (int i0 = 0 ; i0 < size.get(0) ; i0 ++)
-								res[i0][i1][i2][i3] = this.x.get(cont ++);
+				for (int i3 = 0; i3 < size.get(3); i3++)
+					for (int i2 = 0; i2 < size.get(2); i2++)
+						for (int i1 = 0; i1 < size.get(1); i1++)
+							for (int i0 = 0; i0 < size.get(0); i0++)
+								res[i0][i1][i2][i3] = this.x.get(cont++);
 			}
-		case 5:
+			case 5:
 			{
-				int [][][][][] res = new int [size.get(0)][size.get(1)][size.get(2)][size.get(3)][size.get(4)];
+				int[][][][][] res = new int[size.get(0)][size.get(1)][size.get(2)][size.get(3)][size.get(4)];
 				int cont = 0;
-				for (int i4 = 0 ; i4 < size.get(4) ; i4 ++)
-					for (int i3 = 0 ; i3 < size.get(3) ; i3 ++)
-						for (int i2 = 0 ; i2 < size.get(2) ; i2 ++)
-							for (int i1 = 0 ; i1 < size.get(1) ; i1 ++)
-								for (int i0 = 0 ; i0 < size.get(0) ; i0 ++)
-									res[i0][i1][i2][i3][i4] = this.x.get(cont ++);
+				for (int i4 = 0; i4 < size.get(4); i4++)
+					for (int i3 = 0; i3 < size.get(3); i3++)
+						for (int i2 = 0; i2 < size.get(2); i2++)
+							for (int i1 = 0; i1 < size.get(1); i1++)
+								for (int i0 = 0; i0 < size.get(0); i0++)
+									res[i0][i1][i2][i3][i4] = this.x.get(cont++);
 			}
-		case 6:
+			case 6:
 			{
-				int [][][][][][] res = new int [size.get(0)][size.get(1)][size.get(2)][size.get(3)][size.get(4)][size.get(5)];
+				int[][][][][][] res = new int[size.get(0)][size.get(1)][size.get(2)][size.get(3)][size.get(4)][size.get(5)];
 				int cont = 0;
-				for (int i5 = 0 ; i5 < size.get(5) ; i5 ++)
-					for (int i4 = 0 ; i4 < size.get(4) ; i4 ++)
-						for (int i3 = 0 ; i3 < size.get(3) ; i3 ++)
-							for (int i2 = 0 ; i2 < size.get(2) ; i2 ++)
-								for (int i1 = 0 ; i1 < size.get(1) ; i1 ++)
-									for (int i0 = 0 ; i0 < size.get(0) ; i0 ++)
-										res[i0][i1][i2][i3][i4][i5] = this.x.get(cont ++);
+				for (int i5 = 0; i5 < size.get(5); i5++)
+					for (int i4 = 0; i4 < size.get(4); i4++)
+						for (int i3 = 0; i3 < size.get(3); i3++)
+							for (int i2 = 0; i2 < size.get(2); i2++)
+								for (int i1 = 0; i1 < size.get(1); i1++)
+									for (int i0 = 0; i0 < size.get(0); i0++)
+										res[i0][i1][i2][i3][i4][i5] = this.x.get(cont++);
 			}
-		
+
 		}
-		throw new RuntimeException ("Too many dimensions to use toArray ()");
+		throw new RuntimeException("Too many dimensions to use toArray ()");
 	}
 
 	@Override
@@ -603,18 +604,22 @@ class IntMatrixND
 		return this.cast2Double().toString();
 	}
 
-	public int toValue () { if (this.numElem != 1) throw new RuntimeException ("This is not a scalar"); return this.x.get(0); }
-
-	public IntMatrix1D view1D ()
+	public int toValue()
 	{
-		if (this.numDim != 1) throw new RuntimeException ("Tne N-DIM array must have one dimension");
+		if (this.numElem != 1) throw new RuntimeException("This is not a scalar");
+		return this.x.get(0);
+	}
+
+	public IntMatrix1D view1D()
+	{
+		if (this.numDim != 1) throw new RuntimeException("Tne N-DIM array must have one dimension");
 		return IntFactory1D.dense.make(this.x.toArray());
 	}
 
-	public IntMatrix2D view2D ()
+	public IntMatrix2D view2D()
 	{
-		if (this.numDim != 2) throw new RuntimeException ("Tne N-DIM array must have two dimensions");
-		return IntFactory2D.dense.make(this.x.toArray() , this.size.get(0));
+		if (this.numDim != 2) throw new RuntimeException("Tne N-DIM array must have two dimensions");
+		return IntFactory2D.dense.make(this.x.toArray(), this.size.get(0));
 	}
 
 	public IntMatrixND viewPart(IntMatrix1D initialSubindex, IntMatrix1D width)
@@ -665,8 +670,10 @@ class IntMatrixND
 				binVectorCoordThisDim = IntFactory1D.sparse.make(originalSizeThisDim, 1);
 			} else
 			{
-				if (subindexesPerDim[dim].size () > 0) if (subindexesPerDim[dim].getMinLocation()[0] < 0) throw new RuntimeException("Wrong size of n-dim array");
-				if (subindexesPerDim[dim].size () > 0) if (subindexesPerDim[dim].getMaxLocation()[0] >= originalSizeThisDim) throw new RuntimeException("Wrong size of n-dim array");
+				if (subindexesPerDim[dim].size() > 0)
+					if (subindexesPerDim[dim].getMinLocation()[0] < 0) throw new RuntimeException("Wrong size of n-dim array");
+				if (subindexesPerDim[dim].size() > 0)
+					if (subindexesPerDim[dim].getMaxLocation()[0] >= originalSizeThisDim) throw new RuntimeException("Wrong size of n-dim array");
 				newSize.set(dim, (int) subindexesPerDim[dim].size());
 				binVectorCoordThisDim = IntFactory1D.sparse.make(originalSizeThisDim);
 				binVectorCoordThisDim.viewSelection(subindexesPerDim[dim].toArray()).assign(1);
@@ -685,14 +692,16 @@ class IntMatrixND
 		return new IntMatrixND(newSize, this.x.viewSelection(indexesList.elements()));
 	}
 
-	public IntMatrixND viewSelectionByIndexes(IntMatrix1D newSize , IntMatrix1D indexes)
+	public IntMatrixND viewSelectionByIndexes(IntMatrix1D newSize, IntMatrix1D indexes)
 	{
-		if (IntMatrixND.prod(newSize) != (int) indexes.size()) throw new RuntimeException ("Size mismatch");
-		return new IntMatrixND(newSize , this.x.viewSelection(indexes.toArray()));
+		if (IntMatrixND.prod(newSize) != (int) indexes.size()) throw new RuntimeException("Size mismatch");
+		return new IntMatrixND(newSize, this.x.viewSelection(indexes.toArray()));
 	}
-	
-	
-	/* Constructs and returns a new stride view which is a sub matrix consisting of every i-th cell. More specifically, the view has this.slices()/sliceStride slices and this.rows()/rowStride rows and this.columns()/columnStride columns holding cells this.get(k*sliceStride,i*rowStride,j*columnStride) for all k = 0..slices()/sliceStride - 1, i = 0..rows()/rowStride - 1, j = 0..columns()/columnStride - 1 . The returned view is backed by this matrix, so changes in the returned view are reflected in
+
+	/* Constructs and returns a new stride view which is a sub matrix consisting of every i-th cell. More specifically, the view has this.slices()
+	/sliceStride slices and this.rows()/rowStride rows and this.columns()/columnStride columns holding cells this.get(k*sliceStride,i*rowStride,
+	j*columnStride) for all k = 0..slices()/sliceStride - 1, i = 0..rows()/rowStride - 1, j = 0..columns()/columnStride - 1 . The returned view is
+	backed by this matrix, so changes in the returned view are reflected in
 	 * this matrix, and vice-versa. */
 	public IntMatrixND viewStrides(IntMatrix1D strides)
 	{
@@ -728,6 +737,5 @@ class IntMatrixND
 	{
 		return this.x.zSum();
 	}
-	
-	
+
 }
