@@ -4,3 +4,4 @@
 target/
 lib/
 upload-jom.xml
+.idea/
