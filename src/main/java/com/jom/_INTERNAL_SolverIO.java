@@ -315,5 +315,18 @@ class _INTERNAL_SolverIO
 		boolean        solutionIsOptimal;
 		int            statusCode;
 		String         statusMessage;
+		public String toString ()
+		{
+			if (feasibleSolutionDoesNotExist) return "A feasible solution does nor exist";
+			if (foundUnboundedSolution) return "An unbounded solution was found";
+			if (!solutionIsFeasible) return "A feasible solution was not found, but may exist";
+			StringBuffer s = new StringBuffer ();
+			s.append("Status code: " + statusCode + ", message: " + statusMessage + String.format("\n"));
+			s.append("Solution is optimal? " + solutionIsOptimal + String.format("\n"));
+			s.append("Primal solution: " + Arrays.toString(primalSolution.toArray()) + String.format("\n"));
+			s.append("Primal cost: " + primalCost + String.format("\n"));
+			s.append("Best optimality bound: " + bestOptimalityBound + String.format("\n"));
+			return s.toString();
+		}
 	}
 }

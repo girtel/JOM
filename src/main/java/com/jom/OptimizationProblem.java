@@ -20,6 +20,8 @@ import cern.jet.math.tdouble.DoubleFunctions;
 import java.util.*;
 import java.util.Map.Entry;
 
+import com.dashoptimization.XPRSconstants;
+
 /** This class contains the methods for handling optimization problems, defining their input parameters (if any), decision variables,
  * objetive function and constraints, choosing and calling a solver to obtain a numerical solution, and retrieving that solution. 
  * @author Pablo Pavon Mariño
@@ -648,6 +650,10 @@ public class OptimizationProblem
 			_SOLVERWRAPPER_IPOPT solver = new _SOLVERWRAPPER_IPOPT(solverIO, params);
 			// Debug.pln(solver.printOptions ());
 			solver.solve();
+		} else if (solverName.equalsIgnoreCase("xpress"))
+		{
+			_SOLVERWRAPPER_XPRESS solver = new _SOLVERWRAPPER_XPRESS(solverIO, params);
+			int errorCode = solver.solve();
 		} else
 			throw new JOMException("Unknown solver type");
 
@@ -807,14 +813,14 @@ public class OptimizationProblem
 			params.put((String) paramName, value);
 		}
 
-		if (!solverName.equalsIgnoreCase("glpk") && !solverName.equalsIgnoreCase("ipopt") && !solverName.equalsIgnoreCase("cplex"))
+		if (!solverName.equalsIgnoreCase("glpk") && !solverName.equalsIgnoreCase("ipopt") && !solverName.equalsIgnoreCase("cplex") && !solverName.equalsIgnoreCase("xpress"))
 			throw new JOMException("Unknown solver name");
 
 		/* Check if the chosen solver can solve the type of problem */
 		if (solverName.equalsIgnoreCase("cplex") && !solverIO.isLinearProblem()) throw new JOMException("CPLEX cannot solve non linear problems");
 		if (solverName.equalsIgnoreCase("glpk") && !solverIO.isLinearProblem()) throw new JOMException("GLPK cannot solve non linear problems");
-		if (solverName.equalsIgnoreCase("ipopt") && solverIO.in.hasIntegerVariables)
-			throw new JOMException("IPOPT cannot solve problems with integer variables");
+		if (solverName.equalsIgnoreCase("ipopt") && solverIO.in.hasIntegerVariables) throw new JOMException("IPOPT cannot solve problems with integer variables");
+		if (solverName.equalsIgnoreCase("xpress") && !solverIO.isLinearProblem()) throw new JOMException("XPRESS cannot solve non linear problems");
 
 		/* Default COMMON: String solverLibraryName */
 		/* A "" in solverLibraryName is equivalent to not having this parameter */
@@ -825,23 +831,17 @@ public class OptimizationProblem
 			if (solverName.equalsIgnoreCase("glpk"))
 			{
 				String os = System.getProperty("os.name");
-				String arch = System.getProperty("os.arch");
-				if (os.startsWith("Windows") && arch.contains("64")) params.put("solverLibraryName", "glpk.dll"); // win64
-				else if (os.startsWith("Windows") && !arch.contains("64")) params.put("solverLibraryName", "glpk.dll"); // win32
+				if (os.startsWith("Windows")) params.put("solverLibraryName", "glpk.dll"); 
 				else params.put("solverLibraryName", "libglpk"); // Linux
 			} else if (solverName.equalsIgnoreCase("ipopt"))
 			{
 				String os = System.getProperty("os.name");
-				String arch = System.getProperty("os.arch");
-				if (os.startsWith("Windows") && arch.contains("64")) params.put("solverLibraryName", "ipopt.dll"); // win64
-				else if (os.startsWith("Windows") && !arch.contains("64")) params.put("solverLibraryName", "ipopt.dll"); // win32
+				if (os.startsWith("Windows")) params.put("solverLibraryName", "ipopt.dll"); 
 				else params.put("solverLibraryName", "libipopt"); // Linux
 			} else if (solverName.equalsIgnoreCase("cplex"))
 			{
 				String os = System.getProperty("os.name");
-				String arch = System.getProperty("os.arch");
-				if (os.startsWith("Windows") && arch.contains("64")) params.put("solverLibraryName", "cplex.dll"); // win64
-				else if (os.startsWith("Windows") && !arch.contains("64")) params.put("solverLibraryName", "cplex.dll"); // win32
+				if (os.startsWith("Windows")) params.put("solverLibraryName", "cplex.dll"); 
 				else params.put("solverLibraryName", "cplex"); // Linux
 			}
 		}
@@ -863,6 +863,10 @@ public class OptimizationProblem
 			} else if (solverName.equalsIgnoreCase("cplex"))
 			{
 				if (val_maxSolverTimeInSeconds > 0) params.put("" + _JNA_CPLEX.CPX_PARAM_TILIM, val_maxSolverTimeInSeconds);
+				params.remove("maxSolverTimeInSeconds");
+			} else if (solverName.equalsIgnoreCase("xpress"))
+			{
+				if (val_maxSolverTimeInSeconds > 0) params.put("" + XPRSconstants.MAXTIME, -val_maxSolverTimeInSeconds); // negative, if not it waits until first solution is found
 				params.remove("maxSolverTimeInSeconds");
 			}
 

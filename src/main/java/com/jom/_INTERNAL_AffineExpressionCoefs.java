@@ -319,11 +319,9 @@ class _INTERNAL_AffineExpressionCoefs
 		vals[0] = valsArray;
 	}
 
-	void getNonZerosRowColValForXpressSolver(int[][] return_mnel, int[][] return_mrwind, int[][] return_mstart, double[][] return_dmatval)
+	void getNonZerosRowColValForXpressSolver(int[][] return_mnel, int[][] return_mrwind, int[][] return_mstart, double[][] return_dmatval , int numCols)
 	{
 		if (numDim != 2) throw new JOMException ("This call is allowed just for matrices");
-		final int numRows = size [0];
-		final int numCols = size [1];
 		/* count number of non-zero coefficients */
 		int numNonZerosLinearCoefs = 0;
 		for (Cell c : this.linearCoefs.values()) if (c.lCoefs != null) numNonZerosLinearCoefs += c.lCoefs.size();
