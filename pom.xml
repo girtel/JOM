@@ -63,17 +63,25 @@
                             <splitindex>true</splitindex>
                             <use>true</use>
                             <version>true</version>
-                            <!--<additionalparam>-Xdoclint:none</additionalparam>-->
-                            <!-- Adding Latex parser for javadoc -->
-                            <!--<additionalparam>-header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;&apos;</additionalparam>-->
-                            <additionalparam>-header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;&apos;</additionalparam>
+                            <!-- Adding Latex parser for Javadoc -->
+                            <additionalparam>
+                                -header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;&apos;
+                            </additionalparam>
                             <sourceFileIncludes>
                                 <include>DoubleMatrixND.java</include>
                                 <include>OptimizationProblem.java</include>
                                 <include>Expression.java</include>
                                 <include>JOMException.java</include>
                             </sourceFileIncludes>
-                            <sourcepath>src/main/java/com/jom/</sourcepath>
+                            <sourcepath>${project.basedir}/src/main/java/com/jom</sourcepath>
+                            <!-- Adding itself as a dependency in order to find the classes which the sources depend on -->
+                            <additionalDependencies>
+                                <additionalDependency>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                </additionalDependency>
+                            </additionalDependencies>
                         </configuration>
                     </plugin>
 
