@@ -33,7 +33,7 @@ import cern.jet.math.tint.IntFunctions;
  * http://sourceforge.net/projects/parallelcolt/ for more details
  *
  * @author Pablo Pavon Mariño
- * @see http://www.net2plan.com/jom
+ * @see <a href="http://www.net2plan.com/jom">http://www.net2plan.com/jom</a>
  */
 public class DoubleMatrixND
 {
@@ -667,7 +667,7 @@ public class DoubleMatrixND
 
 	/** Returns the matrix cell value at coordinate index. Provided with invalid parameters this method may return invalid objects without throwing
 	 * any exception. You should only use this method when you are absolutely sure that the coordinate is within bounds. Precondition (unchecked):
-	 * index<0 || index>=size().
+	 * \(index {@literal <} 0 \parallel index \ge size()\).
 	 * @param index the index of the cell
 	 * @return the value of the specified cell */
 	public double getQuick(int index)
@@ -683,6 +683,7 @@ public class DoubleMatrixND
 	}
 
 	/** Gets the size of the array in the given dimension
+	 * @param dim Dimension from which the size will be taken.
 	 * @return the size */
 	public int getSize(int dim)
 	{
@@ -911,6 +912,7 @@ public class DoubleMatrixND
 	}
 
 	/** If the array is 3D, returns a DoubleMatrix3D object copying the data in the array
+	 * @param type Type of the matrix.
 	 * @return The DoubleMatrix3D object */
 	public DoubleMatrix3D view3D(String type)
 	{

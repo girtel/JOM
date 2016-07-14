@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 /** Expressions objects represent a function of the decision variables defined in its related OptimizationProblem object. JOM creates Expression
  * objects parsing Strings in the JOM syntax.
  * @author Pablo Pavon Mariño
- * @see http://www.net2plan.com/jom
+ * @see <a href="http://www.net2plan.com/jom">http://www.net2plan.com/jom</a>
  * */
 public abstract class Expression
 {
@@ -178,6 +178,7 @@ public abstract class Expression
 	}
 
 	/** Evaluates the given cell in this expression. The expression should be a constant: do not depend from the decision variables
+	 * @param cellIndex Index of the constants that will be evaluated.
 	 * @return an array with the same size as the expression, with the values evaluated in each cell */
 	public final double evaluateConstant(int cellIndex)
 	{

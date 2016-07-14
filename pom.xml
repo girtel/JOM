@@ -64,7 +64,9 @@
                             <use>true</use>
                             <version>true</version>
                             <!--<additionalparam>-Xdoclint:none</additionalparam>-->
-                            <additionalparam>-Xdoclint:none</additionalparam>
+                            <!-- Adding Latex parser for javadoc -->
+                            <!--<additionalparam>-header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;&apos;</additionalparam>-->
+                            <additionalparam>-header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;&apos;</additionalparam>
                             <sourceFileIncludes>
                                 <include>DoubleMatrixND.java</include>
                                 <include>OptimizationProblem.java</include>
