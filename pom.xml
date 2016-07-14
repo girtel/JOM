@@ -63,6 +63,7 @@
                             <splitindex>true</splitindex>
                             <use>true</use>
                             <version>true</version>
+                            <!--<additionalparam>-Xdoclint:none</additionalparam>-->
                             <additionalparam>-Xdoclint:none</additionalparam>
                             <sourceFileIncludes>
                                 <include>DoubleMatrixND.java</include>

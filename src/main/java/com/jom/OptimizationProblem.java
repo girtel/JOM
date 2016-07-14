@@ -21,10 +21,11 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /** This class contains the methods for handling optimization problems, defining their input parameters (if any), decision variables,
- * objetive function and constraints, choosing and calling a solver to obtain a numerical solution, and retrieving that solution. 
+ * objetive function and constraints, choosing and calling a solver to obtain a numerical solution, and retrieving that solution.
  * @author Pablo Pavon Mariño
- * @see http://www.net2plan.com/jom
+ * @see <a href="http://www.net2plan.com/jom">http://www.net2plan.com/jom</a>
  */
+
 public class OptimizationProblem
 {
 	final static int MAX_NUMBER_DIMENSIONS_INPUTPARAMETER = 10;
@@ -216,7 +217,7 @@ public class OptimizationProblem
 		return inputParameters.get(name);
 	}
 
-	/** Returns the multipliers of the automatic constraints: x_l <= varName added to the problem, where x_l is the array of lower bounds provided,
+	/** Returns the multipliers of the automatic constraints: {@literal x_l <= varName} added to the problem, where x_l is the array of lower bounds provided,
 	 * associated to the decision variable.
 	 * @param decisionVariableName The name of the decision variable
 	 * @return The multipliers as an array of the same size of the decision variables
@@ -230,7 +231,7 @@ public class OptimizationProblem
 		return new DoubleMatrixND(dv.getVarIds().getSize(), values.copy());
 	}
 
-	/** Returns the multipliers of the automatic constraints: varName <= x_u added to the problem, where x_u is the array of upper bounds provided,
+	/** Returns the multipliers of the automatic constraints: {@literal varName <= x_u} added to the problem, where x_u is the array of upper bounds provided,
 	 * associated to the decision variable.
 	 * @param decisionVariableName The name of the decision variable
 	 * @return The multipliers as an array of the same size of the decision variables

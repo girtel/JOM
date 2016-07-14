@@ -5,3 +5,4 @@ target/
 lib/
 upload-jom.xml
 .idea/
+/jom.iml
