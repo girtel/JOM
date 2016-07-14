@@ -11,7 +11,7 @@ public class TestXPRESS_JOM
 		OptimizationProblem op = new OptimizationProblem();
 
 		/* Add the decision variables to the problem */
-		op.addDecisionVariable("x", true, new int[] { N , N , N }, 0, 1);  // name, isInteger, size , minValue, maxValue
+		op.addDecisionVariable("x", false, new int[] { N , N , N }, 0, 1);  // name, isInteger, size , minValue, maxValue
 
 		/* Set value for the input parameter c_{ijk} */
 		op.setInputParameter("c", new DoubleMatrixND(new int [] { N , N , N} , "random"));
@@ -25,8 +25,7 @@ public class TestXPRESS_JOM
   		op.addConstraint(" sum(sum(x,2),1) <= 1");  // for each k \sum_{ij} x_{ijk} <= 1
   	
 		/* Call the solver to solve the problem */
-		op.solve("xpress" , "maxSolverTimeInSeconds" , 1.0);
-		//op.solve("xpress" );
+		op.solve("xpress" , "maxSolverTimeInSeconds" , 1.0 , "solverLibraryName" , "c:\\xpressmp\\xpauth.xpr");
 		if (!op.solutionIsOptimal ()) throw new RuntimeException ("An optimal solution was not found");
 		
 		/* Print the solution */

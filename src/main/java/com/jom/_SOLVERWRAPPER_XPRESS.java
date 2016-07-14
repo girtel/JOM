@@ -17,12 +17,18 @@ package com.jom;
 
 /* PABLO: CHANGE POM TO COMPILE: THE JAR SHOULD BE LOCAL? SOME FORM TO COMPILE WITHOUT THE JAR?
  * VEr: http://stackoverflow.com/questions/8325819/how-can-i-create-an-executable-jar-without-dependencies-using-maven
+ * PABLO: Any benefit from loafglobal64 in Java? I mean that all the arrays have at most 2^32 vals...
+ * PABLO: Which is the control for getting the best bound in LP?
+ * PABLO: Which is the control for getting the output status when LP found feasible but not optimal solution?
+ * PABLO: Error getting the primal solution: calcObjective gives error inside XPROSprob (5793), no further message
+ * PABLO: how to get multipliers of LB and UB constraints
  *   */
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import com.dashoptimization.DoubleHolder;
 import com.dashoptimization.XPRS;
 import com.dashoptimization.XPRSconstants;
 import com.dashoptimization.XPRSenumerations;
@@ -52,7 +58,7 @@ class _SOLVERWRAPPER_XPRESS
 
 		try
 		{
-			XPRS.init("C:\\xpressmp\\xpauth.xpr"); // PABLO: use hare solverLibraryName
+			XPRS.init(solverLibraryName); 
 			p = new XPRSprob();
             final int ncols = s.in.numDecVariables;
             final int nrows = s.in.numConstraints;
@@ -159,8 +165,8 @@ class _SOLVERWRAPPER_XPRESS
 				s.out.primalCost = p.getDblAttrib(XPRSconstants.MIPBESTOBJVAL);
 
 				/* Check the number of constraitns and variables */
-				if (p.getIntAttrib(XPRSconstants.ROWS) != s.in.numConstraints) throw new JOMException("JOM - CPLEX interface. Unexpected error");
-				if (p.getIntAttrib(XPRSconstants.COLS)  != s.in.numDecVariables) throw new JOMException("JOM - CPLEX interface. Unexpected error");
+				if (p.getIntAttrib(XPRSconstants.ROWS) != s.in.numConstraints) throw new JOMException("JOM - XPRESS interface. Unexpected error");
+				if (p.getIntAttrib(XPRSconstants.COLS)  != s.in.numDecVariables) throw new JOMException("JOM - XPRESS interface. Unexpected error");
 
 				/* Retrieve the optimal primal solution */
 				double [] primalSolution = new double [s.in.numDecVariables];
@@ -181,10 +187,68 @@ class _SOLVERWRAPPER_XPRESS
 				s.out.multiplierOfLowerBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
 				s.out.multiplierOfUpperBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
 				
+				System.out.println(s.out);
+				
 				return s.out.statusCode;
 			}
 			else
 			{
+				/* load the problem */
+				p.loadLp("" , ncols, nrows, _srowtypes, _drhs, _drange, _dobj, return_mstart [0], return_mnel [0], return_mrwind [0], 
+						return_dmatval [0], _dlb, _dub);
+				/* Minimize or maximize */
+				p.chgObjSense(s.in.toMinimize? XPRSenumerations.ObjSense.MINIMIZE : XPRSenumerations.ObjSense.MAXIMIZE);
+
+				/* Call the solver */
+				p.lpOptimize();
+
+				s.problemAlreadyAttemptedTobeSolved = true;
+				s.out.bestOptimalityBound = p.getDblAttrib(XPRSconstants.BESTBOUND); // pablo: this may not be the one for this
+				s.out.statusCode = p.getIntAttrib(XPRSconstants.ERRORCODE);
+				s.out.statusMessage = p.getLastError();
+
+				final int lpStatus = p.getIntAttrib(XPRSconstants.LPSTATUS);
+				s.out.solutionIsOptimal = (lpStatus == XPRSconstants.LP_OPTIMAL);
+				s.out.solutionIsFeasible = s.out.solutionIsOptimal || (lpStatus == XPRSconstants.LP_UNFINISHED); // NOT SURE ABOUT LP_UNFINISHED 
+				s.out.feasibleSolutionDoesNotExist = (lpStatus == XPRSconstants.LP_INFEAS);
+				s.out.foundUnboundedSolution = (lpStatus == XPRSconstants.LP_UNBOUNDED);
+
+				if (!s.out.solutionIsFeasible)
+					return s.out.statusCode;
+
+				/* Check the number of constraitns and variables */
+				if (p.getIntAttrib(XPRSconstants.ROWS) != s.in.numConstraints) throw new JOMException("JOM - XPRESS interface. Unexpected error");
+				if (p.getIntAttrib(XPRSconstants.COLS)  != s.in.numDecVariables) throw new JOMException("JOM - XPRESS interface. Unexpected error");
+
+				/* Retrieve the optimal primal solution */
+				final double [] primalSolution = new double [s.in.numDecVariables];
+				double [] slackSolution = new double [s.in.numConstraints];
+				double [] mulipliersSolution = new double [s.in.numConstraints];
+				p.getLpSol(primalSolution , slackSolution , mulipliersSolution , null);
+				s.out.primalSolution = DoubleFactory1D.dense.make(primalSolution);
+				DoubleHolder obj = new DoubleHolder(); 
+				System.out.println("primalSolution: " + Arrays.toString(primalSolution));
+				p.calcObjective(primalSolution , obj);
+				s.out.primalCost = obj.value;
+
+				/* Retrieve the values of the constraints in the solution */
+				double[] rhsCplex = (s.in.numConstraints == 0) ? new double[0] :
+						Arrays.copyOf(s.in.lhsMinusRhsAccumulatedConstraint.getAffineExpression().getConstantCoefArray(), s.in
+								.lhsMinusRhsAccumulatedConstraint.getAffineExpression().getConstantCoefArray().length);
+				for (int cont = 0; cont < rhsCplex.length; cont++) rhsCplex[cont] = -rhsCplex[cont];
+				
+				double[] slack = new double[s.in.numConstraints];
+				p.calcSlacks(primalSolution , slack);
+				s.out.primalValuePerConstraint = DoubleFactory1D.dense.make(rhsCplex).assign(DoubleFactory1D.dense.make(slack), DoubleFunctions.minus);
+				s.out.multiplierOfConstraint = DoubleFactory1D.dense.make(mulipliersSolution);
+				s.out.multiplierOfLowerBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
+				s.out.multiplierOfUpperBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
+				
+				System.out.println(s.out);
+				
+				return s.out.statusCode;
+
+				
 				 // pag 454: LPSTATUS --> infreasible, optimal, unbounded... 
 				 // pag 457: MIPSTATUS --> infreasible, optimal, unbounded... 
 				 // pag 467: STOPSTATUS --> stopped by time limit...
@@ -192,14 +256,15 @@ class _SOLVERWRAPPER_XPRESS
 				 // pag. 369: BARGAPSTOP, BARPRIMALSTOP, FEASTOL, FEASTOLTARGET: stop conditions
 				 // PAG. 410: MAXTIME: maximum solver time
 				 // MIPABSSTOP, MIPRELSTOP: stop criterion based on absolute gap
-				throw new RuntimeException ("Only MIPs");
+				//throw new RuntimeException ("Only MIPs");
 			}
 	
 		} catch (RuntimeException e)
 		{
 			XPRS.free(); // frees the license
+			e.printStackTrace(); 
 			if (p != null) p.destroy(); // frees any memory associated to the object
-			e.printStackTrace(); throw e;
+			throw e;
 		} 
 		
 	}

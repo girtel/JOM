@@ -843,7 +843,8 @@ public class OptimizationProblem
 				String os = System.getProperty("os.name");
 				if (os.startsWith("Windows")) params.put("solverLibraryName", "cplex.dll"); 
 				else params.put("solverLibraryName", "cplex"); // Linux
-			}
+			} else if (solverName.equalsIgnoreCase("xpress"))
+				params.put("solverLibraryName", "xpauth.xpr"); // default name of the license file in XPRESS
 		}
 		/* Default COMMON: String maxSolverTimeInSeconds */
 		/* A "" in maxSolverTimeInSeconds is equivalent to not having this parameter */
@@ -866,7 +867,7 @@ public class OptimizationProblem
 				params.remove("maxSolverTimeInSeconds");
 			} else if (solverName.equalsIgnoreCase("xpress"))
 			{
-				if (val_maxSolverTimeInSeconds > 0) params.put("" + XPRSconstants.MAXTIME, -val_maxSolverTimeInSeconds); // negative, if not it waits until first solution is found
+				if (val_maxSolverTimeInSeconds > 0) params.put("" + XPRSconstants.MAXTIME, (int) -Math.ceil(val_maxSolverTimeInSeconds)); // negative, if not it waits until first solution is found
 				params.remove("maxSolverTimeInSeconds");
 			}
 
