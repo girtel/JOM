@@ -41,10 +41,10 @@ public class TestXPRESS
 	 p.chgObjSense(XPRSenumerations.ObjSense.MAXIMIZE);
 	 
 	 p.mipOptimize();
-	
+
+	 
 	 double [] primalSolution = new double [2];
 	 double [] slackSolution = new double [2];
-	 
 	 p.getMipSol(primalSolution , slackSolution);
 
 	 System.out.println("Primal: " + Arrays.toString(primalSolution));

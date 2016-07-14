@@ -319,6 +319,55 @@ class _INTERNAL_AffineExpressionCoefs
 		vals[0] = valsArray;
 	}
 
+	void getNonZerosRowColValForXpressSolver(int[][] return_mnel, int[][] return_mrwind, int[][] return_mstart, double[][] return_dmatval)
+	{
+		if (numDim != 2) throw new JOMException ("This call is allowed just for matrices");
+		final int numRows = size [0];
+		final int numCols = size [1];
+		/* count number of non-zero coefficients */
+		int numNonZerosLinearCoefs = 0;
+		for (Cell c : this.linearCoefs.values()) if (c.lCoefs != null) numNonZerosLinearCoefs += c.lCoefs.size();
+		
+		int [] _mnel = new int [numCols]; // one element per column in the constraints matrix, with the number of nonzeros
+		int [] _mrwind = new int [numNonZerosLinearCoefs]; // for each non-zero in the constraints matrix, the row
+		int [] _mstart = new int [numCols]; // for each column, the index of the first element in mrwind and dmatval for the nonzeros of that column
+        double [] _dmatval = new double [numNonZerosLinearCoefs];
+        
+        return_mnel [0] = _mnel;
+        return_mrwind [0] = _mrwind;
+        return_mstart [0] = _mstart;
+        return_dmatval [0] = _dmatval;
+        
+        if (numNonZerosLinearCoefs == 0) return;
+        
+        /* First, create the _mnel array: the number of nonzero elements in each column */
+		for (Cell c : this.linearCoefs.values())
+			if (c != null)
+				for (Integer col : c.lCoefs.keySet())
+					_mnel [col] ++;
+        /* Create the mstart array: the start of the first nonzero element */
+		for (int col = 1 ; col < numCols ; col ++)
+			_mstart[col] = _mstart[col-1] + _mnel[col-1];
+		int [] numAlreadySetValuesThisColumn = new int [numCols];
+		
+        /* Create the mrwind and dmatval arrays */
+		for (Entry<Integer, Cell> e : this.linearCoefs.entrySet())
+		{
+			final int row = e.getKey();
+			final Cell c = e.getValue();
+			if (c.lCoefs != null)
+				for (Entry<Integer, Double> lc : c.lCoefs.entrySet())
+				{
+					final int col = lc.getKey();
+					final int positionInDataArray = _mstart [col] + numAlreadySetValuesThisColumn [col];
+					_mrwind [positionInDataArray] = row;
+					_dmatval [positionInDataArray] = lc.getValue(); 
+					numAlreadySetValuesThisColumn [col] ++;
+				}
+		}
+	}
+
+	
 	double[] getCellLinearCoefsFull(int cellIndex)
 	{
 		double[] res = new double[model.getNumScalarDecisionVariables()];

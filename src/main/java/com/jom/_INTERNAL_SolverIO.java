@@ -307,6 +307,7 @@ class _INTERNAL_SolverIO
 		DoubleMatrix1D multiplierOfLowerBoundConstraintToPrimalVariables;
 		DoubleMatrix1D multiplierOfUpperBoundConstraintToPrimalVariables;
 		double         primalCost;
+		double bestOptimalityBound;
 
 		DoubleMatrix1D primalSolution;
 		DoubleMatrix1D primalValuePerConstraint;

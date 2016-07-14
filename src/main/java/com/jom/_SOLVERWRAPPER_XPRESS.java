@@ -15,15 +15,20 @@
 
 package com.jom;
 
-import cern.colt.matrix.tdouble.DoubleFactory1D;
-import cern.jet.math.tdouble.DoubleFunctions;
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import com.dashoptimization.*;
+
+import com.dashoptimization.XPRS;
+import com.dashoptimization.XPRSconstants;
+import com.dashoptimization.XPRSenumerations;
+import com.dashoptimization.XPRSprob;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+
+import cern.colt.list.tint.IntArrayList;
+import cern.colt.matrix.tdouble.DoubleFactory1D;
+import cern.jet.math.tdouble.DoubleFunctions;
 
 /** @author Pablo */
 class _SOLVERWRAPPER_XPRESS
@@ -54,38 +59,147 @@ class _SOLVERWRAPPER_XPRESS
             final double [] _drange = s.in.constraintUpperBound.copy ().assign(s.in.constraintLowerBound,DoubleFunctions.minus).toArray();
             final double[] _dobj = s.in.objectiveFunction.getAffineExpression().getCellLinearCoefsFull(0);
 			_INTERNAL_AffineExpressionCoefs constraintsMatrix = s.in.lhsMinusRhsAccumulatedConstraint.getAffineExpression();
-			int[][] rows = new int[1][];
-			int[][] cols = new int[1][];
-			double[][] vals = new double[1][];
-			constraintsMatrix.getNonZerosRowColVal(rows, cols, vals);
-			final int numNonZerosCoefs = vals [0].length;
+			int[][] return_mnel = new int [0][]; 
+			int[][] return_mrwind = new int [0][];
+			int[][] return_mstart = new int [0][];
+			double[][] return_dmatval = new double [0][];
+			constraintsMatrix.getNonZerosRowColValForXpressSolver(return_mnel, return_mrwind, return_mstart, return_dmatval);
+			final double [] _dlb = new double [ncols];
+			final double [] _dub = new double [ncols];
+			for (int col = 0 ; col < ncols ; col ++)
+			{
+				_dlb [col] = s.in.primalSolutionLowerBound.get(col) == -Double.MAX_VALUE? XPRSconstants.MINUSINFINITY : s.in.primalSolutionLowerBound.get(col);
+				_dub [col] = s.in.primalSolutionUpperBound.get(col) == Double.MAX_VALUE? XPRSconstants.PLUSINFINITY : s.in.primalSolutionLowerBound.get(col);
+			}
+			final int ngents = s.in.primalSolutionIsInteger.zSum();
+			final int nsets = 0;
+			final byte[] _qgtype = new byte [ngents]; 
+			int[] _mgcols = new int [ngents]; 
+			if (ngents > 0)
+			{
+				Arrays.fill(_qgtype , (byte) 'I');
+				IntArrayList nonZerosCols = new IntArrayList ();
+				s.in.primalSolutionIsInteger.getNonZeros(nonZerosCols , new IntArrayList ());
+				_mgcols = nonZerosCols.elements();
+			}
+			final double[] _dlim = null;
+			final byte[] _stype = null;
+			final int[] _msstart = null;
+			final int[] _mscols = null;
+			final double[] _dref = null;
 			
-			PABLOOOO
-			- METER SOLUCION INICIAL
-			- METER ATRIBUTOS ETC.
-			- METER MAXSOLVERTIME
-            final int[] _mstart = new int [];
-            final int[] _mnel = new int [ncols];
-            final int [] _mrwind = new int [s.in.],
+			p.loadGlobal("" , ncols, nrows, _srowtypes, _drhs, _drange, _dobj, return_mstart [0],
+					return_mnel [0], return_mrwind [0], return_dmatval [0], _dlb, _dub, ngents, nsets, _qgtype, _mgcols, _dlim,
+					_stype, _msstart, _mscols, _dref);
+			
+			 p.chgObjSense(s.in.toMinimize? XPRSenumerations.ObjSense.MINIMIZE : XPRSenumerations.ObjSense.MAXIMIZE);
 
-//            double[] _dmatval,
-//            double[] _dlb,
-//            double[] _dub,
-//            int ngents,
-//            int nsets,
-//            byte[] _qgtype,
-//            int[] _mgcols,
-//            double[] _dlim,
-//            byte[] _stype,
-//            int[] _msstart,
-//            int[] _mscols,
-//            double[] _dref)
+			 p.mipOptimize();
+
+			 s.out.bestOptimalityBound = p.getDblAttrib(XPRSconstants.BESTBOUND);
+			 s.out.statusCode = p.getIntAttrib(XPRSconstants.ERRORCODE);
+			 s.out.statusMessage = p.getLastError();
+			 
+			 // pag 454: LPSTATUS --> infreasible, optimal, unbounded... 
+			 // pag 457: MIPSTATUS --> infreasible, optimal, unbounded... 
+			 // pag 467: STOPSTATUS --> stopped by time limit...
+			 
+			 // pag. 369: BARGAPSTOP, BARPRIMALSTOP, FEASTOL, FEASTOLTARGET: stop conditions
+			 // PAG. 410: MAXTIME: maximum solver time
+			 // MIPABSSTOP, MIPRELSTOP: stop criterion based on absolute gap
+			 
+			 s.out.primalCost = p.getDblAttrib(XPRSconstants.MIPBESTOBJVAL);
+			 s.out.
+
+			 
+			 double [] primalSolution = new double [2];
+			 double [] slackSolution = new double [2];
+			 p.getMipSol(primalSolution , slackSolution);
+
+			s.out.statusCode = solstat;
+				s.out.statusMessage = getMsg_CPXgetstat(solstat);
+				s.out.solutionIsOptimal = ((solstat == CPLEXConstants.CPXMIP_OPTIMAL) || (solstat == CPLEXConstants.CPXMIP_OPTIMAL_TOL));
+				s.out.solutionIsFeasible = s.out.solutionIsOptimal || (solstat == CPLEXConstants.CPXMIP_NODE_LIM_FEAS) || (solstat == CPLEXConstants
+						.CPXMIP_TIME_LIM_FEAS) || (solstat == CPLEXConstants.CPXMIP_FAIL_FEAS) || (solstat == CPLEXConstants.CPXMIP_MEM_LIM_FEAS) ||
+						(solstat == CPLEXConstants.CPXMIP_ABORT_FEAS) || (solstat == CPLEXConstants.CPXMIP_FAIL_FEAS_NO_TREE);
+				s.out.feasibleSolutionDoesNotExist = (solstat == CPLEXConstants.CPXMIP_INFEASIBLE);
+				s.out.foundUnboundedSolution = (solstat == CPLEXConstants.CPXMIP_UNBOUNDED);
+
+				if (!s.out.solutionIsFeasible)
+				{
+					s.problemAlreadyAttemptedTobeSolved = true;
+					return s.out.statusCode;
+				} // throw new JOMException("JOM - CPLEX interface. The problem could not be solved. CPLEX error message: " + s.out.statusMessage);
+
+
+				/* Retrieve the optimal cost */
+				double[] objval = new double[1];
+				res = g.CPXgetobjval(env, lp, objval);
+				if (res != 0) throw new JOMException("JOM - CPLEX interface. Failed in call to CPXgetobjval");
+				s.out.primalCost = objval[0];
+
+				/* Check the number of constraitns and variables */
+				int cur_numrows = g.CPXgetnumrows(env, lp);
+				int cur_numcols = g.CPXgetnumcols(env, lp);
+				if (cur_numrows != s.in.numConstraints) throw new JOMException("JOM - CPLEX interface. Unexpected error");
+				if (cur_numcols != s.in.numDecVariables) throw new JOMException("JOM - CPLEX interface. Unexpected error");
+
+				/* Retrieve the optimal primal solution */
+				double[] x = new double[s.in.numDecVariables];
+				res = g.CPXgetx(env, lp, x, 0, cur_numcols - 1);
+				if (res != 0) throw new JOMException("JOM - CPLEX interface. Failed in call to CPXgetx");
+				s.out.primalSolution = DoubleFactory1D.dense.make(x);
+
+				/* Retrieve the values of the constraints in the solution */
+				double[] slack = new double[s.in.numConstraints];
+				res = g.CPXgetslack(env, lp, slack, 0, cur_numrows - 1);
+				if (res != 0) throw new JOMException("JOM - CPLEX interface. Failed in call to CPXgetslack");
+				s.out.primalValuePerConstraint = DoubleFactory1D.dense.make(rhsCplex).assign(DoubleFactory1D.dense.make(slack), DoubleFunctions.minus);
+				s.out.multiplierOfConstraint = DoubleFactory1D.dense.make(s.in.numConstraints);
+				s.out.multiplierOfLowerBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
+				s.out.multiplierOfUpperBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
+
+				s.problemAlreadyAttemptedTobeSolved = true;
+
+				/* Free memory */
+				res = g.CPXfreeprob(env, lp);
+				if (res != 0) throw new JOMException("JOM - CPLEX interface. Failed in call to CPXfreeprob");
+
+				return s.out.statusCode;
+			 
+			 
+
+//			/* Set the environment parameters */
+//			for (Entry<String, Object> entry : this.param.entrySet())
+//			{
+//				String keyStr = entry.getKey();
+//				if (keyStr.equalsIgnoreCase("solverLibraryName")) continue;
+//				int key = new Integer(entry.getKey());
+//				Object value = entry.getValue();
+//				if (value instanceof String)
+//					aux = g.CPXsetstrparam(env, key, ((String) value).getBytes());
+//				else if (value instanceof Integer)
+//					aux = g.CPXsetintparam(env, key, ((Integer) value).intValue());
+//				else if (value instanceof Double)
+//					aux = g.CPXsetdblparam(env, key, ((Double) value).doubleValue());
+//				else
+//					throw new JOMException("JOM - CPLEX interface. Unknown value type in parameters");
+//				if (aux != 0) throw new JOMException("JOM - CPLEX interface. Failure to set parameter: key = " + key);
+//			}
+
 			
-			p.loadGlobal("", 2, 2, _srowtypes , new double [] {1,1.5} , new double [] {1,1.5},new double [] {1,1} , 
-					 new int [] {0,2} , new int [] {2,2} , new int [] {0,1,0,1}, new double [] {1,1,-1,1}, new double [] {0,0} , 
-					 new double [] {XPRSconstants.PLUSINFINITY , XPRSconstants.PLUSINFINITY } , 
-					 2 , 0 , new byte [] {'I' , 'I'} , 
-					 new int [] {0,1} , new double [2] , new byte [2] , null ,  null , null);
+//			p.loadGlobal("", 2, 2, _srowtypes , new double [] {1,1.5} , new double [] {1,1.5},new double [] {1,1} , 
+//					 new int [] {0,2} , new int [] {2,2} , new int [] {0,1,0,1}, new double [] {1,1,-1,1}, new double [] {0,0} , 
+//					 new double [] {XPRSconstants.PLUSINFINITY , XPRSconstants.PLUSINFINITY } , 
+//					 2 , 0 , new byte [] {'I' , 'I'} , 
+//					 new int [] {0,1} , new double [2] , new byte [2] , null ,  null , null);
+
+			
+//			PABLOOOO
+//			- METER SOLUCION INICIAL
+//			- METER ATRIBUTOS ETC.
+//			- METER MAXSOLVERTIME
+
 
 	
 		} catch (RuntimeException e)
@@ -95,47 +209,6 @@ class _SOLVERWRAPPER_XPRESS
 			e.printStackTrace(); throw e;
 		} 
 		
-		_JNA_CPLEX g = (_JNA_CPLEX) Native.loadLibrary(solverLibraryName, _JNA_CPLEX.class);
-
-		int[] status = new int[1];
-
-		Pointer env = g.CPXopenCPLEX(status);
-		/* If an error occurs, the status value indicates the reason for failure. A call to CPXgeterrorstring will produce the text of the error
-		message. Note that CPXopenCPLEX produces no output, so the only way to see the cause of the error is to use CPXgeterrorstring. For other
-		CPLEX routines, the errors will be seen if the CPX_PARAM_SCRIND indicator is set to CPX_ON. */
-		if (env == null)
-		{
-			byte[] errmsg = new byte[1024];
-			g.CPXgeterrorstring(env, status[0], errmsg);
-			throw new JOMException("JOM - CPLEX interface. Could not open CPLEX environment: " + new String(errmsg));
-		}
-
-		int aux;
-		/* Set the environment parameters */
-		for (Entry<String, Object> entry : this.param.entrySet())
-		{
-			String keyStr = entry.getKey();
-			if (keyStr.equalsIgnoreCase("solverLibraryName")) continue;
-			int key = new Integer(entry.getKey());
-			Object value = entry.getValue();
-			if (value instanceof String)
-				aux = g.CPXsetstrparam(env, key, ((String) value).getBytes());
-			else if (value instanceof Integer)
-				aux = g.CPXsetintparam(env, key, ((Integer) value).intValue());
-			else if (value instanceof Double)
-				aux = g.CPXsetdblparam(env, key, ((Double) value).doubleValue());
-			else
-				throw new JOMException("JOM - CPLEX interface. Unknown value type in parameters");
-			if (aux != 0) throw new JOMException("JOM - CPLEX interface. Failure to set parameter: key = " + key);
-		}
-
-		/* Create the problem */
-		Pointer lp = g.CPXcreateprob(env, status, "Problem name".getBytes());
-
-		/* A returned pointer of NULL may mean that not enough memory was available or there was some other problem. In the case of failure, an
-		error message will have been written to the error channel from inside CPLEX. In this example, the setting of the parameter CPX_PARAM_SCRIND
-		causes the error message to appear on stdout. */
-		if (lp == null) throw new JOMException("JOM - CPLEX interface. Failed to create LP");
 
 		/* Set maximization or minimization problem */
 		g.CPXchgobjsen(env, lp, (s.in.toMinimize) ? _JNA_CPLEX.CPX_MIN : _JNA_CPLEX.CPX_MAX); /* Problem is maximization */
