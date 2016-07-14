@@ -21,10 +21,11 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /** This class contains the methods for handling optimization problems, defining their input parameters (if any), decision variables,
- * objetive function and constraints, choosing and calling a solver to obtain a numerical solution, and retrieving that solution. 
+ * objetive function and constraints, choosing and calling a solver to obtain a numerical solution, and retrieving that solution.
  * @author Pablo Pavon Mariño
- * @see http://www.net2plan.com/jom
+ * @see <a href="http://www.net2plan.com/jom">http://www.net2plan.com/jom</a>
  */
+
 public class OptimizationProblem
 {
 	final static int MAX_NUMBER_DIMENSIONS_INPUTPARAMETER = 10;
@@ -75,7 +76,7 @@ public class OptimizationProblem
 	 *  access the multipliers and other constraint-related info.
 	 * Constraints have the form: expression-left-hand-side connector expression-right-hand-side.
 	 * Expressions are strings that can be evaluated to arrayed expressions of the defined input parameters and decision variables. Connectors must
-	 * be of the type less-equal (<= or =<), greater-equal (>= or =>) or equal (==).
+	 * be of the type less-equal {@literal (<= or =<)}, greater-equal {@literal (>= or =>)} or equal {@literal (==)}.
 	 * @param expression The string expression of the constraint.
 	 * @return The Expression object holding the expression (lhs - rhs), where lhs and rhs are the expression in the left-hand-side and
 	 * right-hand-side of the constraint
@@ -91,7 +92,7 @@ public class OptimizationProblem
 	/** Adds (an array of) constraints to the optimization problem.
 	 * Constraints have the form: expression-left-hand-side connector expression-right-hand-side.
 	 * Expressions are strings that can be evaluated to arrayed expressions of the defined input parameters and decision variables. Connectors must
-	 * be of the type less-equal (<= or =<), greater-equal (>= or =>) or equal (==).
+	 * be of the type less-equal {@literal (<= or =<)}, greater-equal {@literal (>= or =>)} or equal {@literal (==)}.
 	 * @param expression The string expression of the constraint.
 	 * @param identifier A unique string given to identify this constraint
 	 * @return The Expression object holding the expression (lhs - rhs), where lhs and rhs are the expression in the left-hand-side and
@@ -119,6 +120,9 @@ public class OptimizationProblem
 	}
 
 	/** Same as addDecisionVariable(name, isInteger, size, null, null);
+	 * @param name Name of the array of decision variables, as it will used in the expressions.
+	 * @param isInteger True if the decision variables in the array are all constrained to be integer
+	 * @param size One coordinate per dimension of the array, each coordinate is the size of the array in the respective dimension.
 	 */
 	public void addDecisionVariable(String name, boolean isInteger, int[] size)
 	{
@@ -127,6 +131,11 @@ public class OptimizationProblem
 
 	/** addDecisionVariable(String name, boolean isInteger, int[] size, DoubleMatrixND x_l, DoubleMatrixND x_u), but now the lower (upper) bounds
 	 * for all the decision variables in the array are equal to x_l (x_u).
+	 * @param name Name of the array of decision variables, as it will used in the expressions.
+	 * @param isInteger True if the decision variables in the array are all constrained to be integer
+	 * @param size One coordinate per dimension of the array, each coordinate is the size of the array in the respective dimension.
+	 * @param x_l The lower bounds of the variables are created as new DoubleMatrixND (size,x_l)
+	 * @param x_u The upper bounds of the variables are created as new DoubleMatrixND (size,x_u)
 	 */
 	public void addDecisionVariable(String name, boolean isInteger, int[] size, double x_l, double x_u)
 	{
@@ -216,7 +225,7 @@ public class OptimizationProblem
 		return inputParameters.get(name);
 	}
 
-	/** Returns the multipliers of the automatic constraints: x_l <= varName added to the problem, where x_l is the array of lower bounds provided,
+	/** Returns the multipliers of the automatic constraints: \(x_l \leq varName\) added to the problem, where \(x_l\) is the array of lower bounds provided,
 	 * associated to the decision variable.
 	 * @param decisionVariableName The name of the decision variable
 	 * @return The multipliers as an array of the same size of the decision variables
@@ -230,7 +239,7 @@ public class OptimizationProblem
 		return new DoubleMatrixND(dv.getVarIds().getSize(), values.copy());
 	}
 
-	/** Returns the multipliers of the automatic constraints: varName <= x_u added to the problem, where x_u is the array of upper bounds provided,
+	/** Returns the multipliers of the automatic constraints: \(varName \leq x_u\) added to the problem, where \(x_u\) is the array of upper bounds provided,
 	 * associated to the decision variable.
 	 * @param decisionVariableName The name of the decision variable
 	 * @return The multipliers as an array of the same size of the decision variables
@@ -316,7 +325,7 @@ public class OptimizationProblem
 	}
 
 	/** Returns the slack of the given constraints. It should be zero for equality constraints.
-	 * @param constraintIdentifier
+	 * @param constraintIdentifier Id of the constrain
 	 * @return An array of the same size of the constraints, with the slack values
 	 */
 	public DoubleMatrixND getSlackOfConstraint(String constraintIdentifier)
@@ -329,6 +338,7 @@ public class OptimizationProblem
 	}
 
 	/** Returns true if the given name corresponds to an input parameter defined for the problem
+	 * @param name Name of the input parameter
 	 * @return True if the previous statement is true, false otherwise
 	 */
 	public boolean isInputParameter(String name)

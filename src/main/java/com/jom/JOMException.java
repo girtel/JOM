@@ -23,7 +23,7 @@ package com.jom;
 /**
  *
  * @author Pablo Pavon Mariño
- * @see http://www.net2plan.com/jom
+ * @see <a href="http://www.net2plan.com/jom">http://www.net2plan.com/jom</a>
  */
 public class JOMException extends RuntimeException
 {
