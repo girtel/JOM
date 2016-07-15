@@ -313,6 +313,7 @@ class _SOLVERWRAPPER_GLPK
 							.glpk_statusMessage_solve(s, status));
 
 				s.out.primalCost = g.glp_mip_obj_val(lp);
+				if (s.out.solutionIsOptimal) s.out.bestOptimalityBound = s.out.primalCost;
 				int nCols = g.glp_get_num_cols(lp);
 				if (nCols != s.in.numDecVariables) throw new JOMException("JOM - GLPK interface. Unexptected error");
 				for (int cont = 1; cont <= nCols; cont++)
@@ -373,6 +374,7 @@ class _SOLVERWRAPPER_GLPK
 				s.out.solutionIsFeasible = true;
 				s.out.solutionIsOptimal = true;
 				s.out.primalCost = g.glp_ipt_obj_val(lp);
+				if (s.out.solutionIsOptimal) s.out.bestOptimalityBound = s.out.primalCost;
 				int nCols = g.glp_get_num_cols(lp);
 				if (nCols != s.in.numDecVariables) throw new JOMException("JOM - GLPK interface. Unexpected error");
 				for (int cont = 1; cont <= nCols; cont++)
@@ -441,6 +443,8 @@ class _SOLVERWRAPPER_GLPK
 				s.out.solutionIsFeasible = true;
 				s.out.solutionIsOptimal = true;
 				s.out.primalCost = g.glp_get_obj_val(lp);
+				if (s.out.solutionIsOptimal) s.out.bestOptimalityBound = s.out.primalCost;
+
 				int nCols = g.glp_get_num_cols(lp);
 				if (nCols != s.in.numDecVariables) throw new JOMException("JOM - GLPK interface. Unexpected error");
 				for (int cont = 1; cont <= nCols; cont++)

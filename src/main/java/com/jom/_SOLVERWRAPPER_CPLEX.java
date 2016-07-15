@@ -235,6 +235,7 @@ class _SOLVERWRAPPER_CPLEX
 			res = g.CPXgetobjval(env, lp, objval);
 			if (res != 0) throw new JOMException("JOM - CPLEX interface. Failed in call to CPXgetobjval");
 			s.out.primalCost = objval[0];
+			if (s.out.solutionIsOptimal) s.out.bestOptimalityBound = s.out.primalCost;
 
 			/* Check the number of constraitns and variables */
 			int cur_numrows = g.CPXgetnumrows(env, lp);

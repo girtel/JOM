@@ -26,7 +26,8 @@ public class TestXPRESS_JOM
   	
 		/* Call the solver to solve the problem */
 //		op.solve("cplex" , "maxSolverTimeInSeconds" , 1.0 , "solverLibraryName" , "c:\\windows\\system32\\cplex.dll");
-		op.solve("xpress" , "maxSolverTimeInSeconds" , 1.0 , "solverLibraryName" , "c:\\xpressmp\\xpauth.xpr");
+//		op.solve("xpress" , "maxSolverTimeInSeconds" , 1.0 , "solverLibraryName" , "c:\\xpressmp\\xpauth.xpr");
+		op.solve("jipopt" , "maxSolverTimeInSeconds" , 1.0 , "solverLibraryName" , "jipopt");
 		
 		System.out.println("optimal cost: " + op.getOptimalCost ());
 		System.out.println("BEST optimal cost: " + op.getBestOptimalityBound());

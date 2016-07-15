@@ -384,6 +384,8 @@ class _SOLVERWRAPPER_IPOPT
 				s.out.foundUnboundedSolution = false;
 				break;
 		}
+		if (s.out.solutionIsOptimal) s.out.bestOptimalityBound = s.out.primalCost;
+
 	}
 
 }

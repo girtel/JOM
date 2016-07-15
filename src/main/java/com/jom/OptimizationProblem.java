@@ -671,6 +671,12 @@ public class OptimizationProblem
 			_SOLVERWRAPPER_IPOPT solver = new _SOLVERWRAPPER_IPOPT(solverIO, params);
 			// Debug.pln(solver.printOptions ());
 			solver.solve();
+		} else if (solverName.equalsIgnoreCase("jipopt"))
+		{
+			// int errorCode = ExampleJNA_IPOPT.solveIPOPTExample ();
+			_SOLVERWRAPPER_JIPOPT solver = new _SOLVERWRAPPER_JIPOPT(solverIO, params);
+			// Debug.pln(solver.printOptions ());
+			solver.solve();
 		} else if (solverName.equalsIgnoreCase("xpress"))
 		{
 			_SOLVERWRAPPER_XPRESS solver = new _SOLVERWRAPPER_XPRESS(solverIO, params);
@@ -834,13 +840,14 @@ public class OptimizationProblem
 			params.put((String) paramName, value);
 		}
 
-		if (!solverName.equalsIgnoreCase("glpk") && !solverName.equalsIgnoreCase("ipopt") && !solverName.equalsIgnoreCase("cplex") && !solverName.equalsIgnoreCase("xpress"))
+		if (!solverName.equalsIgnoreCase("glpk") && !solverName.equalsIgnoreCase("ipopt") && !solverName.equalsIgnoreCase("jipopt")  && !solverName.equalsIgnoreCase("cplex") && !solverName.equalsIgnoreCase("xpress"))
 			throw new JOMException("Unknown solver name");
 
 		/* Check if the chosen solver can solve the type of problem */
 		if (solverName.equalsIgnoreCase("cplex") && !solverIO.isLinearProblem()) throw new JOMException("CPLEX cannot solve non linear problems");
 		if (solverName.equalsIgnoreCase("glpk") && !solverIO.isLinearProblem()) throw new JOMException("GLPK cannot solve non linear problems");
 		if (solverName.equalsIgnoreCase("ipopt") && solverIO.in.hasIntegerVariables) throw new JOMException("IPOPT cannot solve problems with integer variables");
+		if (solverName.equalsIgnoreCase("jipopt") && solverIO.in.hasIntegerVariables) throw new JOMException("IPOPT cannot solve problems with integer variables");
 		if (solverName.equalsIgnoreCase("xpress") && !solverIO.isLinearProblem()) throw new JOMException("XPRESS cannot solve non linear problems");
 
 		/* Default COMMON: String solverLibraryName */
@@ -859,6 +866,11 @@ public class OptimizationProblem
 				String os = System.getProperty("os.name");
 				if (os.startsWith("Windows")) params.put("solverLibraryName", "ipopt.dll"); 
 				else params.put("solverLibraryName", "libipopt"); // Linux
+			} else if (solverName.equalsIgnoreCase("jipopt"))
+			{
+				String os = System.getProperty("os.name");
+				if (os.startsWith("Windows")) params.put("solverLibraryName", "jipopt"); 
+				else params.put("solverLibraryName", "jipopt"); // Linux
 			} else if (solverName.equalsIgnoreCase("cplex"))
 			{
 				String os = System.getProperty("os.name");
@@ -879,6 +891,10 @@ public class OptimizationProblem
 				if (val_maxSolverTimeInSeconds > 0) params.put("tm_lim", numMilisecondsTimeLimit);
 				params.remove("maxSolverTimeInSeconds");
 			} else if (solverName.equalsIgnoreCase("ipopt"))
+			{
+				if (val_maxSolverTimeInSeconds > 0) params.put("max_cpu_time", val_maxSolverTimeInSeconds);
+				params.remove("maxSolverTimeInSeconds");
+			} else if (solverName.equalsIgnoreCase("jipopt"))
 			{
 				if (val_maxSolverTimeInSeconds > 0) params.put("max_cpu_time", val_maxSolverTimeInSeconds);
 				params.remove("maxSolverTimeInSeconds");
@@ -904,7 +920,7 @@ public class OptimizationProblem
 		}
 
 		/* Default IPOPT SPECIFIC: print_level , derivative_test */
-		if (solverName.equalsIgnoreCase("ipopt"))
+		if (solverName.equalsIgnoreCase("ipopt") || solverName.equalsIgnoreCase("jipopt"))
 		{
 			if (!params.containsKey("print_level")) params.put("print_level", 0); // print_level defaults to 0
 			if (!params.containsKey("derivative_test")) params.put("derivative_test", "first-order"); // derivative_test defaults to first-order

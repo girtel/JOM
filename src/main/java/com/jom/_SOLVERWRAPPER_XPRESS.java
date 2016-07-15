@@ -24,6 +24,12 @@ package com.jom;
  * PABLO: how to get multipliers of LB and UB constraints
  *   */
 
+/* 
+ * BARCGAP: Is the best bound (barrier with no crossover) 
+ * 
+ * */
+
+
 /*
  * PABLO: I may have a bound even if a feasible solution was not found?
  * PABLO: can happen that dual and primal feasible, but not optimal??  
@@ -34,7 +40,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import com.dashoptimization.DoubleHolder;
 import com.dashoptimization.XPRS;
 import com.dashoptimization.XPRSconstants;
 import com.dashoptimization.XPRSenumerations;
@@ -209,9 +214,6 @@ class _SOLVERWRAPPER_XPRESS
 				/* Call the solver */
 				p.lpOptimize();
 
-				p.writeProb("c:\\Dropbox\\mpsFileProb");
-				p.writeSol("c:\\Dropbox\\mpsFileSol");
-				
 				s.problemAlreadyAttemptedTobeSolved = true;
 				s.out.bestOptimalityBound = s.in.toMinimize? -Double.MAX_VALUE : Double.MAX_VALUE; //p.getDblAttrib(XPRSconstants.BESTBOUND); // pablo: this may not be the one for this
 				s.out.statusCode = p.getIntAttrib(XPRSconstants.ERRORCODE);
@@ -219,7 +221,6 @@ class _SOLVERWRAPPER_XPRESS
 
 				final int lpStatus = p.getIntAttrib(XPRSconstants.LPSTATUS);
 				s.out.solutionIsOptimal = (lpStatus == XPRSconstants.LP_OPTIMAL);
-				final int a = p.getIntAttrib(XPRSconstants.PRIMALINFEAS);
 				s.out.solutionIsFeasible = s.out.solutionIsOptimal || ((lpStatus == XPRSconstants.LP_UNFINISHED) && (p.getIntAttrib(XPRSconstants.PRIMALINFEAS) == 0));  
 				s.out.feasibleSolutionDoesNotExist = (lpStatus == XPRSconstants.LP_INFEAS);
 				s.out.foundUnboundedSolution = (lpStatus == XPRSconstants.LP_UNBOUNDED);
@@ -238,11 +239,8 @@ class _SOLVERWRAPPER_XPRESS
 				double [] reducedCosts = new double [s.in.numDecVariables];
 				p.getLpSol(primalSolution , slackSolution , mulipliersSolution , reducedCosts);
 				s.out.primalSolution = DoubleFactory1D.dense.make(primalSolution);
-				System.out.println("primalSolution: " + Arrays.toString(primalSolution));
-				//DoubleHolder obj = new DoubleHolder(); p.calcObjective(primalSolution , obj);
-				s.out.primalCost = s.in.objectiveFunction.evaluate_internal(primalSolution).toValue();
-				//s.out.bestOptimalityBound;
-				
+				s.out.primalCost = p.getDblAttrib(XPRSconstants.LPOBJVAL); // s.in.objectiveFunction.evaluate_internal(primalSolution).toValue();
+				if (s.out.solutionIsOptimal) s.out.bestOptimalityBound = s.out.primalCost;
 				
 				/* Retrieve the values of the constraints in the solution */
 				double[] rhsCplex = (s.in.numConstraints == 0) ? new double[0] :
@@ -272,19 +270,9 @@ class _SOLVERWRAPPER_XPRESS
 				}
 				
 				
-				System.out.println(s.out);
-				
+//				System.out.println(s.out);
+//				
 				return s.out.statusCode;
-
-				
-				 // pag 454: LPSTATUS --> infreasible, optimal, unbounded... 
-				 // pag 457: MIPSTATUS --> infreasible, optimal, unbounded... 
-				 // pag 467: STOPSTATUS --> stopped by time limit...
-				 
-				 // pag. 369: BARGAPSTOP, BARPRIMALSTOP, FEASTOL, FEASTOLTARGET: stop conditions
-				 // PAG. 410: MAXTIME: maximum solver time
-				 // MIPABSSTOP, MIPRELSTOP: stop criterion based on absolute gap
-				//throw new RuntimeException ("Only MIPs");
 			}
 	
 		} catch (RuntimeException e)
