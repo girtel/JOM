@@ -335,6 +335,7 @@ class _SOLVERWRAPPER_IPOPT
 		s.out.primalValuePerConstraint = DoubleFactory1D.dense.make(gArray);
 		s.out.multiplierOfConstraint = DoubleFactory1D.dense.make(mult_g);
 		s.out.primalCost = obj_val[0];
+		s.out.bestOptimalityBound = s.in.toMinimize? -Double.MAX_VALUE : Double.MAX_VALUE; //p.getDblAttrib(XPRSconstants.BESTBOUND); // pablo: this may not be the one for this
 
 		switch (status)
 		{

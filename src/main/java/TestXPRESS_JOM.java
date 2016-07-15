@@ -25,8 +25,15 @@ public class TestXPRESS_JOM
   		op.addConstraint(" sum(sum(x,2),1) <= 1");  // for each k \sum_{ij} x_{ijk} <= 1
   	
 		/* Call the solver to solve the problem */
+//		op.solve("cplex" , "maxSolverTimeInSeconds" , 1.0 , "solverLibraryName" , "c:\\windows\\system32\\cplex.dll");
 		op.solve("xpress" , "maxSolverTimeInSeconds" , 1.0 , "solverLibraryName" , "c:\\xpressmp\\xpauth.xpr");
+		
+		System.out.println("optimal cost: " + op.getOptimalCost ());
+		System.out.println("BEST optimal cost: " + op.getBestOptimalityBound());
+		
 		if (!op.solutionIsOptimal ()) throw new RuntimeException ("An optimal solution was not found");
+		
+		
 		
 		/* Print the solution */
 		DoubleMatrixND sol = op.getPrimalSolution("x");

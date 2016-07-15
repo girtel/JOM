@@ -20,9 +20,15 @@ package com.jom;
  * PABLO: Any benefit from loafglobal64 in Java? I mean that all the arrays have at most 2^32 vals...
  * PABLO: Which is the control for getting the best bound in LP?
  * PABLO: Which is the control for getting the output status when LP found feasible but not optimal solution?
- * PABLO: Error getting the primal solution: calcObjective gives error inside XPROSprob (5793), no further message
+ * PABLO: Error getting the primal solution: calcObjective gives error inside XPROSprob (line 5793), no further message
  * PABLO: how to get multipliers of LB and UB constraints
  *   */
+
+/*
+ * PABLO: I may have a bound even if a feasible solution was not found?
+ * PABLO: can happen that dual and primal feasible, but not optimal??  
+ * PABLO: can happen that dual feasible, primal infeasible => then I still have a bound?
+ */
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -159,10 +165,11 @@ class _SOLVERWRAPPER_XPRESS
 				s.out.feasibleSolutionDoesNotExist = (mipStatus == XPRSconstants.MIP_INFEAS);
 				s.out.foundUnboundedSolution = (mipStatus == XPRSconstants.MIP_UNBOUNDED);
 
+				/* I may have a bound even if a feasible solution was not found */
+				s.out.primalCost = p.getDblAttrib(XPRSconstants.MIPBESTOBJVAL);
+
 				if (!s.out.solutionIsFeasible)
 					return s.out.statusCode;
-
-				s.out.primalCost = p.getDblAttrib(XPRSconstants.MIPBESTOBJVAL);
 
 				/* Check the number of constraitns and variables */
 				if (p.getIntAttrib(XPRSconstants.ROWS) != s.in.numConstraints) throw new JOMException("JOM - XPRESS interface. Unexpected error");
@@ -202,14 +209,18 @@ class _SOLVERWRAPPER_XPRESS
 				/* Call the solver */
 				p.lpOptimize();
 
+				p.writeProb("c:\\Dropbox\\mpsFileProb");
+				p.writeSol("c:\\Dropbox\\mpsFileSol");
+				
 				s.problemAlreadyAttemptedTobeSolved = true;
-				s.out.bestOptimalityBound = p.getDblAttrib(XPRSconstants.BESTBOUND); // pablo: this may not be the one for this
+				s.out.bestOptimalityBound = s.in.toMinimize? -Double.MAX_VALUE : Double.MAX_VALUE; //p.getDblAttrib(XPRSconstants.BESTBOUND); // pablo: this may not be the one for this
 				s.out.statusCode = p.getIntAttrib(XPRSconstants.ERRORCODE);
 				s.out.statusMessage = p.getLastError();
 
 				final int lpStatus = p.getIntAttrib(XPRSconstants.LPSTATUS);
 				s.out.solutionIsOptimal = (lpStatus == XPRSconstants.LP_OPTIMAL);
-				s.out.solutionIsFeasible = s.out.solutionIsOptimal || (lpStatus == XPRSconstants.LP_UNFINISHED); // NOT SURE ABOUT LP_UNFINISHED 
+				final int a = p.getIntAttrib(XPRSconstants.PRIMALINFEAS);
+				s.out.solutionIsFeasible = s.out.solutionIsOptimal || ((lpStatus == XPRSconstants.LP_UNFINISHED) && (p.getIntAttrib(XPRSconstants.PRIMALINFEAS) == 0));  
 				s.out.feasibleSolutionDoesNotExist = (lpStatus == XPRSconstants.LP_INFEAS);
 				s.out.foundUnboundedSolution = (lpStatus == XPRSconstants.LP_UNBOUNDED);
 
@@ -224,13 +235,15 @@ class _SOLVERWRAPPER_XPRESS
 				final double [] primalSolution = new double [s.in.numDecVariables];
 				double [] slackSolution = new double [s.in.numConstraints];
 				double [] mulipliersSolution = new double [s.in.numConstraints];
-				p.getLpSol(primalSolution , slackSolution , mulipliersSolution , null);
+				double [] reducedCosts = new double [s.in.numDecVariables];
+				p.getLpSol(primalSolution , slackSolution , mulipliersSolution , reducedCosts);
 				s.out.primalSolution = DoubleFactory1D.dense.make(primalSolution);
-				DoubleHolder obj = new DoubleHolder(); 
 				System.out.println("primalSolution: " + Arrays.toString(primalSolution));
-				p.calcObjective(primalSolution , obj);
-				s.out.primalCost = obj.value;
-
+				//DoubleHolder obj = new DoubleHolder(); p.calcObjective(primalSolution , obj);
+				s.out.primalCost = s.in.objectiveFunction.evaluate_internal(primalSolution).toValue();
+				//s.out.bestOptimalityBound;
+				
+				
 				/* Retrieve the values of the constraints in the solution */
 				double[] rhsCplex = (s.in.numConstraints == 0) ? new double[0] :
 						Arrays.copyOf(s.in.lhsMinusRhsAccumulatedConstraint.getAffineExpression().getConstantCoefArray(), s.in
@@ -243,6 +256,21 @@ class _SOLVERWRAPPER_XPRESS
 				s.out.multiplierOfConstraint = DoubleFactory1D.dense.make(mulipliersSolution);
 				s.out.multiplierOfLowerBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
 				s.out.multiplierOfUpperBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
+				for (int dv = 0; dv < s.in.numDecVariables; dv++)
+				{
+					double lb = s.in.primalSolutionLowerBound.get(dv);
+					double ub = s.in.primalSolutionUpperBound.get(dv);
+					double val = s.out.primalSolution.get(dv);
+					if (lb == ub)
+					{
+						s.out.multiplierOfUpperBoundConstraintToPrimalVariables.set(dv, reducedCosts[dv]);
+						s.out.multiplierOfUpperBoundConstraintToPrimalVariables.set(dv, -reducedCosts[dv]);
+					} else if (Math.abs(val - lb) > Math.abs(val - ub))
+						s.out.multiplierOfUpperBoundConstraintToPrimalVariables.set(dv, reducedCosts[dv]);
+					else
+						s.out.multiplierOfLowerBoundConstraintToPrimalVariables.set(dv, reducedCosts[dv]);
+				}
+				
 				
 				System.out.println(s.out);
 				
@@ -262,7 +290,8 @@ class _SOLVERWRAPPER_XPRESS
 		} catch (RuntimeException e)
 		{
 			XPRS.free(); // frees the license
-			e.printStackTrace(); 
+			e.printStackTrace();
+			System.out.println(e.getLocalizedMessage());
 			if (p != null) p.destroy(); // frees any memory associated to the object
 			throw e;
 		} 

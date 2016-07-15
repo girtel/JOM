@@ -300,6 +300,17 @@ public class OptimizationProblem
 	{
 		return this.solverIO.out.primalCost;
 	}
+	
+	/** Returns the best optimality bound found by the solver. This is a lower bound of the value of an optimum solution in minimization 
+	 * problems, and an upper bound in maximization problems. Some solvers are able to provide this information, even 
+	 * if a feasible solution is not found. If this information is not available, {@code -Double.MAX_VALUE} is returned in 
+	 * minimization problems, and {@code Double.MAX_VALUE} is returned in maximization problems.
+	 * @return The optimality bound 
+	 */
+	public double getBestOptimalityBound()
+	{
+		return this.solverIO.out.bestOptimalityBound;
+	}
 
 	/** Returns the primal solution obtained after solving the problem for the given (array of) decision variables. If the
 	 * decision variable is constrained to be integer, it is rounded. In this case, we are assuming that non-integer values returned by the solver

@@ -274,7 +274,8 @@ class _SOLVERWRAPPER_GLPK
 		s.out.multiplierOfUpperBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
 		s.out.multiplierOfConstraint = DoubleFactory1D.dense.make(s.in.numConstraints);
 		s.out.primalValuePerConstraint = DoubleFactory1D.dense.make(s.in.numConstraints);
-
+		s.out.bestOptimalityBound = s.in.toMinimize? -Double.MAX_VALUE : Double.MAX_VALUE; //p.getDblAttrib(XPRSconstants.BESTBOUND); // pablo: this may not be the one for this
+		
 		/* If MILP use the MILP solver */
 		if (s.in.hasIntegerVariables)
 		{
