@@ -163,6 +163,12 @@ class _SOLVERWRAPPER_CPLEX
 			s.out.feasibleSolutionDoesNotExist = (solstat == CPLEXConstants.CPXMIP_INFEASIBLE);
 			s.out.foundUnboundedSolution = (solstat == CPLEXConstants.CPXMIP_UNBOUNDED);
 
+			/* Retrieve the best optimality bound cost */
+			double[] bestoptimalitybound = new double[1];
+			res = g.CPXgetbestobjval(env, lp, bestoptimalitybound);
+			if (res != 0) throw new JOMException("JOM - CPLEX interface. Failed in call to CPXgetbestobjval");
+			s.out.bestOptimalityBound = bestoptimalitybound[0];
+
 			if (!s.out.solutionIsFeasible)
 			{
 				s.problemAlreadyAttemptedTobeSolved = true;
@@ -219,7 +225,8 @@ class _SOLVERWRAPPER_CPLEX
 			s.out.solutionIsFeasible = s.out.solutionIsOptimal || (solstat == CPLEXConstants.CPX_STAT_NUM_BEST);
 			s.out.feasibleSolutionDoesNotExist = (solstat == CPLEXConstants.CPX_STAT_INFEASIBLE);
 			s.out.foundUnboundedSolution = (solstat == CPLEXConstants.CPX_STAT_UNBOUNDED);
-
+			s.out.bestOptimalityBound = s.in.toMinimize? -Double.MAX_VALUE : Double.MAX_VALUE; // CPLEX may not provide this info
+			
 			if (!s.out.solutionIsFeasible)
 				throw new JOMException("JOM - CPLEX interface. CPLEX: The problem could not be solved. CPLEX error message: " + s.out.statusMessage);
 

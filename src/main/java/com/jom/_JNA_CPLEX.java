@@ -55,6 +55,8 @@ public interface _JNA_CPLEX extends Library
 	int CPXgetnumrows(Pointer env, Pointer lp);
 
 	int CPXgetobjval(Pointer env, Pointer lp, double[] objval);
+	
+	int CPXgetbestobjval(Pointer env, Pointer lp, double[] objval);
 
 	int CPXgetpi(Pointer env, Pointer lp, double[] pi, int begin, int end);
 
