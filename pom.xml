@@ -3,9 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>es.upct.girtel</groupId>
     <artifactId>jom</artifactId>
-    <version>0.1.16</version>
+    <version>0.1.6</version>
     <name>JOM (Java Optimization Modeler)</name>
     <packaging>jar</packaging>
+    <!--  <url>http://www.net2plan.com/jom</url> -->
 
 	<properties>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -79,6 +80,7 @@
                                 <include>OptimizationProblem.java</include>
                                 <include>Expression.java</include>
                                 <include>JOMException.java</include>
+                                <include>SolverTester.java</include>
                             </sourceFileIncludes>
                             <sourcepath>${project.basedir}/src/main/java/com/jom</sourcepath>
                             <!-- Adding itself as a dependency in order to find the classes which the sources depend on -->

@@ -121,7 +121,6 @@ class _SOLVERWRAPPER_XPRESS
 			final double[] _dref = null;
 			
 			/* Set the environment parameters, including the maxSolverTime */
-			System.out.println(this.param);
 			for (Entry<String, Object> entry : this.param.entrySet())
 			{
 				String keyStr = entry.getKey();
@@ -133,10 +132,7 @@ class _SOLVERWRAPPER_XPRESS
 				else if (value instanceof Integer)
 					p.setIntControl(key , (Integer) value);
 				else if (value instanceof Double)
-				{
-					System.out.println("here");
 					p.setDblControl(key , (double) value);
-				}
 				else
 					throw new JOMException("JOM - XPRESS interface. Unknown value type in parameters");
 			}
@@ -194,8 +190,6 @@ class _SOLVERWRAPPER_XPRESS
 				s.out.multiplierOfLowerBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
 				s.out.multiplierOfUpperBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
 				
-				System.out.println(s.out);
-				
 				return s.out.statusCode;
 			}
 			else
@@ -238,9 +232,8 @@ class _SOLVERWRAPPER_XPRESS
 				double [] reducedCosts = new double [s.in.numDecVariables];
 				p.getLpSol(primalSolution , slackSolution , mulipliersSolution , reducedCosts);
 				s.out.primalSolution = DoubleFactory1D.dense.make(primalSolution);
-				System.out.println("primalSolution: " + Arrays.toString(primalSolution));
 				//DoubleHolder obj = new DoubleHolder(); p.calcObjective(primalSolution , obj);
-				s.out.primalCost = s.in.objectiveFunction.evaluate_internal(primalSolution).toValue();
+				s.out.primalCost = p.getDblAttrib(XPRSconstants.LPOBJVAL);//s.in.objectiveFunction.evaluate_internal(primalSolution).toValue();
 				//s.out.bestOptimalityBound;
 				
 				
@@ -271,25 +264,12 @@ class _SOLVERWRAPPER_XPRESS
 						s.out.multiplierOfLowerBoundConstraintToPrimalVariables.set(dv, reducedCosts[dv]);
 				}
 				
-				
-				System.out.println(s.out);
-				
 				return s.out.statusCode;
-
-				
-				 // pag 454: LPSTATUS --> infreasible, optimal, unbounded... 
-				 // pag 457: MIPSTATUS --> infreasible, optimal, unbounded... 
-				 // pag 467: STOPSTATUS --> stopped by time limit...
-				 
-				 // pag. 369: BARGAPSTOP, BARPRIMALSTOP, FEASTOL, FEASTOLTARGET: stop conditions
-				 // PAG. 410: MAXTIME: maximum solver time
-				 // MIPABSSTOP, MIPRELSTOP: stop criterion based on absolute gap
-				//throw new RuntimeException ("Only MIPs");
 			}
 	
 		} catch (RuntimeException e)
 		{
-			XPRS.free(); // frees the license
+			try { XPRS.free(); } catch (Exception ee) {} // frees the license, can fail if already done
 			e.printStackTrace();
 			System.out.println(e.getLocalizedMessage());
 			if (p != null) p.destroy(); // frees any memory associated to the object
