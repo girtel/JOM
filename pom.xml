@@ -10,7 +10,6 @@
 
 	<properties>
     	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    	<xprsSolverPath>c:\xpressmp\lib\xprs.jar</xprsSolverPath>
   	</properties>
 
     <dependencies>
@@ -23,14 +22,6 @@
             <groupId>net.sourceforge.parallelcolt</groupId>
             <artifactId>parallelcolt</artifactId>
             <version>0.10.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dashoptimization</groupId>
-            <artifactId>xprs</artifactId>
-            <version>0.10.1</version>
-            <scope>system</scope>
-            <systemPath>${xprsSolverPath}</systemPath>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 
@@ -49,6 +40,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <version>3.5.1</version>
+                        
                         <configuration> <!-- To guarantee that we use 1.8 in compiling  -->
                             <source>1.8</source>
                             <target>1.8</target>

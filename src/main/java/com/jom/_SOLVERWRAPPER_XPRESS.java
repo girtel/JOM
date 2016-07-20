@@ -20,11 +20,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import com.dashoptimization.XPRS;
-import com.dashoptimization.XPRSconstants;
-import com.dashoptimization.XPRSenumerations;
-import com.dashoptimization.XPRSprob;
-
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.jet.math.tdouble.DoubleFunctions;
@@ -35,22 +30,61 @@ class _SOLVERWRAPPER_XPRESS
 	private final HashMap<String, Object> param;
 	private final _INTERNAL_SolverIO      s;
 	private final String                  solverLibraryName;
+	private final Class c_XPRSconstants , c_XPRS , c_XPRSenumerations_ObjSense, c_XPRSprob;
+	private final double XPRSconstants_MINUSINFINITY , XPRSconstants_PLUSINFINITY;
+	private final int XPRSconstants_BESTBOUND , XPRSconstants_ERRORCODE , XPRSconstants_MAXTIME;
+	private final int XPRSconstants_MIPSTATUS , XPRSconstants_MIP_OPTIMAL , XPRSconstants_MIP_SOLUTION;
+	private final int XPRSconstants_MIP_INFEAS , XPRSconstants_MIP_UNBOUNDED , XPRSconstants_MIPBESTOBJVAL;
+	private final int XPRSconstants_ROWS , XPRSconstants_COLS;
+	private final int XPRSconstants_LPSTATUS , XPRSconstants_LP_OPTIMAL , XPRSconstants_LPOBJVAL;
+	private final int XPRSconstants_PRIMALINFEAS , XPRSconstants_LP_UNFINISHED, XPRSconstants_LP_INFEAS , XPRSconstants_LP_UNBOUNDED;
 
+	
+	
 	_SOLVERWRAPPER_XPRESS(_INTERNAL_SolverIO s, HashMap<String, Object> param)
 	{
 		this.s = s;
 		this.solverLibraryName = (String) param.get("solverLibraryName");
 		this.param = param;
+		try
+		{
+			this.c_XPRSconstants = Class.forName("com.dashoptimization.XPRSconstants");
+			this.c_XPRS = Class.forName("com.dashoptimization.XPRS");
+			this.c_XPRSprob = Class.forName("com.dashoptimization.XPRSprob");
+			this.c_XPRSenumerations_ObjSense = Class.forName("com.dashoptimization.XPRSenumerations$ObjSense");
+			this.XPRSconstants_MINUSINFINITY = c_XPRSconstants.getField("MINUSINFINITY").getDouble(null);
+			this.XPRSconstants_PLUSINFINITY = c_XPRSconstants.getField("PLUSINFINITY").getDouble(null);
+			this.XPRSconstants_MAXTIME = c_XPRSconstants.getField("MAXTIME").getInt(null);
+			this.XPRSconstants_BESTBOUND = c_XPRSconstants.getField("BESTBOUND").getInt(null);
+			this.XPRSconstants_ERRORCODE = c_XPRSconstants.getField("ERRORCODE").getInt(null);
+			this.XPRSconstants_MIPSTATUS = c_XPRSconstants.getField("MIPSTATUS").getInt(null);
+			this.XPRSconstants_MIP_OPTIMAL = c_XPRSconstants.getField("MIP_OPTIMAL").getInt(null);
+			this.XPRSconstants_MIP_SOLUTION = c_XPRSconstants.getField("MIP_SOLUTION").getInt(null);
+			this.XPRSconstants_MIP_INFEAS = c_XPRSconstants.getField("MIP_INFEAS").getInt(null);
+			this.XPRSconstants_MIPBESTOBJVAL = c_XPRSconstants.getField("MIPBESTOBJVAL").getInt(null);
+			this.XPRSconstants_MIP_UNBOUNDED = c_XPRSconstants.getField("MIP_UNBOUNDED").getInt(null);
+			this.XPRSconstants_ROWS = c_XPRSconstants.getField("ROWS").getInt(null);
+			this.XPRSconstants_COLS = c_XPRSconstants.getField("COLS").getInt(null);
+
+			this.XPRSconstants_LPSTATUS = c_XPRSconstants.getField("LPSTATUS").getInt(null);
+			this.XPRSconstants_LP_OPTIMAL = c_XPRSconstants.getField("LP_OPTIMAL").getInt(null);
+			this.XPRSconstants_LPOBJVAL = c_XPRSconstants.getField("LPOBJVAL").getInt(null);
+			this.XPRSconstants_PRIMALINFEAS = c_XPRSconstants.getField("PRIMALINFEAS").getInt(null);
+			this.XPRSconstants_LP_UNFINISHED = c_XPRSconstants.getField("LP_UNFINISHED").getInt(null);
+			this.XPRSconstants_LP_INFEAS = c_XPRSconstants.getField("LP_INFEAS").getInt(null);
+			this.XPRSconstants_LP_UNBOUNDED = c_XPRSconstants.getField("LP_UNBOUNDED").getInt(null);
+		} catch (Exception e) { e.printStackTrace();throw new JOMException ("The classes of the EXPRESS solver cannot be found. Note that xprs.jar should be in the classpath, or accessible to the class loader."); }
 	}
 
 	int solve()
 	{
-		XPRSprob p = null;
-
+		Object p_XPRSprob_obj = null;
 		try
 		{
-			XPRS.init(solverLibraryName); 
-			p = new XPRSprob();
+			c_XPRS.getMethod("init", String.class).invoke(null , solverLibraryName); 
+			//p = new XPRSprob();
+			
+			p_XPRSprob_obj = c_XPRSprob.newInstance();
             final int ncols = s.in.numDecVariables;
             final int nrows = s.in.numConstraints;
             final double[] _drhs = (s.in.numConstraints == 0) ? new double[0] : 
@@ -85,8 +119,8 @@ class _SOLVERWRAPPER_XPRESS
 			final double [] _dub = new double [ncols];
 			for (int col = 0 ; col < ncols ; col ++)
 			{
-				_dlb [col] = s.in.primalSolutionLowerBound.get(col) == -Double.MAX_VALUE? XPRSconstants.MINUSINFINITY : s.in.primalSolutionLowerBound.get(col);
-				_dub [col] = s.in.primalSolutionUpperBound.get(col) == Double.MAX_VALUE? XPRSconstants.PLUSINFINITY : s.in.primalSolutionUpperBound.get(col);
+				_dlb [col] = s.in.primalSolutionLowerBound.get(col) == -Double.MAX_VALUE? XPRSconstants_MINUSINFINITY : s.in.primalSolutionLowerBound.get(col);
+				_dub [col] = s.in.primalSolutionUpperBound.get(col) == Double.MAX_VALUE? XPRSconstants_PLUSINFINITY : s.in.primalSolutionUpperBound.get(col);
 			}
 			final int ngents = s.in.primalSolutionIsInteger.zSum();
 			final int nsets = 0;
@@ -114,17 +148,17 @@ class _SOLVERWRAPPER_XPRESS
 				{
 					final Double val_maxSolverTimeInSeconds = ((Number) entry.getValue()).doubleValue();
 					if (val_maxSolverTimeInSeconds > 0)
-						p.setIntControl(XPRSconstants.MAXTIME , (int) -Math.ceil(val_maxSolverTimeInSeconds));
+						c_XPRSprob.getMethod("setIntControl" , int.class , int.class).invoke(p_XPRSprob_obj , XPRSconstants_MAXTIME , (int) -Math.ceil(val_maxSolverTimeInSeconds));
 					continue;
 				}
 				int key = new Integer(entry.getKey());
 				Object value = entry.getValue();
 				if (value instanceof String)
-					p.setStrControl(key , (String) value);
+					c_XPRSprob.getMethod("setStrControl" , String.class , String.class).invoke(p_XPRSprob_obj , key , (String) value);
 				else if (value instanceof Integer)
-					p.setIntControl(key , (Integer) value);
+					c_XPRSprob.getMethod("setIntControl" , String.class , int.class).invoke(p_XPRSprob_obj , key , (Integer) value);
 				else if (value instanceof Double)
-					p.setDblControl(key , (double) value);
+					c_XPRSprob.getMethod("setDblControl" , String.class , double.class).invoke(p_XPRSprob_obj , key , (double) value);
 				else
 					throw new JOMException("JOM - XPRESS interface. Unknown value type in parameters");
 			}
@@ -133,40 +167,40 @@ class _SOLVERWRAPPER_XPRESS
 			if (s.in.hasIntegerVariables)
 			{
 				/* load the problem */
-				p.loadGlobal("" , ncols, nrows, _srowtypes, _drhs, _drange, _dobj, return_mstart [0],
+				c_XPRSprob.getMethod("loadGlobal",String.class,int.class,int.class,byte[].class,double[].class, double[].class,double[].class, int[].class, int[].class, int[].class, double[].class, double[].class, double[].class, int.class, int.class, byte[].class, int[].class, double[].class, byte[].class, int[].class, int[].class, double[].class).invoke(p_XPRSprob_obj , "" , ncols, nrows, _srowtypes, _drhs, _drange, _dobj, return_mstart [0],
 						return_mnel [0], return_mrwind [0], return_dmatval [0], _dlb, _dub, ngents, nsets, _qgtype, _mgcols, _dlim,
 						_stype, _msstart, _mscols, _dref);
 				/* Minimize or maximize */
-				p.chgObjSense(s.in.toMinimize? XPRSenumerations.ObjSense.MINIMIZE : XPRSenumerations.ObjSense.MAXIMIZE);
+				c_XPRSprob.getMethod("chgObjSense" , c_XPRSenumerations_ObjSense).invoke(p_XPRSprob_obj , s.in.toMinimize? c_XPRSenumerations_ObjSense.getField("MINIMIZE").get(null) : c_XPRSenumerations_ObjSense.getField("MAXIMIZE").get(null));
 
 				/* Call the solver */
-				p.mipOptimize();
+				c_XPRSprob.getMethod("mipOptimize").invoke(p_XPRSprob_obj);
 
 				s.problemAlreadyAttemptedTobeSolved = true;
-				s.out.bestOptimalityBound = p.getDblAttrib(XPRSconstants.BESTBOUND);
-				s.out.statusCode = p.getIntAttrib(XPRSconstants.ERRORCODE);
-				s.out.statusMessage = p.getLastError();
+				s.out.bestOptimalityBound = ((double) c_XPRSprob.getMethod("getDblAttrib" , int.class).invoke(p_XPRSprob_obj , XPRSconstants_BESTBOUND));
+				s.out.statusCode = ((int) c_XPRSprob.getMethod("getIntAttrib" , int.class).invoke(p_XPRSprob_obj , XPRSconstants_ERRORCODE));
+				s.out.statusMessage = (String) c_XPRSprob.getMethod("getLastError").invoke(p_XPRSprob_obj);
 
-				final int mipStatus = p.getIntAttrib(XPRSconstants.MIPSTATUS);
-				s.out.solutionIsOptimal = (mipStatus == XPRSconstants.MIP_OPTIMAL);
-				s.out.solutionIsFeasible = s.out.solutionIsOptimal || (mipStatus == XPRSconstants.MIP_SOLUTION);
-				s.out.feasibleSolutionDoesNotExist = (mipStatus == XPRSconstants.MIP_INFEAS);
-				s.out.foundUnboundedSolution = (mipStatus == XPRSconstants.MIP_UNBOUNDED);
+				final int mipStatus = (int) c_XPRSprob.getMethod("getIntAttrib",int.class).invoke(p_XPRSprob_obj , XPRSconstants_MIPSTATUS);
+				s.out.solutionIsOptimal = (mipStatus == XPRSconstants_MIP_OPTIMAL);
+				s.out.solutionIsFeasible = s.out.solutionIsOptimal || (mipStatus == XPRSconstants_MIP_SOLUTION);
+				s.out.feasibleSolutionDoesNotExist = (mipStatus == XPRSconstants_MIP_INFEAS);
+				s.out.foundUnboundedSolution = (mipStatus == XPRSconstants_MIP_UNBOUNDED);
 
 				/* I may have a bound even if a feasible solution was not found */
-				s.out.primalCost = p.getDblAttrib(XPRSconstants.MIPBESTOBJVAL);
+				s.out.primalCost = (double) c_XPRSprob.getMethod("getDblAttrib",int.class).invoke(p_XPRSprob_obj , XPRSconstants_MIPBESTOBJVAL);
 
 				if (!s.out.solutionIsFeasible)
 					return s.out.statusCode;
 
 				/* Check the number of constraitns and variables */
-				if (p.getIntAttrib(XPRSconstants.ROWS) != s.in.numConstraints) throw new JOMException("JOM - XPRESS interface. Unexpected error");
-				if (p.getIntAttrib(XPRSconstants.COLS)  != s.in.numDecVariables) throw new JOMException("JOM - XPRESS interface. Unexpected error");
+				if (((int) c_XPRSprob.getMethod("getIntAttrib" , int.class).invoke(p_XPRSprob_obj , XPRSconstants_ROWS)) != s.in.numConstraints) throw new JOMException("JOM - XPRESS interface. Unexpected error");
+				if (((int) c_XPRSprob.getMethod("getIntAttrib" , int.class).invoke(p_XPRSprob_obj , XPRSconstants_COLS))   != s.in.numDecVariables) throw new JOMException("JOM - XPRESS interface. Unexpected error");
 
 				/* Retrieve the optimal primal solution */
 				double [] primalSolution = new double [s.in.numDecVariables];
 				double [] slackSolution = new double [s.in.numConstraints];
-				p.getMipSol(primalSolution , slackSolution);
+				c_XPRSprob.getMethod("getMipSol" , double[].class,double[].class).invoke(p_XPRSprob_obj , primalSolution , slackSolution);
 				s.out.primalSolution = DoubleFactory1D.dense.make(primalSolution);
 
 				/* Retrieve the values of the constraints in the solution */
@@ -176,7 +210,7 @@ class _SOLVERWRAPPER_XPRESS
 				for (int cont = 0; cont < rhsCplex.length; cont++) rhsCplex[cont] = -rhsCplex[cont];
 				
 				double[] slack = new double[s.in.numConstraints];
-				p.calcSlacks(primalSolution , slack);
+				c_XPRSprob.getMethod("calcSlacks" , double[].class,double[].class).invoke(p_XPRSprob_obj , primalSolution , slack);
 				s.out.primalValuePerConstraint = DoubleFactory1D.dense.make(rhsCplex).assign(DoubleFactory1D.dense.make(slack), DoubleFunctions.minus);
 				s.out.multiplierOfConstraint = DoubleFactory1D.dense.make(s.in.numConstraints);
 				s.out.multiplierOfLowerBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
@@ -187,45 +221,45 @@ class _SOLVERWRAPPER_XPRESS
 			else
 			{
 				/* load the problem */
-				p.loadLp("" , ncols, nrows, _srowtypes, _drhs, _drange, _dobj, return_mstart [0], return_mnel [0], return_mrwind [0], 
-						return_dmatval [0], _dlb, _dub);
+				
+				c_XPRSprob.getMethod("loadLp" , String.class, int.class, int.class, byte[].class, double[].class, double[].class, double[].class, int[].class, int[].class, int[].class, 
+						double[].class, double[].class, double[].class).invoke(p_XPRSprob_obj , "" , 
+								ncols, nrows, _srowtypes, _drhs, _drange, _dobj, return_mstart [0], return_mnel [0], 
+								return_mrwind [0],return_dmatval [0], _dlb, _dub);
 				/* Minimize or maximize */
-				p.chgObjSense(s.in.toMinimize? XPRSenumerations.ObjSense.MINIMIZE : XPRSenumerations.ObjSense.MAXIMIZE);
+				c_XPRSprob.getMethod("chgObjSense" , c_XPRSenumerations_ObjSense).invoke(p_XPRSprob_obj , s.in.toMinimize? c_XPRSenumerations_ObjSense.getField("MINIMIZE").get(null) : c_XPRSenumerations_ObjSense.getField("MAXIMIZE").get(null));
 
 				/* Call the solver */
-				p.lpOptimize();
+				c_XPRSprob.getMethod("lpOptimize").invoke(p_XPRSprob_obj);
 
-				p.writeProb("c:\\Dropbox\\mpsFileProb");
-				p.writeSol("c:\\Dropbox\\mpsFileSol");
-				
 				s.problemAlreadyAttemptedTobeSolved = true;
 				s.out.bestOptimalityBound = s.in.toMinimize? -Double.MAX_VALUE : Double.MAX_VALUE; //p.getDblAttrib(XPRSconstants.BESTBOUND); // pablo: this may not be the one for this
-				s.out.statusCode = p.getIntAttrib(XPRSconstants.ERRORCODE);
-				s.out.statusMessage = p.getLastError();
+				s.out.statusCode = (int) c_XPRSprob.getMethod("getIntAttrib",int.class).invoke(p_XPRSprob_obj , XPRSconstants_ERRORCODE);
+				s.out.statusMessage = (String) c_XPRSprob.getMethod("getLastError").invoke(p_XPRSprob_obj); 
 
-				final int lpStatus = p.getIntAttrib(XPRSconstants.LPSTATUS);
-				s.out.solutionIsOptimal = (lpStatus == XPRSconstants.LP_OPTIMAL);
-				final int a = p.getIntAttrib(XPRSconstants.PRIMALINFEAS);
-				s.out.solutionIsFeasible = s.out.solutionIsOptimal || ((lpStatus == XPRSconstants.LP_UNFINISHED) && (p.getIntAttrib(XPRSconstants.PRIMALINFEAS) == 0));  
-				s.out.feasibleSolutionDoesNotExist = (lpStatus == XPRSconstants.LP_INFEAS);
-				s.out.foundUnboundedSolution = (lpStatus == XPRSconstants.LP_UNBOUNDED);
+				final int lpStatus = (int) c_XPRSprob.getMethod("getIntAttrib",int.class).invoke(p_XPRSprob_obj , XPRSconstants_LPSTATUS);
+				s.out.solutionIsOptimal = (lpStatus == XPRSconstants_LP_OPTIMAL);
+				final int a = (int) c_XPRSprob.getMethod("getIntAttrib",int.class).invoke(p_XPRSprob_obj , XPRSconstants_PRIMALINFEAS); 
+				s.out.solutionIsFeasible = s.out.solutionIsOptimal || ((lpStatus == XPRSconstants_LP_UNFINISHED) && (a == 0));  
+				s.out.feasibleSolutionDoesNotExist = (lpStatus == XPRSconstants_LP_INFEAS);
+				s.out.foundUnboundedSolution = (lpStatus == XPRSconstants_LP_UNBOUNDED);
 
 				if (!s.out.solutionIsFeasible)
 					return s.out.statusCode;
 
 				/* Check the number of constraitns and variables */
-				if (p.getIntAttrib(XPRSconstants.ROWS) != s.in.numConstraints) throw new JOMException("JOM - XPRESS interface. Unexpected error");
-				if (p.getIntAttrib(XPRSconstants.COLS)  != s.in.numDecVariables) throw new JOMException("JOM - XPRESS interface. Unexpected error");
+				if (((int) c_XPRSprob.getMethod("getIntAttrib" , int.class).invoke(p_XPRSprob_obj , XPRSconstants_ROWS)) != s.in.numConstraints) throw new JOMException("JOM - XPRESS interface. Unexpected error");
+				if (((int) c_XPRSprob.getMethod("getIntAttrib" , int.class).invoke(p_XPRSprob_obj , XPRSconstants_COLS))   != s.in.numDecVariables) throw new JOMException("JOM - XPRESS interface. Unexpected error");
 
 				/* Retrieve the optimal primal solution */
 				final double [] primalSolution = new double [s.in.numDecVariables];
 				double [] slackSolution = new double [s.in.numConstraints];
 				double [] mulipliersSolution = new double [s.in.numConstraints];
 				double [] reducedCosts = new double [s.in.numDecVariables];
-				p.getLpSol(primalSolution , slackSolution , mulipliersSolution , reducedCosts);
+				c_XPRSprob.getMethod("getLpSol",double[].class,double[].class,double[].class,double[].class).invoke(p_XPRSprob_obj,primalSolution , slackSolution , mulipliersSolution , reducedCosts);
 				s.out.primalSolution = DoubleFactory1D.dense.make(primalSolution);
 				//DoubleHolder obj = new DoubleHolder(); p.calcObjective(primalSolution , obj);
-				s.out.primalCost = p.getDblAttrib(XPRSconstants.LPOBJVAL);//s.in.objectiveFunction.evaluate_internal(primalSolution).toValue();
+				s.out.primalCost = (double) c_XPRSprob.getMethod("getDblAttrib",int.class).invoke(p_XPRSprob_obj, XPRSconstants_LPOBJVAL);//s.in.objectiveFunction.evaluate_internal(primalSolution).toValue();
 				//s.out.bestOptimalityBound;
 				
 				
@@ -236,7 +270,7 @@ class _SOLVERWRAPPER_XPRESS
 				for (int cont = 0; cont < rhsCplex.length; cont++) rhsCplex[cont] = -rhsCplex[cont];
 				
 				double[] slack = new double[s.in.numConstraints];
-				p.calcSlacks(primalSolution , slack);
+				c_XPRSprob.getMethod("calcSlacks" , double[].class,double[].class).invoke(p_XPRSprob_obj , primalSolution , slack);
 				s.out.primalValuePerConstraint = DoubleFactory1D.dense.make(rhsCplex).assign(DoubleFactory1D.dense.make(slack), DoubleFunctions.minus);
 				s.out.multiplierOfConstraint = DoubleFactory1D.dense.make(mulipliersSolution);
 				s.out.multiplierOfLowerBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
@@ -259,13 +293,13 @@ class _SOLVERWRAPPER_XPRESS
 				return s.out.statusCode;
 			}
 	
-		} catch (RuntimeException e)
+		} catch (Exception e)
 		{
-			try { XPRS.free(); } catch (Exception ee) {} // frees the license, can fail if already done
+			try { c_XPRS.getMethod("free").invoke(null); } catch (Exception ee) {} // frees the license, can fail if already done
 			e.printStackTrace();
 			System.out.println(e.getLocalizedMessage());
-			if (p != null) p.destroy(); // frees any memory associated to the object
-			throw e;
+			try { if (p_XPRSprob_obj != null) c_XPRSprob.getMethod("destroy").invoke(p_XPRSprob_obj); } catch (Exception ee) {} // frees any memory associated to the object
+			throw new JOMException (e.getLocalizedMessage());
 		} 
 		
 	}

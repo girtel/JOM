@@ -15,16 +15,15 @@
 
 package com.jom;
 
-import cern.colt.matrix.tdouble.DoubleFactory1D;
-import cern.jet.math.tdouble.DoubleFunctions;
-
-import com.dashoptimization.XPRSconstants;
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+
+import cern.colt.matrix.tdouble.DoubleFactory1D;
+import cern.jet.math.tdouble.DoubleFunctions;
 
 /** @author Pablo */
 class _SOLVERWRAPPER_CPLEX
