@@ -15,26 +15,11 @@
 
 package com.jom;
 
-/* PABLO: CHANGE POM TO COMPILE: THE JAR SHOULD BE LOCAL? SOME FORM TO COMPILE WITHOUT THE JAR?
- * VEr: http://stackoverflow.com/questions/8325819/how-can-i-create-an-executable-jar-without-dependencies-using-maven
- * PABLO: Any benefit from loafglobal64 in Java? I mean that all the arrays have at most 2^32 vals...
- * PABLO: Which is the control for getting the best bound in LP?
- * PABLO: Which is the control for getting the output status when LP found feasible but not optimal solution?
- * PABLO: Error getting the primal solution: calcObjective gives error inside XPROSprob (line 5793), no further message
- * PABLO: how to get multipliers of LB and UB constraints
- *   */
-
-/*
- * PABLO: I may have a bound even if a feasible solution was not found?
- * PABLO: can happen that dual and primal feasible, but not optimal??  
- * PABLO: can happen that dual feasible, primal infeasible => then I still have a bound?
- */
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import com.dashoptimization.DoubleHolder;
 import com.dashoptimization.XPRS;
 import com.dashoptimization.XPRSconstants;
 import com.dashoptimization.XPRSenumerations;
@@ -125,6 +110,13 @@ class _SOLVERWRAPPER_XPRESS
 			{
 				String keyStr = entry.getKey();
 				if (keyStr.equalsIgnoreCase("solverLibraryName")) continue;
+				if (keyStr.equals("maxSolverTimeInSeconds")) 
+				{
+					final Double val_maxSolverTimeInSeconds = ((Number) entry.getValue()).doubleValue();
+					if (val_maxSolverTimeInSeconds > 0)
+						p.setIntControl(XPRSconstants.MAXTIME , (int) -Math.ceil(val_maxSolverTimeInSeconds));
+					continue;
+				}
 				int key = new Integer(entry.getKey());
 				Object value = entry.getValue();
 				if (value instanceof String)

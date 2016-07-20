@@ -11,16 +11,20 @@
 
 package com.jom;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import cern.colt.Arrays;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.jet.math.tdouble.DoubleFunctions;
-
-import java.util.*;
-import java.util.Map.Entry;
-
-import com.dashoptimization.XPRSconstants;
 
 /** This class contains the methods for handling optimization problems, defining their input parameters (if any), decision variables,
  * objetive function and constraints, choosing and calling a solver to obtain a numerical solution, and retrieving that solution.
@@ -867,30 +871,30 @@ public class OptimizationProblem
 			} else if (solverName.equalsIgnoreCase("xpress"))
 				params.put("solverLibraryName", "xpauth.xpr"); // default name of the license file in XPRESS
 		}
-		/* Default COMMON: String maxSolverTimeInSeconds */
-		/* A "" in maxSolverTimeInSeconds is equivalent to not having this parameter */
-		Double val_maxSolverTimeInSeconds = params.get("maxSolverTimeInSeconds") == null ?
-				null :
-				((Number) params.get("maxSolverTimeInSeconds")).doubleValue();
-		if (val_maxSolverTimeInSeconds != null)
-			if (solverName.equalsIgnoreCase("glpk"))
-			{
-				final Integer numMilisecondsTimeLimit = (int) Math.ceil(1000 * val_maxSolverTimeInSeconds);
-				if (val_maxSolverTimeInSeconds > 0) params.put("tm_lim", numMilisecondsTimeLimit);
-				params.remove("maxSolverTimeInSeconds");
-			} else if (solverName.equalsIgnoreCase("ipopt"))
-			{
-				if (val_maxSolverTimeInSeconds > 0) params.put("max_cpu_time", val_maxSolverTimeInSeconds);
-				params.remove("maxSolverTimeInSeconds");
-			} else if (solverName.equalsIgnoreCase("cplex"))
-			{
-				if (val_maxSolverTimeInSeconds > 0) params.put("" + _JNA_CPLEX.CPX_PARAM_TILIM, val_maxSolverTimeInSeconds);
-				params.remove("maxSolverTimeInSeconds");
-			} else if (solverName.equalsIgnoreCase("xpress"))
-			{
-				if (val_maxSolverTimeInSeconds > 0) params.put("" + XPRSconstants.MAXTIME, (int) -Math.ceil(val_maxSolverTimeInSeconds)); // negative, if not it waits until first solution is found
-				params.remove("maxSolverTimeInSeconds");
-			}
+//		/* Default COMMON: String maxSolverTimeInSeconds */
+//		/* A "" in maxSolverTimeInSeconds is equivalent to not having this parameter */
+//		Double val_maxSolverTimeInSeconds = params.get("maxSolverTimeInSeconds") == null ?
+//				null :
+//				((Number) params.get("maxSolverTimeInSeconds")).doubleValue();
+//		if (val_maxSolverTimeInSeconds != null)
+//			if (solverName.equalsIgnoreCase("glpk"))
+//			{
+//				final Integer numMilisecondsTimeLimit = (int) Math.ceil(1000 * val_maxSolverTimeInSeconds);
+//				if (val_maxSolverTimeInSeconds > 0) params.put("tm_lim", numMilisecondsTimeLimit);
+//				params.remove("maxSolverTimeInSeconds");
+//			} else if (solverName.equalsIgnoreCase("ipopt"))
+//			{
+//				if (val_maxSolverTimeInSeconds > 0) params.put("max_cpu_time", val_maxSolverTimeInSeconds);
+//				params.remove("maxSolverTimeInSeconds");
+//			} else if (solverName.equalsIgnoreCase("cplex"))
+//			{
+//				if (val_maxSolverTimeInSeconds > 0) params.put("" + _JNA_CPLEX.CPX_PARAM_TILIM, val_maxSolverTimeInSeconds);
+//				params.remove("maxSolverTimeInSeconds");
+//			} else if (solverName.equalsIgnoreCase("xpress"))
+//			{
+//				if (val_maxSolverTimeInSeconds > 0) params.put("" + XPRSconstants.MAXTIME, (int) -Math.ceil(val_maxSolverTimeInSeconds)); // negative, if not it waits until first solution is found
+//				params.remove("maxSolverTimeInSeconds");
+//			}
 
 
 		/* Default GLPK SPECIFIC: String glpkSolverType */

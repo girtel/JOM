@@ -266,6 +266,13 @@ class _SOLVERWRAPPER_IPOPT
 		{
 			String key = entry.getKey();
 			if (key.equalsIgnoreCase("solverLibraryName")) continue; // a non-IPOPT specific option
+			if (key.equals("maxSolverTimeInSeconds")) 
+			{
+				final Double val_maxSolverTimeInSeconds = ((Number) entry.getValue()).doubleValue();
+				if (val_maxSolverTimeInSeconds > 0)
+					g.AddIpoptNumOption(nlp, "max_cpu_time", val_maxSolverTimeInSeconds);
+				continue;
+			}
 			Object value = entry.getValue();
 			if (value instanceof String)
 				g.AddIpoptStrOption(nlp, key, (String) value);

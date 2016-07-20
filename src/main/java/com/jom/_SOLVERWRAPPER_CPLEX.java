@@ -17,6 +17,8 @@ package com.jom;
 
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.jet.math.tdouble.DoubleFunctions;
+
+import com.dashoptimization.XPRSconstants;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
@@ -61,6 +63,16 @@ class _SOLVERWRAPPER_CPLEX
 		{
 			String keyStr = entry.getKey();
 			if (keyStr.equalsIgnoreCase("solverLibraryName")) continue;
+			if (keyStr.equals("maxSolverTimeInSeconds")) 
+			{
+				final Double val_maxSolverTimeInSeconds = ((Number) entry.getValue()).doubleValue();
+				if (val_maxSolverTimeInSeconds > 0)
+				{
+					aux = g.CPXsetdblparam(env, _JNA_CPLEX.CPX_PARAM_TILIM, val_maxSolverTimeInSeconds);
+					if (aux != 0) throw new JOMException("JOM - CPLEX interface. Failure to set parameter: key = " + _JNA_CPLEX.CPX_PARAM_TILIM);
+				}
+				continue;
+			}
 			int key = new Integer(entry.getKey());
 			Object value = entry.getValue();
 			if (value instanceof String)

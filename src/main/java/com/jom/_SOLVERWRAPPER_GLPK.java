@@ -288,6 +288,14 @@ class _SOLVERWRAPPER_GLPK
 				String key = entry.getKey();
 				if (key.equalsIgnoreCase("solverLibraryName")) continue; // a non-GPLK specific option
 				if (key.equalsIgnoreCase("glpkSolverType")) continue; // a non-GPLK specific option
+				if (key.equalsIgnoreCase("maxSolverTimeInSeconds"))
+				{
+					final Double val_maxSolverTimeInSeconds = ((Number) param.get("maxSolverTimeInSeconds")).doubleValue();
+					final Integer numMilisecondsTimeLimit = (int) Math.ceil(1000 * val_maxSolverTimeInSeconds);
+					if (val_maxSolverTimeInSeconds > 0)
+						parm.writeField("tm_lim", numMilisecondsTimeLimit);
+					continue;
+				}
 				Object value = entry.getValue();
 				if (value instanceof Integer)
 					parm.writeField(key, ((Integer) value).intValue());
@@ -342,6 +350,14 @@ class _SOLVERWRAPPER_GLPK
 				if (key.equalsIgnoreCase("solverLibraryName")) continue; // a non-GPLK specific option
 				if (key.equalsIgnoreCase("glpkSolverType")) continue; // a non-GPLK specific option
 				if (key.equalsIgnoreCase("presolve")) continue; // not valid for interior-point
+				if (key.equalsIgnoreCase("maxSolverTimeInSeconds"))
+				{
+					final Double val_maxSolverTimeInSeconds = ((Number) param.get("maxSolverTimeInSeconds")).doubleValue();
+					final Integer numMilisecondsTimeLimit = (int) Math.ceil(1000 * val_maxSolverTimeInSeconds);
+					if (val_maxSolverTimeInSeconds > 0)
+						parm.writeField("tm_lim", numMilisecondsTimeLimit);
+					continue;
+				}
 				Object value = entry.getValue();
 				if (value instanceof Integer)
 					parm.writeField(key, ((Integer) value).intValue());
@@ -411,6 +427,14 @@ class _SOLVERWRAPPER_GLPK
 				String key = entry.getKey();
 				if (key.equalsIgnoreCase("solverLibraryName")) continue; // a non-GPLK specific option
 				if (key.equalsIgnoreCase("glpkSolverType")) continue; // a non-GPLK specific option
+				if (key.equalsIgnoreCase("maxSolverTimeInSeconds"))
+				{
+					final Double val_maxSolverTimeInSeconds = ((Number) param.get("maxSolverTimeInSeconds")).doubleValue();
+					final Integer numMilisecondsTimeLimit = (int) Math.ceil(1000 * val_maxSolverTimeInSeconds);
+					if (val_maxSolverTimeInSeconds > 0)
+						parm.writeField("tm_lim", numMilisecondsTimeLimit);
+					continue;
+				}
 				Object value = entry.getValue();
 				if (value instanceof Integer)
 					parm.writeField(key, ((Integer) value).intValue());
