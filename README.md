@@ -15,5 +15,5 @@ Commands for building the library:
 
 1. Compile, assembly, but do NOT update Javadoc: ```clean package assembly:single```
 
-2. Compile, update Javadoc, and then assembly: ```clean package assembly:single javadoc:javadoc```
+2. Compile, update Javadoc, and then assembly: ```clean package javadoc:javadoc assembly:single```
 
