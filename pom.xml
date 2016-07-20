@@ -30,6 +30,7 @@
             <version>0.10.1</version>
             <scope>system</scope>
             <systemPath>${xprsSolverPath}</systemPath>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
