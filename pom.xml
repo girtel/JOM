@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>es.upct.girtel</groupId>
     <artifactId>jom</artifactId>
-    <version>0.2.1</version>
+    <version>0.2.0.1</version>
     <name>JOM (Java Optimization Modeler)</name>
     <packaging>jar</packaging>
     <url>http://www.net2plan.com/jom</url>
