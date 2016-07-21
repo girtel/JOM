@@ -191,8 +191,10 @@ class _SOLVERWRAPPER_XPRESS
 				s.out.primalCost = (double) c_XPRSprob.getMethod("getDblAttrib",int.class).invoke(p_XPRSprob_obj , XPRSconstants_MIPBESTOBJVAL);
 
 				if (!s.out.solutionIsFeasible)
+				{
+					try { c_XPRS.getMethod("free").invoke(null); } catch (Exception ee) {} // frees the license, can fail if already done
 					return s.out.statusCode;
-
+				}
 				/* Check the number of constraitns and variables */
 				if (((int) c_XPRSprob.getMethod("getIntAttrib" , int.class).invoke(p_XPRSprob_obj , XPRSconstants_ROWS)) != s.in.numConstraints) throw new JOMException("JOM - XPRESS interface. Unexpected error");
 				if (((int) c_XPRSprob.getMethod("getIntAttrib" , int.class).invoke(p_XPRSprob_obj , XPRSconstants_COLS))   != s.in.numDecVariables) throw new JOMException("JOM - XPRESS interface. Unexpected error");
@@ -215,7 +217,8 @@ class _SOLVERWRAPPER_XPRESS
 				s.out.multiplierOfConstraint = DoubleFactory1D.dense.make(s.in.numConstraints);
 				s.out.multiplierOfLowerBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
 				s.out.multiplierOfUpperBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(s.in.numDecVariables);
-				
+
+				try { c_XPRS.getMethod("free").invoke(null); } catch (Exception ee) {} // frees the license, can fail if already done
 				return s.out.statusCode;
 			}
 			else
@@ -245,7 +248,10 @@ class _SOLVERWRAPPER_XPRESS
 				s.out.foundUnboundedSolution = (lpStatus == XPRSconstants_LP_UNBOUNDED);
 
 				if (!s.out.solutionIsFeasible)
+				{
+					try { c_XPRS.getMethod("free").invoke(null); } catch (Exception ee) {} // frees the license, can fail if already done
 					return s.out.statusCode;
+				}
 
 				/* Check the number of constraitns and variables */
 				if (((int) c_XPRSprob.getMethod("getIntAttrib" , int.class).invoke(p_XPRSprob_obj , XPRSconstants_ROWS)) != s.in.numConstraints) throw new JOMException("JOM - XPRESS interface. Unexpected error");
@@ -289,7 +295,8 @@ class _SOLVERWRAPPER_XPRESS
 					else
 						s.out.multiplierOfLowerBoundConstraintToPrimalVariables.set(dv, reducedCosts[dv]);
 				}
-				
+
+				try { c_XPRS.getMethod("free").invoke(null); } catch (Exception ee) {} // frees the license, can fail if already done
 				return s.out.statusCode;
 			}
 	
