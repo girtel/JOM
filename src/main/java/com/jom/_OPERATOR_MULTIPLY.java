@@ -14,15 +14,20 @@
  */
 package com.jom;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdouble.DoubleFunctions;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 class _OPERATOR_MULTIPLY extends Expression
 {
@@ -134,7 +139,7 @@ class _OPERATOR_MULTIPLY extends Expression
 		final int[] resSize = new int[]{aRows, bCols};
 		LinkedHashMap<Integer, HashSet<Integer>> newActiveVarIdsMatrix = new LinkedHashMap<Integer, HashSet<Integer>>();
 		int previousColumn_b = 0;
-		ArrayList<HashSet<Integer>> aColumn = new ArrayList<HashSet<Integer>>(bRows);
+		HashMap<Integer,HashSet<Integer>> aColumn = new HashMap<Integer,HashSet<Integer>>();
 		Iterator<Entry<Integer, HashSet<Integer>>> b_it = b.getActiveVarIds().entrySet().iterator();
 		while (b_it.hasNext())
 		{
@@ -147,7 +152,7 @@ class _OPERATOR_MULTIPLY extends Expression
 			if ((!b_it.hasNext()) || (bCol != previousColumn_b))
 			{
 				/* the last time we execute this (possibly in the last column of b)  */
-				if (!b_it.hasNext()) aColumn.set(bRow, bHs);
+				if (!b_it.hasNext()) aColumn.put(bRow, bHs);
 
 				IntMatrix1D subindexes_res = subindexes_b.copy(); 
 				/* multiply LM with the column of RM. Accumulate the result in res_linearCoefs */
@@ -164,7 +169,7 @@ class _OPERATOR_MULTIPLY extends Expression
 					final int resCellId = DoubleMatrixND.sub2ind(subindexes_res, this.size);//resRow + resRows * resCol;
 					final HashSet<Integer> aCellColumnVector = aColumn.get(aCol);
 					HashSet<Integer> summand = ((HashSet<Integer>) aHs.clone());
-					summand.addAll(aCellColumnVector);
+					if (aCellColumnVector != null) summand.addAll(aCellColumnVector);
 					HashSet<Integer> accumHs = newActiveVarIdsMatrix.get(resCellId);
 					if (accumHs == null)
 						newActiveVarIdsMatrix.put(resCellId, summand);
@@ -172,9 +177,9 @@ class _OPERATOR_MULTIPLY extends Expression
 						accumHs.addAll(summand);
 				}
 				previousColumn_b = bCol;
-				aColumn = new ArrayList<HashSet<Integer>>(bRows);
+				aColumn = new HashMap<Integer,HashSet<Integer>>();
 			}
-			aColumn.set(bRow, bHs);
+			aColumn.put(bRow, bHs);
 		}
 
 		return newActiveVarIdsMatrix;
