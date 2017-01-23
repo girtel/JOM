@@ -96,6 +96,12 @@
                             <descriptors>
                                 <descriptor>${project.basedir}/src/assembly/assembly.xml</descriptor>
                             </descriptors>
+                                    <archive>
+                                        <manifest>
+                                            <mainClass>com.jom.SolverTester</mainClass>
+                                        </manifest>
+                                    </archive>
+                            
                         </configuration>
                     </plugin>
                 </plugins>

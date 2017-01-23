@@ -25,20 +25,20 @@ public class SolverTester
 {
 	final static String RETURN = System.getProperty("line.separator");
 
-//	/** Creates an optimization problem object
-//	 *
-//	 */
-//	public static void main (String [] args)
-//	{
-//		String res = com.jom.SolverTester.check_xpress("c:\\xpressmp\\xpauth.xpr");
-//		System.out.println("XPRESS: " + res);
-//		res = com.jom.SolverTester.check_cplex("c:\\windows\\system32\\cplex.dll");
-//		System.out.println("CPLEX: " + res);
-//		res = com.jom.SolverTester.check_glpk("c:\\windows\\system32\\glpk.dll");
-//		System.out.println("GLPK: " + res);
-//		res = com.jom.SolverTester.check_ipopt("c:\\windows\\system32\\ipopt.dll");
-//		System.out.println("IPOPT: " + res);
-//	}
+	/** Creates an optimization problem object
+	 *
+	 */
+	public static void main (String [] args)
+	{
+		String res = com.jom.SolverTester.check_xpress("c:\\xpressmp\\xpauth.xpr");
+		System.out.println("XPRESS: " + res);
+		res = com.jom.SolverTester.check_cplex("c:\\windows\\system32\\cplex.dll");
+		System.out.println("CPLEX: " + res);
+		res = com.jom.SolverTester.check_glpk("c:\\windows\\system32\\glpk.dll");
+		System.out.println("GLPK: " + res);
+		res = com.jom.SolverTester.check_ipopt("c:\\windows\\system32\\ipopt.dll");
+		System.out.println("IPOPT: " + res);
+	}
 
 	private static void checkLinearSolver (String solverName , String auxFileName)
 	{

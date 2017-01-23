@@ -14,14 +14,15 @@
  */
 package com.jom;
 
-import cern.colt.matrix.tdouble.DoubleFactory1D;
-import cern.colt.matrix.tint.IntFactory1D;
-import cern.colt.matrix.tint.IntMatrix1D;
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
+import cern.colt.matrix.tdouble.DoubleFactory1D;
+import cern.colt.matrix.tint.IntFactory1D;
+import cern.colt.matrix.tint.IntMatrix1D;
 
 class _SOLVERWRAPPER_GLPK
 {
@@ -316,20 +317,19 @@ class _SOLVERWRAPPER_GLPK
 				s.out.solutionIsOptimal = (status == GLP_OPT);
 				s.out.feasibleSolutionDoesNotExist = (status == GLP_NOFEAS);
 				s.out.foundUnboundedSolution = false;
-				if (!s.out.solutionIsFeasible)
-					throw new JOMException("JOM - GLPK interface. The problem could not be solved. GLPK error message: " + this
-							.glpk_statusMessage_solve(s, status));
+				if (s.out.solutionIsFeasible)
+				{
+					s.out.primalCost = g.glp_mip_obj_val(lp);
+					int nCols = g.glp_get_num_cols(lp);
+					if (nCols != s.in.numDecVariables) throw new JOMException("JOM - GLPK interface. Unexptected error");
+					for (int cont = 1; cont <= nCols; cont++)
+						s.out.primalSolution.set(cont - 1, g.glp_mip_col_val(lp, cont));
 
-				s.out.primalCost = g.glp_mip_obj_val(lp);
-				int nCols = g.glp_get_num_cols(lp);
-				if (nCols != s.in.numDecVariables) throw new JOMException("JOM - GLPK interface. Unexptected error");
-				for (int cont = 1; cont <= nCols; cont++)
-					s.out.primalSolution.set(cont - 1, g.glp_mip_col_val(lp, cont));
-
-				int nRows = g.glp_get_num_rows(lp);
-				if (nRows != s.in.numConstraints) throw new JOMException("JOM - GLPK interface. Unexpected error");
-				for (int cont = 1; cont <= nRows; cont++)
-					s.out.primalValuePerConstraint.set(cont - 1, g.glp_mip_row_val(lp, cont));
+					int nRows = g.glp_get_num_rows(lp);
+					if (nRows != s.in.numConstraints) throw new JOMException("JOM - GLPK interface. Unexpected error");
+					for (int cont = 1; cont <= nRows; cont++)
+						s.out.primalValuePerConstraint.set(cont - 1, g.glp_mip_row_val(lp, cont));
+				}
 			} else
 				throw new JOMException("JOM - GLPK interface. The problem could not be solved. GLPK error message: " + this.glpk_errorMessage_solve
 						(s, ret));
@@ -377,35 +377,27 @@ class _SOLVERWRAPPER_GLPK
 				s.out.solutionIsOptimal = (status == GLP_OPT);
 				s.out.feasibleSolutionDoesNotExist = (status == GLP_NOFEAS);
 				s.out.foundUnboundedSolution = false;
-				if (!s.out.solutionIsFeasible)
-					throw new JOMException("JOM - GLPK interface. The problem could not be solved. GLPK error message: " + this
-							.glpk_statusMessage_solve(s, status));
-				;
-
-				if (status != GLP_OPT)
-					throw new JOMException("JOM - GLPK interface. The problem could not be solved. GLPK error message: " + this
-							.glpk_statusMessage_solve(s, status));
-				;
-				s.out.solutionIsFeasible = true;
-				s.out.solutionIsOptimal = true;
-				s.out.primalCost = g.glp_ipt_obj_val(lp);
-				int nCols = g.glp_get_num_cols(lp);
-				if (nCols != s.in.numDecVariables) throw new JOMException("JOM - GLPK interface. Unexpected error");
-				for (int cont = 1; cont <= nCols; cont++)
+				if (s.out.solutionIsFeasible)
 				{
-					double multiplier = g.glp_ipt_col_dual(lp, cont);
-					s.out.primalSolution.set(cont - 1, g.glp_ipt_col_prim(lp, cont));
-					double[] bounds = glpk_obtainMultipliersLbUb(dvType.get(cont - 1), multiplier);
-					s.out.multiplierOfLowerBoundConstraintToPrimalVariables.set(cont - 1, bounds[0]);
-					s.out.multiplierOfUpperBoundConstraintToPrimalVariables.set(cont - 1, bounds[1]);
-				}
+					s.out.primalCost = g.glp_ipt_obj_val(lp);
+					int nCols = g.glp_get_num_cols(lp);
+					if (nCols != s.in.numDecVariables) throw new JOMException("JOM - GLPK interface. Unexpected error");
+					for (int cont = 1; cont <= nCols; cont++)
+					{
+						double multiplier = g.glp_ipt_col_dual(lp, cont);
+						s.out.primalSolution.set(cont - 1, g.glp_ipt_col_prim(lp, cont));
+						double[] bounds = glpk_obtainMultipliersLbUb(dvType.get(cont - 1), multiplier);
+						s.out.multiplierOfLowerBoundConstraintToPrimalVariables.set(cont - 1, bounds[0]);
+						s.out.multiplierOfUpperBoundConstraintToPrimalVariables.set(cont - 1, bounds[1]);
+					}
 
-				int nRows = g.glp_get_num_rows(lp);
-				if (nRows != s.in.numConstraints) throw new JOMException("JOM - GLPK interface. Unexpected error");
-				for (int cont = 1; cont <= nRows; cont++)
-				{
-					s.out.primalValuePerConstraint.set(cont - 1, g.glp_ipt_row_prim(lp, cont));
-					s.out.multiplierOfConstraint.set(cont - 1, g.glp_ipt_row_dual(lp, cont));
+					int nRows = g.glp_get_num_rows(lp);
+					if (nRows != s.in.numConstraints) throw new JOMException("JOM - GLPK interface. Unexpected error");
+					for (int cont = 1; cont <= nRows; cont++)
+					{
+						s.out.primalValuePerConstraint.set(cont - 1, g.glp_ipt_row_prim(lp, cont));
+						s.out.multiplierOfConstraint.set(cont - 1, g.glp_ipt_row_dual(lp, cont));
+					}
 				}
 			} else
 				throw new JOMException("JOM - GLPK interface. The problem could not be solved. GLPK error message: " + this.glpk_errorMessage_solve
@@ -453,35 +445,31 @@ class _SOLVERWRAPPER_GLPK
 				s.out.solutionIsOptimal = (status == GLP_OPT);
 				s.out.feasibleSolutionDoesNotExist = (status == GLP_NOFEAS);
 				s.out.foundUnboundedSolution = (status == GLP_UNBND);
-				if (!s.out.solutionIsFeasible)
-					throw new JOMException("JOM - GLPK interface. The problem could not be solved. GLPK error message: " + this
-							.glpk_statusMessage_solve(s, status));
-
-				if ((status != GLP_OPT) && (status != GLP_ETMLIM))
-					throw new JOMException("JOM - GLPK interface. The problem could not be solved. GLPK error message: " + this
-							.glpk_statusMessage_solve(s, status));
-				s.out.solutionIsFeasible = true;
-				s.out.solutionIsOptimal = true;
-				s.out.solutionIsFeasible = true;
-				s.out.solutionIsOptimal = true;
-				s.out.primalCost = g.glp_get_obj_val(lp);
-				int nCols = g.glp_get_num_cols(lp);
-				if (nCols != s.in.numDecVariables) throw new JOMException("JOM - GLPK interface. Unexpected error");
-				for (int cont = 1; cont <= nCols; cont++)
+				if (s.out.solutionIsFeasible)
 				{
-					double multiplier = g.glp_get_col_dual(lp, cont);
-					s.out.primalSolution.set(cont - 1, g.glp_get_col_prim(lp, cont));
-					double[] bounds = glpk_obtainMultipliersLbUb(dvType.get(cont - 1), multiplier);
-					s.out.multiplierOfLowerBoundConstraintToPrimalVariables.set(cont - 1, bounds[0]);
-					s.out.multiplierOfUpperBoundConstraintToPrimalVariables.set(cont - 1, bounds[1]);
-				}
+					s.out.solutionIsFeasible = true;
+					s.out.solutionIsOptimal = true;
+					s.out.solutionIsFeasible = true;
+					s.out.solutionIsOptimal = true;
+					s.out.primalCost = g.glp_get_obj_val(lp);
+					int nCols = g.glp_get_num_cols(lp);
+					if (nCols != s.in.numDecVariables) throw new JOMException("JOM - GLPK interface. Unexpected error");
+					for (int cont = 1; cont <= nCols; cont++)
+					{
+						double multiplier = g.glp_get_col_dual(lp, cont);
+						s.out.primalSolution.set(cont - 1, g.glp_get_col_prim(lp, cont));
+						double[] bounds = glpk_obtainMultipliersLbUb(dvType.get(cont - 1), multiplier);
+						s.out.multiplierOfLowerBoundConstraintToPrimalVariables.set(cont - 1, bounds[0]);
+						s.out.multiplierOfUpperBoundConstraintToPrimalVariables.set(cont - 1, bounds[1]);
+					}
 
-				int nRows = g.glp_get_num_rows(lp);
-				if (nRows != s.in.numConstraints) throw new JOMException("JOM - GLPK interface. Unexpected error");
-				for (int cont = 1; cont <= nRows; cont++)
-				{
-					s.out.primalValuePerConstraint.set(cont - 1, g.glp_get_row_prim(lp, cont));
-					s.out.multiplierOfConstraint.set(cont - 1, g.glp_get_row_dual(lp, cont));
+					int nRows = g.glp_get_num_rows(lp);
+					if (nRows != s.in.numConstraints) throw new JOMException("JOM - GLPK interface. Unexpected error");
+					for (int cont = 1; cont <= nRows; cont++)
+					{
+						s.out.primalValuePerConstraint.set(cont - 1, g.glp_get_row_prim(lp, cont));
+						s.out.multiplierOfConstraint.set(cont - 1, g.glp_get_row_dual(lp, cont));
+					}
 				}
 			} else
 				throw new JOMException("JOM - GLPK interface. The problem could not be solved. GLPK error message: " + this.glpk_errorMessage_solve
