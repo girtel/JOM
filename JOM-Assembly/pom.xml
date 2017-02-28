@@ -3,13 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>com.jom</artifactId>
         <groupId>es.upct.girtel</groupId>
+        <artifactId>jom</artifactId>
         <version>0.2.0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>com.jom-assembly</artifactId>
+    <artifactId>jom-assembly</artifactId>
 
     <!-- Does not generate JAR -->
     <packaging>pom</packaging>
