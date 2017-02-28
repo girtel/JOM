@@ -10,6 +10,8 @@
         <format>tar.bz2</format>
     </formats>
 
+    <includeBaseDirectory>false</includeBaseDirectory>
+
     <!-- Building ZIP package -->
 
     <!-- Adding project info -->
@@ -25,7 +27,7 @@
         </fileSet>
     </fileSets>
 
-    <!-- Adding sources -->
+    <!-- Adding jar -->
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
@@ -35,30 +37,38 @@
                 <include>${project.groupId}:jom-sources:jar:*</include>
             </includes>
             <outputDirectory/>
-            <outputFileNameMapping>defaultNetworkDesign.jar</outputFileNameMapping>
+            <outputFileNameMapping>jom-${project.version}.jar</outputFileNameMapping>
         </dependencySet>
     </dependencySets>
 
-    <!--<fileSet>-->
-    <!--<directory>${project.build.directory}</directory>-->
-    <!--<outputDirectory></outputDirectory>-->
-    <!--<includes>-->
-    <!--<include>*.jar</include>-->
-    <!--</includes>-->
-    <!--</fileSet>-->
-    <!--<fileSet>-->
-    <!--<directory>${project.basedir}/src/main/java</directory>-->
-    <!--<outputDirectory>src</outputDirectory>-->
-    <!--<includes>-->
-    <!--<include>**</include>-->
-    <!--</includes>-->
-    <!--</fileSet>-->
-    <!--<fileSet>-->
-    <!--<directory>${project.build.directory}/site/apidocs</directory>-->
-    <!--<outputDirectory>javadoc</outputDirectory>-->
-    <!--<includes>-->
-    <!--<include>**</include>-->
-    <!--</includes>-->
-    <!--</fileSet>-->
-    <!--</fileSets>-->
+    <moduleSets>
+        <!-- Javadoc -->
+        <moduleSet>
+            <useAllReactorProjects>true</useAllReactorProjects>
+            <includes>
+                <include>${project.groupId}:jom-javadoc</include>
+            </includes>
+            <binaries>
+                <unpack>true</unpack>
+                <attachmentClassifier>javadoc</attachmentClassifier>
+                <outputDirectory>javadoc</outputDirectory>
+                <includeDependencies>false</includeDependencies>
+            </binaries>
+        </moduleSet>
+        <!-- Adding sources -->
+        <moduleSet>
+            <useAllReactorProjects>true</useAllReactorProjects>
+            <includes>
+                <include>${project.groupId}.jom-sources</include>
+            </includes>
+            <sources>
+                <includeModuleDirectory>false</includeModuleDirectory>
+                <fileSets>
+                    <fileSet>
+                        <outputDirectory>src</outputDirectory>
+                    </fileSet>
+                </fileSets>
+            </sources>
+        </moduleSet>
+    </moduleSets>
 </assembly>
