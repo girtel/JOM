@@ -57,6 +57,10 @@
                             <splitindex>true</splitindex>
                             <use>true</use>
                             <version>true</version>
+                            <links>
+                                <link>http://incanter.org/docs/parallelcolt/api/</link>
+                            </links>
+                            <detectOfflineLinks>false</detectOfflineLinks>
                             <!-- Adding Latex parser for Javadoc -->
                             <additionalparam>
                                 --allow-script-in-comments
