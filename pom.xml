@@ -3,14 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>es.upct.girtel</groupId>
     <artifactId>jom</artifactId>
-    <version>0.2.0.1</version>
+    <version>0.2.0.2-SNAPSHOT</version>
     <name>JOM (Java Optimization Modeler)</name>
-    <packaging>jar</packaging>
     <url>http://www.net2plan.com/jom</url>
 
-	<properties>
-    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  	</properties>
+    <packaging>jar</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -25,87 +26,85 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>jom-default</id>
+    <build>
+        <plugins>
+            <!-- This applies in COMPILE -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <!-- To guarantee that we use 1.8 in compiling  -->
+                    <compilerVersion>1.8</compilerVersion>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <failOnError>true</failOnError>
+                </configuration>
+            </plugin>
 
-            <activation>
-                <activeByDefault>true</activeByDefault> <!--  to use this profile as default in Maven build -->
-            </activation>
+            <!-- JAR generation -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+            </plugin>
 
-            <build>
-                <plugins>
-                    <!-- This applies in COMPILE -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.5.1</version>
-                        
-                        <configuration> <!-- To guarantee that we use 1.8 in compiling  -->
-                            <source>1.8</source>
-                            <target>1.8</target>
-                            <failOnError>true</failOnError>
-                        </configuration>
-                    </plugin>
+            <!-- Generate Javadoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <configuration>
+                    <show>public</show>
+                    <author>true</author>
+                    <nodeprecated>false</nodeprecated>
+                    <nodeprecatedlist>false</nodeprecatedlist>
+                    <noindex>false</noindex>
+                    <nonavbar>false</nonavbar>
+                    <notree>false</notree>
+                    <source>1.7</source>
+                    <splitindex>true</splitindex>
+                    <use>true</use>
+                    <version>true</version>
+                    <!-- Adding Latex parser for Javadoc -->
+                    <additionalparam>
+                        -header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;&apos;
+                    </additionalparam>
+                    <sourceFileIncludes>
+                        <include>DoubleMatrixND.java</include>
+                        <include>OptimizationProblem.java</include>
+                        <include>Expression.java</include>
+                        <include>JOMException.java</include>
+                        <include>SolverTester.java</include>
+                    </sourceFileIncludes>
+                    <sourcepath>${project.basedir}/src/main/java/com/jom</sourcepath>
+                    <!-- Adding itself as a dependency in order to find the classes which the sources depend on -->
+                    <additionalDependencies>
+                        <additionalDependency>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <version>${project.version}</version>
+                        </additionalDependency>
+                    </additionalDependencies>
+                </configuration>
+            </plugin>
 
-                    <!-- Generate Javadoc -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.3</version>
-                        <configuration>
-                            <show>public</show>
-                            <author>true</author>
-                            <nodeprecated>false</nodeprecated>
-                            <nodeprecatedlist>false</nodeprecatedlist>
-                            <noindex>false</noindex>
-                            <nonavbar>false</nonavbar>
-                            <notree>false</notree>
-                            <source>1.7</source>
-                            <splitindex>true</splitindex>
-                            <use>true</use>
-                            <version>true</version>
-                            <!-- Adding Latex parser for Javadoc -->
-                            <additionalparam>
-                                -header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;&apos;
-                            </additionalparam>
-                            <sourceFileIncludes>
-                                <include>DoubleMatrixND.java</include>
-                                <include>OptimizationProblem.java</include>
-                                <include>Expression.java</include>
-                                <include>JOMException.java</include>
-                                <include>SolverTester.java</include>
-                            </sourceFileIncludes>
-                            <sourcepath>${project.basedir}/src/main/java/com/jom</sourcepath>
-                            <!-- Adding itself as a dependency in order to find the classes which the sources depend on -->
-                            <additionalDependencies>
-                                <additionalDependency>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
-                                </additionalDependency>
-                            </additionalDependencies>
-                        </configuration>
-                    </plugin>
-
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId> <!-- This is for assembling a JOM release (the .jar, the javadoc...) -->
-                        <version>2.6</version>
-                        <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <descriptors>
-                                <descriptor>${project.basedir}/src/assembly/assembly.xml</descriptor>
-                            </descriptors>
-                                    <archive>
-                                        <manifest>
-                                            <mainClass>com.jom.SolverTester</mainClass>
-                                        </manifest>
-                                    </archive>
-                            
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+            <plugin>
+                <!-- This is for assembling a JOM release (the .jar, the javadoc...) -->
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>${project.basedir}/src/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.jom.SolverTester</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
