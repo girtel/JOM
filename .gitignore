@@ -20,11 +20,7 @@ target/
 *.checkstyle
 
 # Documentation
-doc/gen/
 */doc/gen/
 
 # Mac
 .DS_Store
-
-*.releaseBackup
-*.stackdump

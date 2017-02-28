@@ -11,8 +11,14 @@
 
     <artifactId>jom-javadoc</artifactId>
 
-    <!-- Does not generate JAR -->
-    <packaging>pom</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>es.upct.girtel</groupId>
+            <artifactId>jom-sources</artifactId>
+            <version>0.2.0.2-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -42,6 +48,7 @@
                             <version>true</version>
                             <!-- Adding Latex parser for Javadoc -->
                             <additionalparam>
+                                --allow-script-in-comments
                                 -header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;&apos;
                             </additionalparam>
                             <includeDependencySources>true</includeDependencySources>
@@ -49,11 +56,11 @@
                                 <dependencySourceInclude>es.upct.girtel:jom-sources</dependencySourceInclude>
                             </dependencySourceIncludes>
                             <sourceFileIncludes>
-                                <include>DoubleMatrixND.java</include>
-                                <include>OptimizationProblem.java</include>
-                                <include>Expression.java</include>
-                                <include>JOMException.java</include>
-                                <include>SolverTester.java</include>
+                                <include>com/jom/DoubleMatrixND.java</include>
+                                <include>com/jom/OptimizationProblem.java</include>
+                                <include>com/jom/Expression.java</include>
+                                <include>com/jom/JOMException.java</include>
+                                <include>com/jom/SolverTester.java</include>
                             </sourceFileIncludes>
                         </configuration>
                     </execution>
