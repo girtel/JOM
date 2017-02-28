@@ -14,14 +14,6 @@
  */
 package com.jom;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
-
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
@@ -29,6 +21,10 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdouble.DoubleFunctions;
 
+import java.util.*;
+import java.util.Map.Entry;
+
+@SuppressWarnings("unchecked")
 class _OPERATOR_MULTIPLY extends Expression
 {
 	private final Expression a;

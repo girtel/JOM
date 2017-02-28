@@ -24,6 +24,7 @@ import cern.jet.math.tdouble.DoubleFunctions;
 import java.util.*;
 import java.util.Map.Entry;
 
+@SuppressWarnings("unchecked")
 class _OPERATOR_MULTIPLYOLD extends Expression
 {
 	private final Expression a;

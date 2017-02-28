@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+@SuppressWarnings("unchecked")
 class _OPERATOR_E2EDIVIDE extends Expression
 {
 	private final Expression a;

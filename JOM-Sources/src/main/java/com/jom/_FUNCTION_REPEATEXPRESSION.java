@@ -17,6 +17,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 
+@SuppressWarnings("unchecked")
 class _FUNCTION_REPEATEXPRESSION extends Expression
 {
 	private final Expression a;

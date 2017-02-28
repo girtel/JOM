@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("unchecked")
 class _INTERNAL_ExpressionParser extends AbstractEvaluator<Expression>
 {
 	private final static BracketPair bracketPairs = BracketPair.PARENTHESES;

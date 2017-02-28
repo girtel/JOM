@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+@SuppressWarnings("unchecked")
 class _OPERATOR_APPENDCOLUMNS extends Expression
 {
 

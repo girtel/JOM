@@ -16,15 +16,16 @@
 package com.jom;
 
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.jet.math.tdouble.DoubleFunctions;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 /** @author Pablo */
+@SuppressWarnings("unchecked")
 class _SOLVERWRAPPER_XPRESS
 {
 	private final HashMap<String, Object> param;

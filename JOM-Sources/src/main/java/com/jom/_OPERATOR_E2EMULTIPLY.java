@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+@SuppressWarnings("unchecked")
 class _OPERATOR_E2EMULTIPLY extends Expression
 {
 	private static ArrayList<Long> times = new ArrayList<Long>();

@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 /** @author Pablo */
+@SuppressWarnings("unchecked")
 class _OPERATOR_PLUS extends Expression
 {
 	private final Expression a;
