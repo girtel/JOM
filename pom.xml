@@ -2,12 +2,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>es.upct.girtel</groupId>
-    <artifactId>jom</artifactId>
+    <artifactId>com.jom</artifactId>
     <version>0.2.0.2-SNAPSHOT</version>
     <name>JOM (Java Optimization Modeler)</name>
-    <url>http://www.net2plan.com/jom</url>
+    <url>http://www.net2plan.com/com.jom</url>
 
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>JOM-Assembly</module>
+        <module>JOM-Sources</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -77,7 +82,7 @@
                         <include>JOMException.java</include>
                         <include>SolverTester.java</include>
                     </sourceFileIncludes>
-                    <sourcepath>${project.basedir}/src/main/java/com/jom</sourcepath>
+                    <sourcepath>${project.basedir}/src/main/java/com/com.jom</sourcepath>
                     <!-- Adding itself as a dependency in order to find the classes which the sources depend on -->
                     <additionalDependencies>
                         <additionalDependency>
@@ -96,7 +101,7 @@
                 <configuration>
                     <appendAssemblyId>false</appendAssemblyId>
                     <descriptors>
-                        <descriptor>${project.basedir}/src/assembly/assembly.xml</descriptor>
+                        <descriptor>JOM-Assembly/src/assembly/assembly.xml</descriptor>
                     </descriptors>
                     <archive>
                         <manifest>
