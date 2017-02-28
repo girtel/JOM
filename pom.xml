@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>es.upct.girtel</groupId>
-    <artifactId>com.jom</artifactId>
+    <artifactId>jom</artifactId>
     <version>0.2.0.2-SNAPSHOT</version>
 
     <name>JOM (Java Optimization Modeler)</name>
@@ -44,7 +44,6 @@
     <build>
         <pluginManagement>
             <plugins>
-                <!-- This applies in COMPILE -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>

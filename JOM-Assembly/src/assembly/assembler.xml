@@ -2,21 +2,30 @@
           xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
 
-    <id>Package</id>
+    <id>distribution</id>
+
     <formats>
         <format>zip</format>
+        <format>tar.gz</format>
+        <format>tar.bz2</format>
     </formats>
 
-    <fileSets> <!-- This is what you put inside the ZIP release  -->
+    <!-- Building ZIP package -->
+
+    <!-- Adding project info -->
+    <fileSets>
         <fileSet>
             <directory>${project.basedir}</directory>
-            <outputDirectory></outputDirectory>
+            <outputDirectory/>
             <includes>
                 <include>README*</include>
                 <include>LICENSE*</include>
                 <include>NOTICE*</include>
             </includes>
         </fileSet>
+    </fileSets>
+
+
         <fileSet>
             <directory>${project.build.directory}</directory>
             <outputDirectory></outputDirectory>
