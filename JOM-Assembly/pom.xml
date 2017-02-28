@@ -10,4 +10,29 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>com.jom-assembly</artifactId>
+
+    <!-- Does not generate JAR -->
+    <packaging>pom</packaging>
+
+    <build>
+        <finalName>as</finalName>
+        <plugins>
+            <plugin>
+                <!-- This is for assembling a JOM release (the .jar, the javadoc...) -->
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>JOM-Assembly/src/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.jom.SolverTester</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
