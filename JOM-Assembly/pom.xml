@@ -49,13 +49,8 @@
                         <configuration>
                             <appendAssemblyId>false</appendAssemblyId>
                             <descriptors>
-                                <descriptor>JOM-Assembly/src/assembly/assembly.xml</descriptor>
+                                <descriptor>src/assembly/assembler.xsl</descriptor>
                             </descriptors>
-                            <archive>
-                                <manifest>
-                                    <mainClass>com.jom.SolverTester</mainClass>
-                                </manifest>
-                            </archive>
                         </configuration>
                     </execution>
                 </executions>
