@@ -14,6 +14,7 @@
  */
 package com.jom;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -117,7 +118,7 @@ class _OPERATOR_MULTIPLY extends Expression
 	}
 
 	/* (non-Javadoc)
-	 * @see Expression#isConstant()
+	 * @see com.jom.Expression#isConstant()
 	 */
 	@Override
 	boolean isConstant()

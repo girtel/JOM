@@ -62,7 +62,7 @@ class _FUNCTION_DIAG extends Expression
 	}
 
 	/* (non-Javadoc)
-	 * @see Expression#isLinear()
+	 * @see com.jom.Expression#isLinear()
 	 */
 	@Override
 	boolean isLinear()
@@ -71,7 +71,7 @@ class _FUNCTION_DIAG extends Expression
 	}
 
 	/* (non-Javadoc)
-	 * @see Expression#isConstant()
+	 * @see com.jom.Expression#isConstant()
 	 */
 	@Override
 	boolean isConstant()

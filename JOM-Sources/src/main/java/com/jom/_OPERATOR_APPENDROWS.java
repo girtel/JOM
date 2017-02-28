@@ -101,7 +101,7 @@ class _OPERATOR_APPENDROWS extends Expression
 	}
 
 	/* (non-Javadoc)
-	 * @see Expression#isConstant()
+	 * @see com.jom.Expression#isConstant()
 	 */
 	@Override
 	boolean isConstant()

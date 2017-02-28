@@ -30,13 +30,13 @@ public class SolverTester
 	 */
 	public static void main (String [] args)
 	{
-		String res = SolverTester.check_xpress("c:\\xpressmp\\xpauth.xpr");
+		String res = com.jom.SolverTester.check_xpress("c:\\xpressmp\\xpauth.xpr");
 		System.out.println("XPRESS: " + res);
-		res = SolverTester.check_cplex("c:\\windows\\system32\\cplex.dll");
+		res = com.jom.SolverTester.check_cplex("c:\\windows\\system32\\cplex.dll");
 		System.out.println("CPLEX: " + res);
-		res = SolverTester.check_glpk("c:\\windows\\system32\\glpk.dll");
+		res = com.jom.SolverTester.check_glpk("c:\\windows\\system32\\glpk.dll");
 		System.out.println("GLPK: " + res);
-		res = SolverTester.check_ipopt("c:\\windows\\system32\\ipopt.dll");
+		res = com.jom.SolverTester.check_ipopt("c:\\windows\\system32\\ipopt.dll");
 		System.out.println("IPOPT: " + res);
 	}
 

@@ -64,7 +64,7 @@ class _FUNCTION_SQRT extends Expression
 	}
 
 	/* (non-Javadoc)
-	 * @see Expression#isLinear()
+	 * @see com.jom.Expression#isLinear()
 	 */
 	@Override
 	boolean isLinear()
@@ -73,7 +73,7 @@ class _FUNCTION_SQRT extends Expression
 	}
 
 	/* (non-Javadoc)
-	 * @see Expression#isConstant()
+	 * @see com.jom.Expression#isConstant()
 	 */
 	@Override
 	boolean isConstant()
@@ -82,7 +82,7 @@ class _FUNCTION_SQRT extends Expression
 	}
 
 	/* (non-Javadoc)
-	 * @see Expression#getActiveVarIds()
+	 * @see com.jom.Expression#getActiveVarIds()
 	 */
 	@Override
 	LinkedHashMap<Integer, HashSet<Integer>> nl_getActiveVarIds()

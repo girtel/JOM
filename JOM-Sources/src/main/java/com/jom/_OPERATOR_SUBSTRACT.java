@@ -72,7 +72,7 @@ class _OPERATOR_SUBSTRACT extends Expression
 	}
 
 	/* (non-Javadoc)
-	 * @see Expression#isConstant()
+	 * @see com.jom.Expression#isConstant()
 	 */
 	@Override
 	boolean isConstant()
