@@ -17,7 +17,7 @@
     <!-- Adding project info -->
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}</directory>
+            <directory>${project.parent.basedir}</directory>
             <outputDirectory/>
             <includes>
                 <include>README*</include>
@@ -39,16 +39,6 @@
             </includes>
             <outputDirectory/>
             <outputFileNameMapping>jom-${project.version}.jar</outputFileNameMapping>
-        </dependencySet>
-        <!--Dependencies-->
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <unpack>false</unpack>
-            <outputDirectory>lib</outputDirectory>
-            <excludes>
-                <exclude>${project.groupId}:*:*</exclude>
-            </excludes>
         </dependencySet>
     </dependencySets>
 
