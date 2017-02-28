@@ -11,6 +11,8 @@
 
     <artifactId>jom-javadoc</artifactId>
 
+    <packaging>jar</packaging>
+
     <dependencies>
         <dependency>
             <groupId>es.upct.girtel</groupId>
@@ -22,6 +24,15 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <!-- Do not build jar if there are no sources -->
+                    <skipIfEmpty>true</skipIfEmpty>
+                </configuration>
+            </plugin>
+
             <!-- Generate Javadoc -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

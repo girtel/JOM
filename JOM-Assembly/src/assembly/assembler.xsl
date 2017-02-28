@@ -32,9 +32,10 @@
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>false</useTransitiveDependencies>
+            <useStrictFiltering>true</useStrictFiltering>
             <unpack>false</unpack>
             <includes>
-                <include>${project.groupId}:jom-sources:jar:*</include>
+                <include>${project.groupId}:jom-sources:*</include>
             </includes>
             <outputDirectory/>
             <outputFileNameMapping>jom-${project.version}.jar</outputFileNameMapping>
@@ -47,7 +48,6 @@
             <outputDirectory>lib</outputDirectory>
             <excludes>
                 <exclude>${project.groupId}:*:*</exclude>
-                <exclude>${project.groupId}:jom-sources:*</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>
@@ -70,12 +70,16 @@
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
-                <include>${project.groupId}.jom-sources</include>
+                <include>${project.groupId}:jom-sources</include>
             </includes>
             <sources>
                 <includeModuleDirectory>false</includeModuleDirectory>
                 <fileSets>
                     <fileSet>
+                        <directory>src/main/java</directory>
+                        <includes>
+                            <include>**</include>
+                        </includes>
                         <outputDirectory>src</outputDirectory>
                     </fileSet>
                 </fileSets>
