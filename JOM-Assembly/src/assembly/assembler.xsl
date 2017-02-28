@@ -12,7 +12,7 @@
 
     <includeBaseDirectory>false</includeBaseDirectory>
 
-    <!-- Building ZIP package -->
+    <!-- Building package -->
 
     <!-- Adding project info -->
     <fileSets>
@@ -27,8 +27,8 @@
         </fileSet>
     </fileSets>
 
-    <!-- Adding jar -->
     <dependencySets>
+        <!-- Adding jar -->
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>false</useTransitiveDependencies>
@@ -38,6 +38,17 @@
             </includes>
             <outputDirectory/>
             <outputFileNameMapping>jom-${project.version}.jar</outputFileNameMapping>
+        </dependencySet>
+        <!--Dependencies-->
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <unpack>false</unpack>
+            <outputDirectory>lib</outputDirectory>
+            <excludes>
+                <exclude>${project.groupId}:*:*</exclude>
+                <exclude>${project.groupId}:jom-sources:*</exclude>
+            </excludes>
         </dependencySet>
     </dependencySets>
 
