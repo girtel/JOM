@@ -11,9 +11,9 @@ Visit http://www.net2plan.com/jom
 
 # Building
 
-Commands for building the library:
+The library is currently build under Maven. Run the following goal to build the library:
 
-1. Compile, assembly, but do NOT update Javadoc: ```clean package assembly:single```
+`clean package`
 
-2. Compile, update Javadoc, and then assembly: ```clean package javadoc:javadoc assembly:single```
+The result is a JOM-${VERSION} package contained under the _target_ folder of the JOM-Assembly module.
 
