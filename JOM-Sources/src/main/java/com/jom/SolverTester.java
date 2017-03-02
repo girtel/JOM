@@ -129,9 +129,6 @@ public class SolverTester
 			{
 			    sb.append("MESSAGE: Solver cplex could not be found at: " + solverLibraryName + RETURN);
 			    sb.append(HELP_MESSAGE + RETURN);
-                StringWriter sw = new StringWriter ();
-                e.printStackTrace(new PrintWriter (sw));
-                sb.append(sw.toString());
 			} catch (Exception e)
 		  	{
 		  		sb.append("MESSAGE: Check failed." + RETURN);
