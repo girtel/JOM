@@ -48,6 +48,11 @@ public class OptimizationProblem
 	private TimeInfo timeInfo;
 	private boolean toMinimize;
 
+	/** Returns the list of the names of the installed solvers, in the form that is accepted as the solverName inpt parameter of solve method
+	 * @return see above
+	 */
+	public static List<String> getAcceptedSolverNames () { return Arrays.asList ("ipopt" , "glpk" , "cplex" , "xpress"); }
+	
 	/** Creates an optimization problem object
 	 *
 	 */
