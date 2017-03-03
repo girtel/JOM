@@ -92,7 +92,11 @@ public class SolverTester
 		  		StringWriter sw = new StringWriter ();
 		  		e.printStackTrace(new PrintWriter (sw));
 		  		sb.append(sw.toString());
-		  	} catch (Exception e)
+		  	} catch (JOMException e)
+			{
+				sb.append("MESSAGE: Solver cplex could not be found at: " + licenseFileName + RETURN);
+				sb.append(HELP_MESSAGE + RETURN);
+			} catch (Exception e)
 		  	{
 		  		sb.append("MESSAGE: Check failed." + RETURN);
 		  		StringWriter sw = new StringWriter ();
@@ -161,7 +165,11 @@ public class SolverTester
 		  		StringWriter sw = new StringWriter ();
 		  		e.printStackTrace(new PrintWriter (sw));
 		  		sb.append(sw.toString());
-		  	} catch (Exception e)
+		  	} catch (JOMException e)
+			{
+				sb.append("MESSAGE: Solver cplex could not be found at: " + solverLibraryName + RETURN);
+				sb.append(HELP_MESSAGE + RETURN);
+			} catch (Exception e)
 		  	{
 		  		sb.append("MESSAGE: Check failed." + RETURN);
 		  		StringWriter sw = new StringWriter ();
@@ -199,7 +207,11 @@ public class SolverTester
 		  		StringWriter sw = new StringWriter ();
 		  		e.printStackTrace(new PrintWriter (sw));
 		  		sb.append(sw.toString());
-		  	} catch (Exception e)
+		  	} catch (UnsatisfiedLinkError e)
+			{
+				sb.append("MESSAGE: Solver cplex could not be found at: " + solverLibraryName + RETURN);
+				sb.append(HELP_MESSAGE + RETURN);
+			} catch (Exception e)
 		  	{
 		  		sb.append("MESSAGE: Check failed." + RETURN);
 		  		StringWriter sw = new StringWriter ();
