@@ -95,7 +95,7 @@
             <activation>
                 <os>
                     <name>Linux</name>
-                    <family>unix</family>
+                    <family>!windows</family>
                 </os>
             </activation>
             <properties>
