@@ -88,26 +88,14 @@
         </plugins>
     </build>
 
-    <!-- Especial condition for Windows, it cannot have the allow-script-in-comments param -->
+    <!-- Especial condition for linux, it needs the allow script in comment parameter -->
     <profiles>
-        <profile>
-            <id>Javadoc-Windows</id>
-            <activation>
-                <os>
-                    <name>Windows</name>
-                    <family>windows</family>
-                </os>
-            </activation>
-            <properties>
-                <allow.javascript> </allow.javascript>
-            </properties>
-        </profile>
         <profile>
             <id>Javadoc-Linux</id>
             <activation>
                 <os>
                     <name>Linux</name>
-                    <family>unix</family>
+                    <family>!windows</family>
                 </os>
             </activation>
             <properties>
