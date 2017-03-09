@@ -91,10 +91,10 @@
     <!-- Especial condition for linux, it needs the allow script in comment parameter -->
     <profiles>
         <profile>
-            <id>Javadoc-Linux</id>
+            <id>Javadoc-Unix</id>
             <activation>
                 <os>
-                    <name>Linux</name>
+                    <name>Unix</name>
                     <family>!windows</family>
                 </os>
             </activation>
