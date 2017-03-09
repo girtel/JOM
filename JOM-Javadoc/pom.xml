@@ -5,7 +5,7 @@
     <parent>
         <groupId>es.upct.girtel</groupId>
         <artifactId>jom</artifactId>
-        <version>0.2.0.2-SNAPSHOT</version>
+        <version>0.2.0.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>es.upct.girtel</groupId>
             <artifactId>jom-sources</artifactId>
-            <version>0.2.0.2-SNAPSHOT</version>
+            <version>0.2.0.2</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
