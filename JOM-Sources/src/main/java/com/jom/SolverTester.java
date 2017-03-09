@@ -25,7 +25,7 @@ public class SolverTester
 {
 	final static String RETURN = System.getProperty("line.separator");
 
-	final static String HELP_MESSAGE = "Check the solver's binary path at the 'General options' tab.";
+	final static String HELP_MESSAGE = "Check that the solver is correctly installed at the given location.";
 
 	/** Creates an optimization problem object
 	 *
