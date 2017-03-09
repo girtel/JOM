@@ -11,20 +11,13 @@
 
 package com.jom;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import cern.colt.Arrays;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.jet.math.tdouble.DoubleFunctions;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /** This class contains the methods for handling optimization problems, defining their input parameters (if any), decision variables,
  * objetive function and constraints, choosing and calling a solver to obtain a numerical solution, and retrieving that solution.
@@ -47,6 +40,26 @@ public class OptimizationProblem
 	private _INTERNAL_SolverIO solverIO;
 	private TimeInfo timeInfo;
 	private boolean toMinimize;
+
+	public enum JOMSolver
+    {
+        glpk, ipopt, cplex, xpress
+    }
+
+	/** Returns the list of the names of the installed solvers, in the form that is accepted as the solverName inpt parameter of solve method
+	 * @return see above
+	 */
+	public static List<String> getAcceptedSolverNames ()
+    {
+        final List<String> acceptedNames = new ArrayList<>();
+
+        for (JOMSolver solver : JOMSolver.values())
+        {
+            acceptedNames.add(solver.name());
+        }
+
+        return Collections.unmodifiableList(acceptedNames);
+    }
 
 	/** Creates an optimization problem object
 	 *
@@ -313,12 +326,12 @@ public class OptimizationProblem
 	{
 		return this.solverIO.out.primalCost;
 	}
-	
-	/** Returns the best optimality bound found by the solver. This is a lower bound of the value of an optimum solution in minimization 
-	 * problems, and an upper bound in maximization problems. Some solvers are able to provide this information, even 
-	 * if a feasible solution is not found. If this information is not available, {@code -Double.MAX_VALUE} is returned in 
+
+	/** Returns the best optimality bound found by the solver. This is a lower bound of the value of an optimum solution in minimization
+	 * problems, and an upper bound in maximization problems. Some solvers are able to provide this information, even
+	 * if a feasible solution is not found. If this information is not available, {@code -Double.MAX_VALUE} is returned in
 	 * minimization problems, and {@code Double.MAX_VALUE} is returned in maximization problems.
-	 * @return The optimality bound 
+	 * @return The optimality bound
 	 */
 	public double getBestOptimalityBound()
 	{
@@ -856,17 +869,17 @@ public class OptimizationProblem
 			if (solverName.equalsIgnoreCase("glpk"))
 			{
 				String os = System.getProperty("os.name");
-				if (os.startsWith("Windows")) params.put("solverLibraryName", "glpk.dll"); 
+				if (os.startsWith("Windows")) params.put("solverLibraryName", "glpk.dll");
 				else params.put("solverLibraryName", "libglpk"); // Linux
 			} else if (solverName.equalsIgnoreCase("ipopt"))
 			{
 				String os = System.getProperty("os.name");
-				if (os.startsWith("Windows")) params.put("solverLibraryName", "ipopt.dll"); 
+				if (os.startsWith("Windows")) params.put("solverLibraryName", "ipopt.dll");
 				else params.put("solverLibraryName", "libipopt"); // Linux
 			} else if (solverName.equalsIgnoreCase("cplex"))
 			{
 				String os = System.getProperty("os.name");
-				if (os.startsWith("Windows")) params.put("solverLibraryName", "cplex.dll"); 
+				if (os.startsWith("Windows")) params.put("solverLibraryName", "cplex.dll");
 				else params.put("solverLibraryName", "cplex"); // Linux
 			} else if (solverName.equalsIgnoreCase("xpress"))
 				params.put("solverLibraryName", "xpauth.xpr"); // default name of the license file in XPRESS
