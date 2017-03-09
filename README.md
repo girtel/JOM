@@ -1,5 +1,8 @@
 # JOM
+[![](https://jitpack.io/v/girtel/JOM.svg)](https://jitpack.io/#girtel/JOM)
+
 Java Optimization Modeler
+
 
 JOM (Java Optimization Modeler) is a free and open-source Java library targeted to allowing Java programs modeling and solving optimization problems, defining their input parameters, decision variables, objective function, and constraints. Mathematical expressions combining decision variables, constant parameters, operators and functions, are defined using a simple MATLAB-like syntax. JOM allows handling multidimensional arrays of variables and constants. This enables, for instance, defining arrays of constraints in a single line of code.
 
