@@ -35,10 +35,10 @@
             <useStrictFiltering>true</useStrictFiltering>
             <unpack>false</unpack>
             <includes>
-                <include>${project.groupId}:jom-sources:*</include>
+                <include>${project.groupId}:com.jom-sources:*</include>
             </includes>
             <outputDirectory/>
-            <outputFileNameMapping>jom-${project.version}.jar</outputFileNameMapping>
+            <outputFileNameMapping>com.jom-${project.version}.jar</outputFileNameMapping>
         </dependencySet>
     </dependencySets>
 
@@ -47,7 +47,7 @@
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
-                <include>${project.groupId}:jom-javadoc</include>
+                <include>${project.groupId}:com.jom-javadoc</include>
             </includes>
             <binaries>
                 <unpack>true</unpack>
@@ -60,7 +60,7 @@
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
-                <include>${project.groupId}:jom-sources</include>
+                <include>${project.groupId}:com.jom-sources</include>
             </includes>
             <sources>
                 <includeModuleDirectory>false</includeModuleDirectory>

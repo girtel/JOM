@@ -4,19 +4,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>es.upct.girtel</groupId>
-        <artifactId>jom</artifactId>
+        <artifactId>com.jom</artifactId>
         <version>0.2.0.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>jom-javadoc</artifactId>
+    <artifactId>com.jom-javadoc</artifactId>
 
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>es.upct.girtel</groupId>
-            <artifactId>jom-sources</artifactId>
+            <artifactId>com.jom-sources</artifactId>
             <version>0.2.0.2</version>
             <scope>provided</scope>
         </dependency>
@@ -69,14 +69,14 @@
                             </additionalparam>
                             <includeDependencySources>true</includeDependencySources>
                             <dependencySourceIncludes>
-                                <dependencySourceInclude>es.upct.girtel:jom-sources</dependencySourceInclude>
+                                <dependencySourceInclude>es.upct.girtel:com.jom-sources</dependencySourceInclude>
                             </dependencySourceIncludes>
                             <sourceFileIncludes>
-                                <include>com/jom/DoubleMatrixND.java</include>
-                                <include>com/jom/OptimizationProblem.java</include>
-                                <include>com/jom/Expression.java</include>
-                                <include>com/jom/JOMException.java</include>
-                                <include>com/jom/SolverTester.java</include>
+                                <include>com/com.jom/DoubleMatrixND.java</include>
+                                <include>com/com.jom/OptimizationProblem.java</include>
+                                <include>com/com.jom/Expression.java</include>
+                                <include>com/com.jom/JOMException.java</include>
+                                <include>com/com.jom/SolverTester.java</include>
                             </sourceFileIncludes>
                         </configuration>
                     </execution>
