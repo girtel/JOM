@@ -63,6 +63,7 @@
                             <detectOfflineLinks>false</detectOfflineLinks>
                             <!-- Adding Latex parser for Javadoc -->
                             <additionalparam>
+                                <!-- Uncomment if Javadoc requires the allow-script-in-comments param -->
                                 <!--&#45;&#45;allow-script-in-comments-->
                                 -header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;&apos;
                             </additionalparam>
