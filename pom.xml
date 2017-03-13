@@ -19,8 +19,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>JOM-Sources</module>
-        <module>JOM-Javadoc</module>
         <module>JOM-Assembly</module>
     </modules>
 
@@ -87,6 +85,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.2</version>
+                <inherited>false</inherited>
                 <configuration>
                     <archive>
                         <manifest>
@@ -103,12 +102,60 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>3.0.1</version>
+                <inherited>false</inherited>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Generate Javadoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.4</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>build-javadoc</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <show>public</show>
+                            <author>true</author>
+                            <nodeprecated>false</nodeprecated>
+                            <nodeprecatedlist>false</nodeprecatedlist>
+                            <noindex>false</noindex>
+                            <nonavbar>false</nonavbar>
+                            <notree>false</notree>
+                            <source>1.8</source>
+                            <splitindex>true</splitindex>
+                            <use>true</use>
+                            <version>true</version>
+                            <links>
+                                <link>http://incanter.org/docs/parallelcolt/api/</link>
+                            </links>
+                            <detectOfflineLinks>false</detectOfflineLinks>
+                            <!-- Adding Latex parser for Javadoc -->
+                            <additionalparam>
+                                <!-- Uncomment if Javadoc requires the allow-script-in-comments param -->
+                                <!--&#45;&#45;allow-script-in-comments-->
+                                -header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;&apos;
+                            </additionalparam>
+                            <sourceFileIncludes>
+                                <include>com/jom/DoubleMatrixND.java</include>
+                                <include>com/jom/OptimizationProblem.java</include>
+                                <include>com/jom/Expression.java</include>
+                                <include>com/jom/JOMException.java</include>
+                                <include>com/jom/SolverTester.java</include>
+                            </sourceFileIncludes>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>es.upct.girtel</groupId>
-        <artifactId>com.jom</artifactId>
+        <artifactId>jom</artifactId>
         <version>0.2.0.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>com.jom-assembly</artifactId>
+    <artifactId>jom-assembly</artifactId>
 
     <!-- Does not generate JAR -->
     <packaging>pom</packaging>
@@ -17,14 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>es.upct.girtel</groupId>
-            <artifactId>com.jom-sources</artifactId>
-            <version>0.2.0.2</version>
-            <scope>runtime</scope>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>es.upct.girtel</groupId>
-            <artifactId>com.jom-javadoc</artifactId>
+            <artifactId>jom</artifactId>
             <version>0.2.0.2</version>
             <scope>runtime</scope>
             <type>jar</type>
