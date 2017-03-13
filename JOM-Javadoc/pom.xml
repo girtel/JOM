@@ -22,10 +22,6 @@
         </dependency>
     </dependencies>
 
-    <properties>
-        <allow.javascript/> <!--Defining var but not giving it a value-->
-    </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -67,7 +63,8 @@
                             <detectOfflineLinks>false</detectOfflineLinks>
                             <!-- Adding Latex parser for Javadoc -->
                             <additionalparam>
-                                ${allow.javascript}
+                                <!-- Uncomment if Javadoc requires the allow-script-in-comments param -->
+                                <!--&#45;&#45;allow-script-in-comments-->
                                 -header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;&apos;
                             </additionalparam>
                             <includeDependencySources>true</includeDependencySources>
@@ -87,20 +84,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <!-- Especial condition for linux, it needs the allow script in comment parameter -->
-    <profiles>
-        <profile>
-            <id>Javadoc-Linux</id>
-            <activation>
-                <os>
-                    <name>Linux</name>
-                    <family>!windows</family>
-                </os>
-            </activation>
-            <properties>
-                    <allow.javascript>--allow-script-in-comments</allow.javascript>
-            </properties>
-        </profile>
-    </profiles>
 </project>
