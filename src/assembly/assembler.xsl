@@ -10,14 +10,12 @@
         <format>tar.bz2</format>
     </formats>
 
-    <includeBaseDirectory>false</includeBaseDirectory>
-
     <!-- Building package -->
 
     <fileSets>
         <!-- Adding project info -->
         <fileSet>
-            <directory>${project.parent.basedir}</directory>
+            <directory>${project.basedir}</directory>
             <outputDirectory/>
             <includes>
                 <include>README*</include>
@@ -30,7 +28,7 @@
             <directory>${project.build.directory}</directory>
             <outputDirectory/>
             <includes>
-                <include>*.jar</include>
+                <include>*${project.version}.jar</include>
             </includes>
         </fileSet>
         <!-- Adding sources -->
@@ -43,7 +41,7 @@
         </fileSet>
         <!-- Adding Javadoc -->
         <fileSet>
-            <directory>${project.build.directory}/site/apidocs</directory>
+            <directory>${project.build.directory}/apidocs</directory>
             <outputDirectory>javadoc</outputDirectory>
             <includes>
                 <include>**</include>
