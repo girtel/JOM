@@ -16,11 +16,7 @@
         </license>
     </licenses>
 
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>JOM-Assembly</module>
-    </modules>
+    <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,6 +36,7 @@
     </dependencies>
 
     <build>
+        <finalName>JOM-${project.version}</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -77,7 +74,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.3</version>
-                <inherited>false</inherited>
             </plugin>
 
             <!-- Building JAR -->
@@ -85,7 +81,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.2</version>
-                <inherited>false</inherited>
                 <configuration>
                     <archive>
                         <manifest>
@@ -102,7 +97,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>3.0.1</version>
-                <inherited>false</inherited>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -118,7 +112,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.4</version>
-                <inherited>false</inherited>
                 <executions>
                     <execution>
                         <id>build-javadoc</id>
@@ -145,7 +138,7 @@
                             <!-- Adding Latex parser for Javadoc -->
                             <additionalparam>
                                 <!-- Uncomment if Javadoc requires the allow-script-in-comments param -->
-                                <!--&#45;&#45;allow-script-in-comments-->
+                                --allow-script-in-comments
                                 -header &apos;&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot;&gt;&lt;/script&gt;&apos;
                             </additionalparam>
                             <sourceFileIncludes>
@@ -155,6 +148,27 @@
                                 <include>com/jom/JOMException.java</include>
                                 <include>com/jom/SolverTester.java</include>
                             </sourceFileIncludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- This is for assembling a JOM release (the .jar, the javadoc...) -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>assemble</id>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/assembly/assembler.xsl</descriptor>
+                            </descriptors>
                         </configuration>
                     </execution>
                 </executions>
