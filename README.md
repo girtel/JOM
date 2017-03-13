@@ -18,5 +18,5 @@ The library is currently build under Maven. Run the following goal to build the 
 
 `clean package`
 
-The result is a JOM-${VERSION} package contained under the _target_ folder of the JOM-Assembly module.
+The result is a JOM-${VERSION} package contained under the _target/assembly_ folder of the project.
 
