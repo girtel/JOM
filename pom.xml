@@ -169,6 +169,7 @@
                             <descriptors>
                                 <descriptor>src/assembly/assembler.xsl</descriptor>
                             </descriptors>
+                            <outputDirectory>${project.build.directory}/assembly</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
