@@ -36,7 +36,7 @@
     </dependencies>
 
     <build>
-        <finalName>JOM-${project.version}</finalName>
+        <finalName>jom-${project.version}</finalName>
 
         <plugins>
             <!-- Build helper: Version controller -->
