@@ -33,40 +33,40 @@ class _INTERNAL_ExpressionParser extends AbstractEvaluator<Expression>
 	{
 		/* Define operators. Key in HashMap = symbol + " " + num operands */
 		listOperators = new HashMap<String, Object[]>();
-		listOperators.put(": 2", new Object[]{":", 2, Operator.Associativity.LEFT, 1, "_OPERATOR_CONTIGUOUSRANGE", false}); // assignment
-		listOperators.put("[ 1", new Object[]{"[", 1, Operator.Associativity.RIGHT, 4, "_OPERATOR_OPENARRAY", false}); // e2eMultiply
-		listOperators.put("; 2", new Object[]{";", 2, Operator.Associativity.LEFT, 4, "_OPERATOR_APPENDCOLUMNS", false}); // e2eMultiply
-		listOperators.put(";; 2", new Object[]{";;", 2, Operator.Associativity.LEFT, 4, "_OPERATOR_APPENDROWS", false}); // e2eMultiply
+		listOperators.put(": 2", new Object[]{":", 2, Operator.Associativity.LEFT, 1, "com.jom._OPERATOR_CONTIGUOUSRANGE", false}); // assignment
+		listOperators.put("[ 1", new Object[]{"[", 1, Operator.Associativity.RIGHT, 4, "com.jom._OPERATOR_OPENARRAY", false}); // e2eMultiply
+		listOperators.put("; 2", new Object[]{";", 2, Operator.Associativity.LEFT, 4, "com.jom._OPERATOR_APPENDCOLUMNS", false}); // e2eMultiply
+		listOperators.put(";; 2", new Object[]{";;", 2, Operator.Associativity.LEFT, 4, "com.jom._OPERATOR_APPENDROWS", false}); // e2eMultiply
 
-		listOperators.put("+ 2", new Object[]{"+", 2, Operator.Associativity.LEFT, 1, "_OPERATOR_PLUS", true}); // plus
-		listOperators.put("- 2", new Object[]{"-", 2, Operator.Associativity.LEFT, 1, "_OPERATOR_SUBSTRACT", true}); // minus
-		listOperators.put("- 1", new Object[]{"-", 1, Operator.Associativity.RIGHT, 3, "_OPERATOR_NEG", false}); // negate
-		listOperators.put("* 2", new Object[]{"*", 2, Operator.Associativity.LEFT, 2, "_OPERATOR_MULTIPLY", true}); // e2eMultiply
-		listOperators.put(".* 2", new Object[]{".*", 2, Operator.Associativity.LEFT, 2, "_OPERATOR_E2EMULTIPLY", true}); // e2eMultiply
-		listOperators.put("/ 2", new Object[]{"/", 2, Operator.Associativity.LEFT, 2, "_OPERATOR_E2EDIVIDE", true}); // e2eMultiply
-		listOperators.put("./ 2", new Object[]{"./", 2, Operator.Associativity.LEFT, 2, "_OPERATOR_E2EDIVIDE", true}); // e2eMultiply
-		listOperators.put("^ 2", new Object[]{"^", 2, Operator.Associativity.LEFT, 3, "_OPERATOR_POW", true}); // pow
-		listOperators.put(".^ 2", new Object[]{"^", 2, Operator.Associativity.LEFT, 3, "_OPERATOR_POW", true}); // pow
-		listOperators.put("' 1", new Object[]{"'", 1, Operator.Associativity.LEFT, 4, "_OPERATOR_TRANSPOSE", false}); // e2eMultiply
+		listOperators.put("+ 2", new Object[]{"+", 2, Operator.Associativity.LEFT, 1, "com.jom._OPERATOR_PLUS", true}); // plus
+		listOperators.put("- 2", new Object[]{"-", 2, Operator.Associativity.LEFT, 1, "com.jom._OPERATOR_SUBSTRACT", true}); // minus
+		listOperators.put("- 1", new Object[]{"-", 1, Operator.Associativity.RIGHT, 3, "com.jom._OPERATOR_NEG", false}); // negate
+		listOperators.put("* 2", new Object[]{"*", 2, Operator.Associativity.LEFT, 2, "com.jom._OPERATOR_MULTIPLY", true}); // e2eMultiply
+		listOperators.put(".* 2", new Object[]{".*", 2, Operator.Associativity.LEFT, 2, "com.jom._OPERATOR_E2EMULTIPLY", true}); // e2eMultiply
+		listOperators.put("/ 2", new Object[]{"/", 2, Operator.Associativity.LEFT, 2, "com.jom._OPERATOR_E2EDIVIDE", true}); // e2eMultiply
+		listOperators.put("./ 2", new Object[]{"./", 2, Operator.Associativity.LEFT, 2, "com.jom._OPERATOR_E2EDIVIDE", true}); // e2eMultiply
+		listOperators.put("^ 2", new Object[]{"^", 2, Operator.Associativity.LEFT, 3, "com.jom._OPERATOR_POW", true}); // pow
+		listOperators.put(".^ 2", new Object[]{"^", 2, Operator.Associativity.LEFT, 3, "com.jom._OPERATOR_POW", true}); // pow
+		listOperators.put("' 1", new Object[]{"'", 1, Operator.Associativity.LEFT, 4, "com.jom._OPERATOR_TRANSPOSE", false}); // e2eMultiply
 
 		listFunctions = new HashMap<String, Object[]>();
-		listFunctions.put("sum", new Object[]{1, 2, "_FUNCTION_SUM", false});
-		listFunctions.put("ln", new Object[]{1, 1, "_FUNCTION_LN", false});
-		listFunctions.put("exp", new Object[]{1, 1, "_FUNCTION_EXP", false});
-		listFunctions.put("sqrt", new Object[]{1, 1, "_FUNCTION_SQRT", false});
-		listFunctions.put("sin", new Object[]{1, 1, "_FUNCTION_SIN", false});
-		listFunctions.put("cos", new Object[]{1, 1, "_FUNCTION_COS", false});
-		listFunctions.put("tan", new Object[]{1, 1, "_FUNCTION_TAN", false});
-		listFunctions.put("asin", new Object[]{1, 1, "_FUNCTION_ASIN", false});
-		listFunctions.put("acos", new Object[]{1, 1, "_FUNCTION_ACOS", false});
-		listFunctions.put("atan", new Object[]{1, 1, "_FUNCTION_ATAN", false});
-		listFunctions.put("erlangB", new Object[]{2, 2, "_FUNCTION_ERLANGB_TRAF", true});
-		//		listFunctions.put ("matProd" , new Object [] {4 , 4 , "com.com.jom._FUNCTION_MATPROD" , false});
-		listFunctions.put("permute", new Object[]{2, 2, "_FUNCTION_PERMUTE", false});
-		listFunctions.put("diag", new Object[]{1, 1, "_FUNCTION_DIAG", false});
-		listFunctions.put("ones", new Object[]{1, 1, "_FUNCTION_ONES", false});
-		listFunctions.put("zeros", new Object[]{1, 1, "_FUNCTION_ZEROS", false});
-		listFunctions.put("eye", new Object[]{1, 2, "_FUNCTION_EYE", false});
+		listFunctions.put("sum", new Object[]{1, 2, "com.jom._FUNCTION_SUM", false});
+		listFunctions.put("ln", new Object[]{1, 1, "com.jom._FUNCTION_LN", false});
+		listFunctions.put("exp", new Object[]{1, 1, "com.jom._FUNCTION_EXP", false});
+		listFunctions.put("sqrt", new Object[]{1, 1, "com.jom._FUNCTION_SQRT", false});
+		listFunctions.put("sin", new Object[]{1, 1, "com.jom._FUNCTION_SIN", false});
+		listFunctions.put("cos", new Object[]{1, 1, "com.jom._FUNCTION_COS", false});
+		listFunctions.put("tan", new Object[]{1, 1, "com.jom._FUNCTION_TAN", false});
+		listFunctions.put("asin", new Object[]{1, 1, "com.jom._FUNCTION_ASIN", false});
+		listFunctions.put("acos", new Object[]{1, 1, "com.jom._FUNCTION_ACOS", false});
+		listFunctions.put("atan", new Object[]{1, 1, "com.jom._FUNCTION_ATAN", false});
+		listFunctions.put("erlangB", new Object[]{2, 2, "com.jom._FUNCTION_ERLANGB_TRAF", true});
+		//		listFunctions.put ("matProd" , new Object [] {4 , 4 , "com.jom._FUNCTION_MATPROD" , false});
+		listFunctions.put("permute", new Object[]{2, 2, "com.jom._FUNCTION_PERMUTE", false});
+		listFunctions.put("diag", new Object[]{1, 1, "com.jom._FUNCTION_DIAG", false});
+		listFunctions.put("ones", new Object[]{1, 1, "com.jom._FUNCTION_ONES", false});
+		listFunctions.put("zeros", new Object[]{1, 1, "com.jom._FUNCTION_ZEROS", false});
+		listFunctions.put("eye", new Object[]{1, 2, "com.jom._FUNCTION_EYE", false});
 	}
 
 	private final HashMap<String, _INTERNAL_DecisionVariableArray> decisionVariables;
@@ -382,7 +382,7 @@ class _INTERNAL_ExpressionParser extends AbstractEvaluator<Expression>
 		if (scalarToExpressionChange && operator.getSymbol().equals("*"))
 		{
 			operatorSymbol = ".*";
-			functionClassName = "_OPERATOR_E2EMULTIPLY";
+			functionClassName = "com.jom._OPERATOR_E2EMULTIPLY";
 		}
 
 		/* Instantiate the class that executes the operand */
