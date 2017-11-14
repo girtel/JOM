@@ -52,6 +52,17 @@ class _SOLVERWRAPPER_IPOPT
 	private final _INTERNAL_SolverIO      s;
 	private final String                  solverLibraryName;
 
+
+	// Store callback functions in member fields, to prevent
+	// premature garbage collection. Without this, the JVM sometimes
+	// garbage collects the callbacks between the calls to
+	// g.CreateIpoptProblem and g.IpoptSolve, leading to a core dump.
+	private _JNA_IPOPT_CallBack_Eval_F eval_f;
+	private _JNA_IPOPT_CallBack_Eval_G eval_g;
+	private _JNA_IPOPT_CallBack_Eval_Grad_F eval_grad_f;
+	private _JNA_IPOPT_CallBack_Eval_Jac_G eval_jac_g;
+	private _JNA_IPOPT_CallBack_Eval_H eval_h;
+
 	_SOLVERWRAPPER_IPOPT(_INTERNAL_SolverIO s, HashMap<String, Object> param)
 	{
 		this.s = s;
@@ -172,7 +183,7 @@ class _SOLVERWRAPPER_IPOPT
 				new int[0] :
 				DoubleMatrixND.sub2ind(coord, IntFactory1D.dense.make(new int[]{s.in.numConstraints, s.in.numDecVariables})).toArray();
 
-		_JNA_IPOPT_CallBack_Eval_F eval_f = new _JNA_IPOPT_CallBack_Eval_F()
+		eval_f = new _JNA_IPOPT_CallBack_Eval_F()
 		{
 			@Override
 			public boolean callback(int n, Pointer x, boolean new_x, Pointer obj_value, Pointer user_data)
@@ -182,7 +193,7 @@ class _SOLVERWRAPPER_IPOPT
 				return true;
 			}
 		};
-		_JNA_IPOPT_CallBack_Eval_G eval_g = new _JNA_IPOPT_CallBack_Eval_G()
+		eval_g = new _JNA_IPOPT_CallBack_Eval_G()
 		{
 			@Override
 			public boolean callback(int n, Pointer x, boolean new_x, int m, Pointer g, Pointer user_data)
@@ -194,7 +205,7 @@ class _SOLVERWRAPPER_IPOPT
 				return true;
 			}
 		};
-		_JNA_IPOPT_CallBack_Eval_Grad_F eval_grad_f = new _JNA_IPOPT_CallBack_Eval_Grad_F()
+		eval_grad_f = new _JNA_IPOPT_CallBack_Eval_Grad_F()
 		{
 			@Override
 			public boolean callback(int n, Pointer x, boolean new_x, Pointer grad_f, Pointer user_data)
@@ -204,7 +215,7 @@ class _SOLVERWRAPPER_IPOPT
 				return true;
 			}
 		};
-		_JNA_IPOPT_CallBack_Eval_Jac_G eval_jac_g = new _JNA_IPOPT_CallBack_Eval_Jac_G()
+		eval_jac_g = new _JNA_IPOPT_CallBack_Eval_Jac_G()
 		{
 			@Override
 			public boolean callback(int n, Pointer x, boolean new_x, int m, int nele_jac, Pointer iRow, Pointer jCol, Pointer values, Pointer
@@ -227,7 +238,7 @@ class _SOLVERWRAPPER_IPOPT
 				}
 			}
 		};
-		_JNA_IPOPT_CallBack_Eval_H eval_h = new _JNA_IPOPT_CallBack_Eval_H()
+		eval_h = new _JNA_IPOPT_CallBack_Eval_H()
 		{
 			@Override
 			public boolean callback(int n, Pointer x, boolean new_x, double obj_factor, int m, Pointer lambda, boolean new_lambda, int nele_hess,
@@ -393,8 +404,14 @@ class _SOLVERWRAPPER_IPOPT
                break;
          }
       } finally {
-		   g.FreeIpoptProblem(nlp);
+         g.FreeIpoptProblem(nlp);
          nlp = null;
+
+         eval_f = null;
+         eval_g = null;
+         eval_grad_f = null;
+         eval_jac_g = null;
+         eval_h = null;
       }
    }
 
