@@ -259,138 +259,143 @@ class _SOLVERWRAPPER_IPOPT
 		Pointer nlp = g.CreateIpoptProblem(n, x_L, x_U, m, g_L, g_U, nele_jac, nele_hess, index_style, eval_f, eval_g, eval_grad_f, eval_jac_g,
 				eval_h);
 
-		if (!s.in.toMinimize) g.AddIpoptNumOption(nlp, "obj_scaling_factor", -1);
-		
-		/* Set specific parameters specified by the user */
-		for (Entry<String, Object> entry : this.param.entrySet())
-		{
-			String key = entry.getKey();
-			if (key.equalsIgnoreCase("solverLibraryName")) continue; // a non-IPOPT specific option
-			if (key.equals("maxSolverTimeInSeconds")) 
-			{
-				final Double val_maxSolverTimeInSeconds = ((Number) entry.getValue()).doubleValue();
-				if (val_maxSolverTimeInSeconds > 0)
-					g.AddIpoptNumOption(nlp, "max_cpu_time", val_maxSolverTimeInSeconds);
-				continue;
-			}
-			Object value = entry.getValue();
-			if (value instanceof String)
-				g.AddIpoptStrOption(nlp, key, (String) value);
-			else if (value instanceof Integer)
-				g.AddIpoptIntOption(nlp, key, ((Integer) value).intValue());
-			else if (value instanceof Double)
-				g.AddIpoptNumOption(nlp, key, ((Double) value).doubleValue());
-			else
-				throw new JOMException("JOM - IPOPT interface. Unknown value type in parameters");
-		}
+      try {
+         if (!s.in.toMinimize) g.AddIpoptNumOption(nlp, "obj_scaling_factor", -1);
 
-		if (s.in.lhsMinusRhsAccumulatedConstraint != null)
-			if (s.in.lhsMinusRhsAccumulatedConstraint.isLinear())
-			{
-				g.AddIpoptStrOption(nlp, "jac_c_constant", "yes"); // equality constraints
-				// are linear => the
-				// jacobian is called
-				// once
-				g.AddIpoptStrOption(nlp, "jac_d_constant", "yes"); // inequality
-				// constraints are
-				// linear => the
-				// jacobian is called
-				// once
-			}
-		if (s.isLinearProblem())
-		{
-			g.AddIpoptStrOption(nlp, "hessian_approximation", "exact"); // the hessian
-			// is given
-			// exactly,
-			// and will be
-			// equal to 0
-			g.AddIpoptStrOption(nlp, "hessian_constant", "yes"); // the hessian is
-			// constant
-			// (objective
-			// function and
-			// constraints are
-			// quadratic or
-			// linear) => the
-			// hessian is called
-			// once
-		} else
-		{
-			g.AddIpoptStrOption(nlp, "hessian_approximation", "limited-memory");
-			g.AddIpoptStrOption(nlp, "hessian_constant", "no");
-		}
+         /* Set specific parameters specified by the user */
+         for (Entry<String, Object> entry : this.param.entrySet())
+         {
+            String key = entry.getKey();
+            if (key.equalsIgnoreCase("solverLibraryName")) continue; // a non-IPOPT specific option
+            if (key.equals("maxSolverTimeInSeconds"))
+            {
+               final Double val_maxSolverTimeInSeconds = ((Number) entry.getValue()).doubleValue();
+               if (val_maxSolverTimeInSeconds > 0)
+                  g.AddIpoptNumOption(nlp, "max_cpu_time", val_maxSolverTimeInSeconds);
+               continue;
+            }
+            Object value = entry.getValue();
+            if (value instanceof String)
+               g.AddIpoptStrOption(nlp, key, (String) value);
+            else if (value instanceof Integer)
+               g.AddIpoptIntOption(nlp, key, ((Integer) value).intValue());
+            else if (value instanceof Double)
+               g.AddIpoptNumOption(nlp, key, ((Double) value).doubleValue());
+            else
+               throw new JOMException("JOM - IPOPT interface. Unknown value type in parameters");
+         }
 
-		double[] x0 = s.in.primalInitialSolution.toArray();
-		double[] gArray = new double[m];
-		double[] obj_val = new double[1];
-		double[] mult_g = new double[m];
-		double[] mult_x_L = new double[n];
-		double[] mult_x_U = new double[n];
+         if (s.in.lhsMinusRhsAccumulatedConstraint != null)
+            if (s.in.lhsMinusRhsAccumulatedConstraint.isLinear())
+            {
+               g.AddIpoptStrOption(nlp, "jac_c_constant", "yes"); // equality constraints
+               // are linear => the
+               // jacobian is called
+               // once
+               g.AddIpoptStrOption(nlp, "jac_d_constant", "yes"); // inequality
+               // constraints are
+               // linear => the
+               // jacobian is called
+               // once
+            }
+         if (s.isLinearProblem())
+         {
+            g.AddIpoptStrOption(nlp, "hessian_approximation", "exact"); // the hessian
+            // is given
+            // exactly,
+            // and will be
+            // equal to 0
+            g.AddIpoptStrOption(nlp, "hessian_constant", "yes"); // the hessian is
+            // constant
+            // (objective
+            // function and
+            // constraints are
+            // quadratic or
+            // linear) => the
+            // hessian is called
+            // once
+         } else
+         {
+            g.AddIpoptStrOption(nlp, "hessian_approximation", "limited-memory");
+            g.AddIpoptStrOption(nlp, "hessian_constant", "no");
+         }
 
-		int status = g.IpoptSolve(nlp, x0, gArray, obj_val, mult_g, mult_x_L, mult_x_U, Pointer.NULL);
+         double[] x0 = s.in.primalInitialSolution.toArray();
+         double[] gArray = new double[m];
+         double[] obj_val = new double[1];
+         double[] mult_g = new double[m];
+         double[] mult_x_L = new double[n];
+         double[] mult_x_U = new double[n];
 
-		s.problemAlreadyAttemptedTobeSolved = true;
+         int status = g.IpoptSolve(nlp, x0, gArray, obj_val, mult_g, mult_x_L, mult_x_U, Pointer.NULL);
 
-		if (status == 0)
-		{ // Solve_Succeeded = 0
-		}
+         s.problemAlreadyAttemptedTobeSolved = true;
 
-		s.out.statusCode = status;
-		s.out.statusMessage = errorMessage(status);
-		s.out.primalSolution = DoubleFactory1D.dense.make(x0);
-		s.out.multiplierOfLowerBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(mult_x_L);
-		s.out.multiplierOfUpperBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(mult_x_U);
-		s.out.primalValuePerConstraint = DoubleFactory1D.dense.make(gArray);
-		s.out.multiplierOfConstraint = DoubleFactory1D.dense.make(mult_g);
-		s.out.primalCost = obj_val[0];
-		s.out.bestOptimalityBound = s.in.toMinimize? -Double.MAX_VALUE : Double.MAX_VALUE; //p.getDblAttrib(XPRSconstants.BESTBOUND); // pablo: this may not be the one for this
+         if (status == 0)
+         { // Solve_Succeeded = 0
+         }
 
-		switch (status)
-		{
-			case returnCode_Solve_Succeeded:
-			case returnCode_Solved_To_Acceptable_Level:
-			case returnCode_Feasible_Point_Found:
-				s.out.solutionIsFeasible = true;
-				s.out.solutionIsOptimal = true;
-				s.out.feasibleSolutionDoesNotExist = false;
-				s.out.foundUnboundedSolution = false;
-				break;
-			case returnCode_Infeasible_Problem_Detected:
-				s.out.solutionIsFeasible = false;
-				s.out.solutionIsOptimal = false;
-				s.out.feasibleSolutionDoesNotExist = true;
-				s.out.foundUnboundedSolution = false;
-				break;
-			case returnCode_Search_Direction_Becomes_Too_Small:
-			case returnCode_Maximum_Iterations_Exceeded:
-				s.out.solutionIsFeasible = true;
-				s.out.solutionIsOptimal = false;
-				s.out.feasibleSolutionDoesNotExist = false;
-				s.out.foundUnboundedSolution = false;
-				break;
-			case returnCode_Diverging_Iterates:
-				s.out.solutionIsFeasible = true;
-				s.out.solutionIsOptimal = false;
-				s.out.feasibleSolutionDoesNotExist = false;
-				s.out.foundUnboundedSolution = true;
-				break;
-			case returnCode_User_Requested_Stop:
-			case returnCode_Restoration_Failed:
-			case returnCode_Error_In_Step_Computation:
-			case returnCode_Maximum_CpuTime_Exceeded:
-			case returnCode_Not_Enough_Degrees_Of_Freedom:
-			case returnCode_Invalid_Problem_Definition:
-			case returnCode_Invalid_Option:
-			case returnCode_Invalid_Number_Detected:
-			case returnCode_Unrecoverable_Exception:
-			case returnCode_NonIpopt_Exception_Thrown:
-			case returnCode_Insufficient_Memory:
-			case returnCode_Internal_Error:
-				s.out.solutionIsFeasible = false;
-				s.out.solutionIsOptimal = false;
-				s.out.feasibleSolutionDoesNotExist = false;
-				s.out.foundUnboundedSolution = false;
-				break;
-		}
-	}
+         s.out.statusCode = status;
+         s.out.statusMessage = errorMessage(status);
+         s.out.primalSolution = DoubleFactory1D.dense.make(x0);
+         s.out.multiplierOfLowerBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(mult_x_L);
+         s.out.multiplierOfUpperBoundConstraintToPrimalVariables = DoubleFactory1D.dense.make(mult_x_U);
+         s.out.primalValuePerConstraint = DoubleFactory1D.dense.make(gArray);
+         s.out.multiplierOfConstraint = DoubleFactory1D.dense.make(mult_g);
+         s.out.primalCost = obj_val[0];
+         s.out.bestOptimalityBound = s.in.toMinimize? -Double.MAX_VALUE : Double.MAX_VALUE; //p.getDblAttrib(XPRSconstants.BESTBOUND); // pablo: this may not be the one for this
+
+         switch (status)
+         {
+            case returnCode_Solve_Succeeded:
+            case returnCode_Solved_To_Acceptable_Level:
+            case returnCode_Feasible_Point_Found:
+               s.out.solutionIsFeasible = true;
+               s.out.solutionIsOptimal = true;
+               s.out.feasibleSolutionDoesNotExist = false;
+               s.out.foundUnboundedSolution = false;
+               break;
+            case returnCode_Infeasible_Problem_Detected:
+               s.out.solutionIsFeasible = false;
+               s.out.solutionIsOptimal = false;
+               s.out.feasibleSolutionDoesNotExist = true;
+               s.out.foundUnboundedSolution = false;
+               break;
+            case returnCode_Search_Direction_Becomes_Too_Small:
+            case returnCode_Maximum_Iterations_Exceeded:
+               s.out.solutionIsFeasible = true;
+               s.out.solutionIsOptimal = false;
+               s.out.feasibleSolutionDoesNotExist = false;
+               s.out.foundUnboundedSolution = false;
+               break;
+            case returnCode_Diverging_Iterates:
+               s.out.solutionIsFeasible = true;
+               s.out.solutionIsOptimal = false;
+               s.out.feasibleSolutionDoesNotExist = false;
+               s.out.foundUnboundedSolution = true;
+               break;
+            case returnCode_User_Requested_Stop:
+            case returnCode_Restoration_Failed:
+            case returnCode_Error_In_Step_Computation:
+            case returnCode_Maximum_CpuTime_Exceeded:
+            case returnCode_Not_Enough_Degrees_Of_Freedom:
+            case returnCode_Invalid_Problem_Definition:
+            case returnCode_Invalid_Option:
+            case returnCode_Invalid_Number_Detected:
+            case returnCode_Unrecoverable_Exception:
+            case returnCode_NonIpopt_Exception_Thrown:
+            case returnCode_Insufficient_Memory:
+            case returnCode_Internal_Error:
+               s.out.solutionIsFeasible = false;
+               s.out.solutionIsOptimal = false;
+               s.out.feasibleSolutionDoesNotExist = false;
+               s.out.foundUnboundedSolution = false;
+               break;
+         }
+      } finally {
+		   g.FreeIpoptProblem(nlp);
+         nlp = null;
+      }
+   }
 
 }
