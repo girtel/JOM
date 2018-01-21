@@ -28,11 +28,11 @@ import java.util.Map.Entry;
 public class OptimizationProblem
 {
 	final static int MAX_NUMBER_DIMENSIONS_INPUTPARAMETER = 10;
-	private HashMap<String, _INTERNAL_ConstraintArray> constraints;
-	private HashMap<String, _INTERNAL_DecisionVariableArray> decisionVariables;
+	private Map<String, _INTERNAL_ConstraintArray> constraints;
+	private Map<String, _INTERNAL_DecisionVariableArray> decisionVariables;
 	private _INTERNAL_ExpressionParser evaluator;
-	private HashMap<String, DoubleMatrixND> initialSolution;
-	private HashMap<String, DoubleMatrixND> inputParameters;
+	private Map<String, DoubleMatrixND> initialSolution;
+	private Map<String, DoubleMatrixND> inputParameters;
 	private int lpNumScalarConstraints;
 	private int nlpNumScalarConstraints;
 	private int numScalarDecisionVariables;
@@ -52,13 +52,9 @@ public class OptimizationProblem
 	public static List<String> getAcceptedSolverNames ()
     {
         final List<String> acceptedNames = new ArrayList<>();
-
         for (JOMSolver solver : JOMSolver.values())
-        {
             acceptedNames.add(solver.name());
-        }
-
-        return Collections.unmodifiableList(acceptedNames);
+        return acceptedNames;
     }
 
 	/** Creates an optimization problem object
@@ -657,7 +653,7 @@ public class OptimizationProblem
 		this.solverIO = new _INTERNAL_SolverIO(this, this.objectiveFunction, this.toMinimize, this.decisionVariables, this.constraints, this
 				.initialSolution);
 
-		HashMap<String, Object> params = createParametersMapInitilizingDefaults(solverName, paramValuePairs, this.solverIO);
+		Map<String, Object> params = createParametersMapInitilizingDefaults(solverName, paramValuePairs, this.solverIO);
 
 		if (solverName.equalsIgnoreCase("glpk"))
 		{
@@ -838,11 +834,11 @@ public class OptimizationProblem
 		return null;
 	}
 
-	private HashMap<String, Object> createParametersMapInitilizingDefaults(String solverName, Object[] paramValuePairs, _INTERNAL_SolverIO solverIO)
+	private Map<String, Object> createParametersMapInitilizingDefaults(String solverName, Object[] paramValuePairs, _INTERNAL_SolverIO solverIO)
 	{
 		int numParameters = (int) (paramValuePairs.length / 2);
 		if ((((double) paramValuePairs.length) / 2) != (double) numParameters) throw new JOMException("A parameter has not assigned its value");
-		HashMap<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<String, Object>();
 		for (int contParam = 0; contParam < numParameters; contParam++)
 		{
 			Object paramName = paramValuePairs[contParam * 2];

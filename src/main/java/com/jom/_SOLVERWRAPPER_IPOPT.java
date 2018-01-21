@@ -14,18 +14,19 @@
  */
 package com.jom;
 
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntFactory2D;
 import cern.colt.matrix.tint.IntMatrix2D;
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 class _SOLVERWRAPPER_IPOPT
 {
@@ -48,7 +49,7 @@ class _SOLVERWRAPPER_IPOPT
 	final static int returnCode_Solved_To_Acceptable_Level         = 1;
 	final static int returnCode_Unrecoverable_Exception            = -100;
 	final static int returnCode_User_Requested_Stop                = 5;
-	private final HashMap<String, Object> param;
+	private final Map<String, Object> param;
 	private final _INTERNAL_SolverIO      s;
 	private final String                  solverLibraryName;
 
@@ -63,7 +64,7 @@ class _SOLVERWRAPPER_IPOPT
 	private _JNA_IPOPT_CallBack_Eval_Jac_G eval_jac_g;
 	private _JNA_IPOPT_CallBack_Eval_H eval_h;
 
-	_SOLVERWRAPPER_IPOPT(_INTERNAL_SolverIO s, HashMap<String, Object> param)
+	_SOLVERWRAPPER_IPOPT(_INTERNAL_SolverIO s, Map<String, Object> param)
 	{
 		this.s = s;
 		this.solverLibraryName = (String) param.get("solverLibraryName");
@@ -149,7 +150,7 @@ class _SOLVERWRAPPER_IPOPT
 		final double[] g_L = s.in.constraintLowerBound.toArray();
 		final double[] g_U = s.in.constraintUpperBound.toArray();
 
-		LinkedHashMap<Integer, HashSet<Integer>> activeVarIds = (m == 0) ?
+		Map<Integer, HashSet<Integer>> activeVarIds = (m == 0) ?
 				new LinkedHashMap<Integer, HashSet<Integer>>() :
 				s.in.lhsMinusRhsAccumulatedConstraint.getActiveVarIds();
 

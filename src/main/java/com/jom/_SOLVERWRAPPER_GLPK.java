@@ -14,7 +14,7 @@
  */
 package com.jom;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import com.sun.jna.Native;
@@ -58,11 +58,11 @@ class _SOLVERWRAPPER_GLPK
 	private static int GLP_UNBND = 6;
 	private static int GLP_UNDEF = 1;
 	private static int GLP_UP    = 3;
-	private final HashMap<String, Object> param;
+	private final Map<String, Object> param;
 	private final _INTERNAL_SolverIO      s;
 	private final String                  solverLibraryName;
 
-	_SOLVERWRAPPER_GLPK(_INTERNAL_SolverIO s, HashMap<String, Object> param)
+	_SOLVERWRAPPER_GLPK(_INTERNAL_SolverIO s, Map<String, Object> param)
 	{
 		this.s = s;
 		this.solverLibraryName = (String) param.get("solverLibraryName");

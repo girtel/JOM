@@ -26,8 +26,8 @@ import java.util.regex.Pattern;
 class _INTERNAL_ExpressionParser extends AbstractEvaluator<Expression>
 {
 	private final static BracketPair bracketPairs = BracketPair.PARENTHESES;
-	private final static HashMap<String, Object[]> listFunctions; // min num operans, max num operamds , file name, expand scalar->array
-	private final static HashMap<String, Object[]> listOperators; // symbol, num operans, associativity, priority, class to load, expand
+	private final static Map<String, Object[]> listFunctions; // min num operans, max num operamds , file name, expand scalar->array
+	private final static Map<String, Object[]> listOperators; // symbol, num operans, associativity, priority, class to load, expand
 
 	static /* Initialize the operators information */
 	{
@@ -69,12 +69,12 @@ class _INTERNAL_ExpressionParser extends AbstractEvaluator<Expression>
 		listFunctions.put("eye", new Object[]{1, 2, "com.jom._FUNCTION_EYE", false});
 	}
 
-	private final HashMap<String, _INTERNAL_DecisionVariableArray> decisionVariables;
-	private final HashMap<String, DoubleMatrixND>                  inputParameters;
+	private final Map<String, _INTERNAL_DecisionVariableArray> decisionVariables;
+	private final Map<String, DoubleMatrixND>                  inputParameters;
 	// scalar->array
 	private final OptimizationProblem                              model;
 
-	_INTERNAL_ExpressionParser(OptimizationProblem model, HashMap<String, DoubleMatrixND> inputParameters, HashMap<String,
+	_INTERNAL_ExpressionParser(OptimizationProblem model, Map<String, DoubleMatrixND> inputParameters, Map<String,
 			_INTERNAL_DecisionVariableArray> decisionVariables)
 	{
 		super(computeParametersObject(inputParameters, decisionVariables));
@@ -83,7 +83,7 @@ class _INTERNAL_ExpressionParser extends AbstractEvaluator<Expression>
 		this.decisionVariables = decisionVariables;
 	}
 
-	private static Parameters computeParametersObject(HashMap<String, DoubleMatrixND> inputParameters, HashMap<String,
+	private static Parameters computeParametersObject(Map<String, DoubleMatrixND> inputParameters, Map<String,
 			_INTERNAL_DecisionVariableArray> decisionVariables)
 	{
 		Parameters param = new Parameters();

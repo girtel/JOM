@@ -14,14 +14,14 @@
  */
 package com.jom;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map.Entry;
 
 /** @author Pablo */
 class _INTERNAL_SolverIO
@@ -34,8 +34,8 @@ class _INTERNAL_SolverIO
 	boolean problemAlreadyAttemptedTobeSolved;
 	private OptimizationProblem model;
 
-	_INTERNAL_SolverIO(OptimizationProblem model, Expression objectiveFunction, boolean toMinimize, HashMap<String, _INTERNAL_DecisionVariableArray>
-			decisionVariables, HashMap<String, _INTERNAL_ConstraintArray> constraints, HashMap<String, DoubleMatrixND> initialSolution)
+	_INTERNAL_SolverIO(OptimizationProblem model, Expression objectiveFunction, boolean toMinimize, Map<String, _INTERNAL_DecisionVariableArray>
+			decisionVariables, Map<String, _INTERNAL_ConstraintArray> constraints, Map<String, DoubleMatrixND> initialSolution)
 	{
 		if (objectiveFunction == null) throw new JOMException("An objective function must be defined");
 
