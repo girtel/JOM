@@ -94,7 +94,7 @@ public class SolverTester
 		  		sb.append(sw.toString());
 		  	} catch (JOMException e)
 			{
-				sb.append("MESSAGE: Solver cplex could not be found at: " + licenseFileName + RETURN);
+				sb.append("MESSAGE: Solver XPRESS could not be found at: " + licenseFileName + RETURN);
 				sb.append(HELP_MESSAGE + RETURN);
 			} catch (Exception e)
 		  	{
@@ -104,7 +104,7 @@ public class SolverTester
 		  		sb.append(sw.toString());
 		  	}
 		}
-		return sb.toString();
+		return sb.length() == 0? "Ok" : sb.toString();
 
 	}
 
@@ -141,7 +141,7 @@ public class SolverTester
 		  		sb.append(sw.toString());
 		  	}
 		}
-		return sb.toString();
+		return sb.length() == 0? "Ok" : sb.toString();
 	}
 
 	/** Performs the check for the solver GLPK, returns a "" String if everything ok. If not, the returned String
@@ -177,7 +177,7 @@ public class SolverTester
 		  		sb.append(sw.toString());
 		  	}
 		}
-		return sb.toString();
+		return sb.length() == 0? "Ok" : sb.toString();
 	}
 
 	/** Performs the check for the solver IPOPT, returns a "" String if everything ok. If not, the returned String
@@ -219,7 +219,7 @@ public class SolverTester
 		  		sb.append(sw.toString());
 		  	}
 		}
-		return sb.toString();
+		return sb.length() == 0? "Ok" : sb.toString();
 	}
 
 	private static boolean equalWithMargin (double [] x , double [] y)
