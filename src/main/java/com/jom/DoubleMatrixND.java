@@ -11,12 +11,21 @@
 
 package com.jom;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import cern.colt.function.tdouble.DoubleDoubleFunction;
 import cern.colt.function.tdouble.DoubleFunction;
 import cern.colt.function.tdouble.DoubleProcedure;
 import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tint.IntArrayList;
-import cern.colt.matrix.tdouble.*;
+import cern.colt.matrix.tdouble.DoubleFactory1D;
+import cern.colt.matrix.tdouble.DoubleFactory2D;
+import cern.colt.matrix.tdouble.DoubleFactory3D;
+import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.matrix.tdouble.DoubleMatrix3D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntFactory2D;
 import cern.colt.matrix.tint.IntMatrix1D;
@@ -56,6 +65,31 @@ public class DoubleMatrixND
 		this(values, "dense");
 	}
 
+	/** Creates a row or column (1xN, or Nx1) array, dense, with the given values
+	 * @param values the values
+	 * @param rowOrColumn "row" for a row vector, "column" or other string for a column vector
+	 */
+	public DoubleMatrixND(double[] values , String rowOrColumn)
+	{
+		this(rowOrColumn.equalsIgnoreCase("row")? new int [] { 1 , values.length} : new int [] {values.length , 1} , values ,  "dense");
+	}
+
+	/** Creates a row or column (1xN, or Nx1) array, dense, with the given values
+	 * @param values the values
+	 * @param rowOrColumn "row" for a row vector, "column" or other string for a column vector
+	 */
+	public DoubleMatrixND(Collection<? extends Number> values , String rowOrColumn)
+	{
+		this(toArray(values) , rowOrColumn);
+	}
+	private static double[] toArray(Collection<? extends Number> values) 
+	{ 
+		final double [] res = new double  [values.size()]; 
+		int cont = 0; 
+		for (Number v : values) res [cont ++] = v.doubleValue();
+		return res;
+	}
+	
 	/** Creates a 2D array of the appropriated type, with the same size as value, and initializes with the data in values
 	 * @param values The initializing data
 	 * @param type "sparse" or "dense" for creating sparse or dense arrays respectively */
@@ -73,7 +107,7 @@ public class DoubleMatrixND
 
 	/** Creates a 3D array of the appropriated type, with the same size as value, and initializes with the data in values
 	 * @param values The initializing data
-	 * @param type "sparse" or "dense" for creating sparse or dense arrays respectively */
+	 * @param type "sparse" or "dense" for creating spavaluesrse or dense arrays respectively */
 	public DoubleMatrixND(double[][][] values, String type)
 	{
 		this(new int[]{values.length, values[0].length, values[0][0].length}, (type.equals("dense")) ?
@@ -765,9 +799,83 @@ public class DoubleMatrixND
 	 * @return an array filled with the values of the cells */
 	public double[] to1DArray()
 	{
+		if (this.numDim != 2) throw new RuntimeException("The N-DIM array must be a row or column vector");
+		if ((this.size.get(0) != 1) && (this.size.get(1) != 1)) throw new RuntimeException("The N-DIM array must be a row or column vector");
 		return this.x.toArray();
 	}
+	/** Constructs and returns a 2-dimensional array containing the array values. The values are copied.
+	 * @return an array filled with the values of the cells */
+	public double[][] to2DArray()
+	{
+		if (this.numDim != 2) throw new RuntimeException("The N-DIM array must be a 2D array");
+		double[][] res = new double[size.get(0)][size.get(1)];
+		int cont = 0;
+		for (int i1 = 0; i1 < size.get(1); i1++)
+			for (int i0 = 0; i0 < size.get(0); i0++)
+				res[i0][i1] = this.x.get(cont++);
+		return res;
+	}
+	/** Constructs and returns a 3-dimensional array containing the array values. The values are copied.
+	 * @return an array filled with the values of the cells */
+	public double[][][] to3DArray()
+	{
+		if (this.numDim != 3) throw new RuntimeException("The N-DIM array must be a 3D array");
+		double[][][] res = new double[size.get(0)][size.get(1)][size.get(2)];
+		int cont = 0;
+		for (int i2 = 0; i2 < size.get(2); i2++)
+			for (int i1 = 0; i1 < size.get(1); i1++)
+				for (int i0 = 0; i0 < size.get(0); i0++)
+					res[i0][i1][i2] = this.x.get(cont++);
+		return res;
+	}
+	/** Constructs and returns a 4-dimensional array containing the array values. The values are copied.
+	 * @return an array filled with the values of the cells */
+	public double[][][][] to4DArray()
+	{
+		if (this.numDim != 4) throw new RuntimeException("The N-DIM array must be a 4D array");
+		double[][][][] res = new double[size.get(0)][size.get(1)][size.get(2)][size.get(3)];
+		int cont = 0;
+		for (int i3 = 0; i3 < size.get(3); i3++)
+			for (int i2 = 0; i2 < size.get(2); i2++)
+				for (int i1 = 0; i1 < size.get(1); i1++)
+					for (int i0 = 0; i0 < size.get(0); i0++)
+						res[i0][i1][i2][i3] = this.x.get(cont++);
+		return res;
+	}
+	/** Constructs and returns a 5-dimensional array containing the array values. The values are copied.
+	 * @return an array filled with the values of the cells */
+	public double[][][][][] to5DArray()
+	{
+		if (this.numDim != 5) throw new RuntimeException("The N-DIM array must be a 5D array");
+		double[][][][][] res = new double[size.get(0)][size.get(1)][size.get(2)][size.get(3)][size.get(4)];
+		int cont = 0;
+		for (int i4 = 0; i4 < size.get(4); i4++)
+			for (int i3 = 0; i3 < size.get(3); i3++)
+				for (int i2 = 0; i2 < size.get(2); i2++)
+					for (int i1 = 0; i1 < size.get(1); i1++)
+						for (int i0 = 0; i0 < size.get(0); i0++)
+							res[i0][i1][i2][i3][i4] = this.x.get(cont++);
+		return res;
+	}
+	/** Constructs and returns a 5-dimensional array containing the array values. The values are copied.
+	 * @return an array filled with the values of the cells */
+	public double[][][][][][] to6DArray()
+	{
+		if (this.numDim != 6) throw new RuntimeException("The N-DIM array must be a 6D array");
+		double[][][][][][] res = new double[size.get(0)][size.get(1)][size.get(2)][size.get(3)][size.get(4)][size.get(5)];
+		int cont = 0;
+		for (int i5 = 0; i5 < size.get(5); i5++)
+			for (int i4 = 0; i4 < size.get(4); i4++)
+				for (int i3 = 0; i3 < size.get(3); i3++)
+					for (int i2 = 0; i2 < size.get(2); i2++)
+						for (int i1 = 0; i1 < size.get(1); i1++)
+							for (int i0 = 0; i0 < size.get(0); i0++)
+								res[i0][i1][i2][i3][i4][i5] = this.x.get(cont++);
+		return res;
+	}
 
+	
+	
 	/** Constructs and returns an n-dimensional double array containing the array values. The values are copied. If the array has 2 dimensions
 	 * returns a double [][] object If the array has 3 dimensions returns a double [][][] object If the array has 4 dimensions returns a double
 	 * [][][][] object If the array has 5 dimensions returns a double [][][][][] object If the array has 6 dimensions returns a double [][][][][][]
@@ -778,63 +886,17 @@ public class DoubleMatrixND
 		switch (this.numDim)
 		{
 			case 1:
-				return this.x.toArray();
+				return to1DArray();
 			case 2:
-			{
-				double[][] res = new double[size.get(0)][size.get(1)];
-				int cont = 0;
-				for (int i1 = 0; i1 < size.get(1); i1++)
-					for (int i0 = 0; i0 < size.get(0); i0++)
-						res[i0][i1] = this.x.get(cont++);
-				return res;
-			}
+				return to2DArray();
 			case 3:
-			{
-				double[][][] res = new double[size.get(0)][size.get(1)][size.get(2)];
-				int cont = 0;
-				for (int i2 = 0; i2 < size.get(2); i2++)
-					for (int i1 = 0; i1 < size.get(1); i1++)
-						for (int i0 = 0; i0 < size.get(0); i0++)
-							res[i0][i1][i2] = this.x.get(cont++);
-				return res;
-			}
+				return to3DArray();
 			case 4:
-			{
-				double[][][][] res = new double[size.get(0)][size.get(1)][size.get(2)][size.get(3)];
-				int cont = 0;
-				for (int i3 = 0; i3 < size.get(3); i3++)
-					for (int i2 = 0; i2 < size.get(2); i2++)
-						for (int i1 = 0; i1 < size.get(1); i1++)
-							for (int i0 = 0; i0 < size.get(0); i0++)
-								res[i0][i1][i2][i3] = this.x.get(cont++);
-				return res;
-			}
+				return to4DArray();
 			case 5:
-			{
-				double[][][][][] res = new double[size.get(0)][size.get(1)][size.get(2)][size.get(3)][size.get(4)];
-				int cont = 0;
-				for (int i4 = 0; i4 < size.get(4); i4++)
-					for (int i3 = 0; i3 < size.get(3); i3++)
-						for (int i2 = 0; i2 < size.get(2); i2++)
-							for (int i1 = 0; i1 < size.get(1); i1++)
-								for (int i0 = 0; i0 < size.get(0); i0++)
-									res[i0][i1][i2][i3][i4] = this.x.get(cont++);
-				return res;
-			}
+				return to5DArray();
 			case 6:
-			{
-				double[][][][][][] res = new double[size.get(0)][size.get(1)][size.get(2)][size.get(3)][size.get(4)][size.get(5)];
-				int cont = 0;
-				for (int i5 = 0; i5 < size.get(5); i5++)
-					for (int i4 = 0; i4 < size.get(4); i4++)
-						for (int i3 = 0; i3 < size.get(3); i3++)
-							for (int i2 = 0; i2 < size.get(2); i2++)
-								for (int i1 = 0; i1 < size.get(1); i1++)
-									for (int i0 = 0; i0 < size.get(0); i0++)
-										res[i0][i1][i2][i3][i4][i5] = this.x.get(cont++);
-				return res;
-			}
-
+				return to6DArray();
 		}
 		throw new RuntimeException("Too many dimensions to use toArray ()");
 	}
@@ -892,6 +954,18 @@ public class DoubleMatrixND
 	{
 		if (this.numElem != 1) throw new RuntimeException("This is not a scalar");
 		return this.x.get(0);
+	}
+
+	/** Returns a List (ArrayList) with the values copied
+	 * @return see above
+	 */
+	public List<Double> toList () 
+	{ 
+		if (this.numDim != 2) throw new RuntimeException("The N-DIM array must be a row or column vector");
+		if ((this.size.get(0) != 1) && (this.size.get(1) != 1)) throw new RuntimeException("The N-DIM array must be a row or column vector");
+		final List<Double> res = new ArrayList<> ((int) x.size());
+		for (int cont = 0; cont < x.size() ; cont ++) res.add(x.get(cont));
+		return res;
 	}
 
 	/** If the array is 2D, returns a DoubleMatrix2D object copying the data in the array

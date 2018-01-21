@@ -87,6 +87,33 @@ public class OptimizationProblem
 	public String about(){ return "Java Optimization Modeler v. 0.1.13\nAuthor: Pablo Pavon Mari�o. \nDate: September 2015. \nJOM is open-source, "
 			+ "licensed by GNU Lesser General Public License v3.0\n"; }
 
+	
+	/** Removes from the model the constraints indicated by the given identifier
+	 * @param identifier the identifier, as indicated in the addConstraint method
+	 * @return true if the constraints existed, and thus were removed, false otherwise
+	 */
+	public boolean removeConstraint (String identifier)
+	{
+		final _INTERNAL_ConstraintArray removedElement = this.constraints.remove(identifier);
+		return removedElement != null;
+	}
+
+	/** Indicates if a constraint set with the given identifier exists in the model
+	 * @return see above
+	 */
+	public boolean hasConstraint (String identifier)
+	{
+		return this.constraints.containsKey(identifier);
+	}
+
+	/** Indicates if a decision variable with the given identifier exists in the model
+	 * @return see above
+	 */
+	public boolean hasDecisionVariable (String identifier)
+	{
+		return this.decisionVariables.containsKey(identifier);
+	}
+
 	/** Adds (an array of) constraints to the optimization problem. No identifier is assigned, so after the problem is solved, it is not possible to
 	 *  access the multipliers and other constraint-related info.
 	 * Constraints have the form: expression-left-hand-side connector expression-right-hand-side.
@@ -120,7 +147,7 @@ public class OptimizationProblem
 		if (evaluator == null) this.evaluator = new _INTERNAL_ExpressionParser(this, inputParameters, decisionVariables);
 		if (this.constraints.containsKey(identifier)) throw new JOMException("This constraint identifier already exists");
 
-		_INTERNAL_ConstraintArray cs = new _INTERNAL_ConstraintArray(evaluator, identifier, expression, this.lpNumScalarConstraints + this
+		final _INTERNAL_ConstraintArray cs = new _INTERNAL_ConstraintArray(evaluator, identifier, expression, this.lpNumScalarConstraints + this
 				.nlpNumScalarConstraints); // PABLO: Changed this
 
 		this.constraints.put(identifier, cs);
@@ -166,12 +193,11 @@ public class OptimizationProblem
 	 */
 	public void addDecisionVariable(String name, boolean isInteger, int[] size, double[] x_l, double[] x_u)
 	{
-		long initTime = System.nanoTime();
 		if (objectiveFunctionOrConstraintsAdded())
 			throw new JOMException("Decision variables cannot be added after objective function or constraints are set");
 
-		int numberNewElements = IntMatrixND.prod(IntFactory1D.dense.make(size));
-		_INTERNAL_DecisionVariableArray v = new _INTERNAL_DecisionVariableArray(name, isInteger, IntFactory1D.dense.make(size), new DoubleMatrixND
+		final int numberNewElements = IntMatrixND.prod(IntFactory1D.dense.make(size));
+		final _INTERNAL_DecisionVariableArray v = new _INTERNAL_DecisionVariableArray(name, isInteger, IntFactory1D.dense.make(size), new DoubleMatrixND
 				(size, x_l), new DoubleMatrixND(size, x_u), this.numScalarDecisionVariables);
 		decisionVariables.put(name, v);
 		this.numScalarDecisionVariables += numberNewElements;
@@ -199,18 +225,50 @@ public class OptimizationProblem
 	 */
 	public void addDecisionVariable(String name, boolean isInteger, int[] size, DoubleMatrixND x_l, DoubleMatrixND x_u)
 	{
-		long initTime = System.nanoTime();
 		if (objectiveFunctionOrConstraintsAdded())
 			throw new JOMException("Decision variables cannot be added after objective function or constraints are set");
 
-		int numberNewElements = IntMatrixND.prod(IntFactory1D.dense.make(size));
-		_INTERNAL_DecisionVariableArray v = new _INTERNAL_DecisionVariableArray(name, isInteger, IntFactory1D.dense.make(size), x_l, x_u, this
+		final int numberNewElements = IntMatrixND.prod(IntFactory1D.dense.make(size));
+		final _INTERNAL_DecisionVariableArray v = new _INTERNAL_DecisionVariableArray(name, isInteger, IntFactory1D.dense.make(size), x_l, x_u, this
 				.numScalarDecisionVariables);
 		decisionVariables.put(name, v);
 		this.numScalarDecisionVariables += numberNewElements;
 		checkProblemSizeLimitation(this.numScalarDecisionVariables, this.lpNumScalarConstraints, this.nlpNumScalarConstraints);
 	}
 
+	/** Sets the isInteger flag for the decision variables array identified by the given name
+	 * @param decisionVariableName the name, as introduced with addDecisionVariable
+	 * @param isInteger true if the variables are contrained to be integer
+	 */
+	public void setIsIntegerDecisionVariable (String decisionVariableName , boolean isInteger)
+	{
+		if (!decisionVariables.containsKey(decisionVariableName)) 
+			throw new JOMException ("Unknown decision variables");
+		decisionVariables.get(decisionVariableName).setIsInteger(isInteger);
+	}
+
+	/** Sets the lower bound limit of the indicated decision variable array
+	 * @param decisionVariableName the name, as introduced with addDecisionVariable
+	 * @param x_l an array with the same size as the decision variable, with the new bound
+	 */
+	public void setLowerBoundDecisionVariable (String decisionVariableName , DoubleMatrixND x_l)
+	{
+		if (!decisionVariables.containsKey(decisionVariableName)) 
+			throw new JOMException ("Unknown decision variables");
+		decisionVariables.get(decisionVariableName).set_x_l(x_l);
+	}
+
+	/** Sets the upper bound limit of the indicated decision variable array
+	 * @param decisionVariableName the name, as introduced with addDecisionVariable
+	 * @param x_u an array with the same size as the decision variable, with the new bound
+	 */
+	public void setUpperBoundDecisionVariable (String decisionVariableName , DoubleMatrixND x_u)
+	{
+		if (!decisionVariables.containsKey(decisionVariableName)) 
+			throw new JOMException ("Unknown decision variables");
+		decisionVariables.get(decisionVariableName).set_x_u(x_u);
+	}
+	
 	/** Returns true if the problem was attempted to be solved, and the solver declares that the problem has no feasible solutions. If the method
 	 * "solve" was not invoked yet, throws an exception
 	 * @return See above
@@ -653,7 +711,7 @@ public class OptimizationProblem
 		this.solverIO = new _INTERNAL_SolverIO(this, this.objectiveFunction, this.toMinimize, this.decisionVariables, this.constraints, this
 				.initialSolution);
 
-		Map<String, Object> params = createParametersMapInitilizingDefaults(solverName, paramValuePairs, this.solverIO);
+		final Map<String, Object> params = createParametersMapInitilizingDefaults(solverName, paramValuePairs, this.solverIO);
 
 		if (solverName.equalsIgnoreCase("glpk"))
 		{
