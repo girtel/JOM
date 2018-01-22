@@ -260,7 +260,7 @@ public abstract class Expression
 	 * @param newSize the new size of the array */
 	final void reshape(int[] newSize)
 	{
-		if (IntMatrixND.prod(this.size) != this.numScalarExpressions)
+		if (IntMatrixND.prod(newSize) != this.numScalarExpressions)
 			throw new JOMException("Reshaping an expression cannot change its number of elements");
 		this.size = newSize;
 		this.numDim = this.size.length;
