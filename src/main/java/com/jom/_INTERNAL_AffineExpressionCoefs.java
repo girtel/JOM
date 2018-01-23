@@ -23,13 +23,17 @@
  */
 package com.jom;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * @author Pablo
@@ -1145,7 +1149,7 @@ class _INTERNAL_AffineExpressionCoefs
 	final _INTERNAL_AffineExpressionCoefs reshape(int[] newSize)
 	{
 		if (prod(newSize) != prod(this.size))
-			throw new JOMException("Affine expression operation error: Reshape expression function. Wrong array size");
+			throw new JOMException("Affine expression operation error: Reshape expression function. Wrong array size. Original size: " + Arrays.toString(this.size) + ", new size: " + Arrays.toString(newSize));
 		this.resize(Arrays.copyOf(newSize, newSize.length));
 		return this;
 	}
@@ -1296,7 +1300,8 @@ class _INTERNAL_AffineExpressionCoefs
 			}
 		}
 
-		public String toString()
+		@Override
+        public String toString()
 		{
 			String s = "" + this.constantValue;
 			if (this.lCoefs != null) for (Entry<Integer, Double> e : this.lCoefs.entrySet())

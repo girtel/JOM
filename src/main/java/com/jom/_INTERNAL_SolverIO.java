@@ -56,6 +56,7 @@ class _INTERNAL_SolverIO
 		this.in.primalInitialSolution = DoubleFactory1D.dense.make(model.getNumScalarDecisionVariables(), 0.0);
 		this.in.primalSolutionIsInteger = IntFactory1D.dense.make(model.getNumScalarDecisionVariables());
 		this.in.hasIntegerVariables = false;
+
 		for (Entry<String, _INTERNAL_DecisionVariableArray> entry : decisionVariables.entrySet())
 		{
 			_INTERNAL_DecisionVariableArray var = entry.getValue();
@@ -76,7 +77,7 @@ class _INTERNAL_SolverIO
 			}
 		}
 
-		this.in.lhsMinusRhsAccumulatedConstraint = null;
+        this.in.lhsMinusRhsAccumulatedConstraint = Expression.getEmptyOneColumnZeroRows(model);
 		this.in.constraintLowerBound = DoubleFactory1D.sparse.make(model.getNumLinearScalarConstraints() + model.getNumNonLinearScalarConstraints());
 		this.in.constraintUpperBound = DoubleFactory1D.sparse.make(model.getNumLinearScalarConstraints() + model.getNumNonLinearScalarConstraints());
 
@@ -84,29 +85,22 @@ class _INTERNAL_SolverIO
 		for (Entry<String, _INTERNAL_ConstraintArray> entry : constraints.entrySet())
 		{
 			_INTERNAL_ConstraintArray constraintSet = entry.getValue();
-			Expression exp = constraintSet.getLhsMinusRhs();
+			final Expression exp = constraintSet.getLhsMinusRhs();
 			// reshape the expression to a column vector
 			exp.reshape(new int[]{exp.getNumScalarExpressions(), 1});
-			int firstConstraintId = constraintSet.getIndex_0_FirstConstraint();
-			int numConstraints = constraintSet.getNumScalarConstraints();
-			DoubleMatrix1D lowerBound = (constraintSet.getConnector().equals(_INTERNAL_ConstraintArray.SYMBOL_LESSEQUAL)) ?
+			final int firstConstraintId = constraintSet.getIndex_0_FirstConstraint();
+			final int numConstraints = constraintSet.getNumScalarConstraints();
+			final DoubleMatrix1D lowerBound = (constraintSet.getConnector().equals(_INTERNAL_ConstraintArray.SYMBOL_LESSEQUAL)) ?
 					DoubleFactory1D.dense.make(numConstraints, -Double.MAX_VALUE) :
 					DoubleFactory1D.dense.make(numConstraints, 0);
-			DoubleMatrix1D upperBound = (constraintSet.getConnector().equals(_INTERNAL_ConstraintArray.SYMBOL_GREATEREQUAL)) ?
+					final DoubleMatrix1D upperBound = (constraintSet.getConnector().equals(_INTERNAL_ConstraintArray.SYMBOL_GREATEREQUAL)) ?
 					DoubleFactory1D.dense.make(numConstraints, Double.MAX_VALUE) :
 					DoubleFactory1D.dense.make(numConstraints, 0);
 			in.constraintLowerBound.viewPart(firstConstraintId, numConstraints).assign(lowerBound);
 			in.constraintUpperBound.viewPart(firstConstraintId, numConstraints).assign(upperBound);
-			if (this.in.lhsMinusRhsAccumulatedConstraint == null)
-				this.in.lhsMinusRhsAccumulatedConstraint = exp;
-			else
-				this.in.lhsMinusRhsAccumulatedConstraint = new _FUNCTION_APPENDROWS(model, this.in.lhsMinusRhsAccumulatedConstraint, exp);
+		    this.in.lhsMinusRhsAccumulatedConstraint = new _FUNCTION_APPENDROWS(model, this.in.lhsMinusRhsAccumulatedConstraint, exp);
 		}
-
-		if (in.lhsMinusRhsAccumulatedConstraint == null)
-		{
-			if (in.numConstraints != 0) throw new JOMException("Unexpected error");
-		} else if (in.lhsMinusRhsAccumulatedConstraint.getNumScalarExpressions() != in.numConstraints) throw new JOMException("Unexpected error");
+		if (in.lhsMinusRhsAccumulatedConstraint.getNumScalarExpressions() != in.numConstraints) throw new JOMException("Unexpected error");
 	}
 
 	@Override
@@ -315,7 +309,8 @@ class _INTERNAL_SolverIO
 		boolean        solutionIsOptimal;
 		int            statusCode;
 		String         statusMessage;
-		public String toString ()
+		@Override
+        public String toString ()
 		{
 			if (feasibleSolutionDoesNotExist) return "A feasible solution does nor exist";
 			if (foundUnboundedSolution) return "An unbounded solution was found";

@@ -11,13 +11,20 @@
 
 package com.jom;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.jet.math.tdouble.DoubleFunctions;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /** This class contains the methods for handling optimization problems, defining their input parameters (if any), decision variables,
  * objetive function and constraints, choosing and calling a solver to obtain a numerical solution, and retrieving that solution.
@@ -257,6 +264,17 @@ public class OptimizationProblem
 			throw new JOMException ("Unknown decision variables");
 		decisionVariables.get(decisionVariableName).set_x_l(x_l);
 	}
+
+   /** Sets the lower bound limit of the indicated decision variable array
+     * @param decisionVariableName the name, as introduced with addDecisionVariable
+     * @param x_l a constant, the new bound
+     */
+    public void setLowerBoundDecisionVariable (String decisionVariableName , double x_l)
+    {
+        if (!decisionVariables.containsKey(decisionVariableName)) 
+            throw new JOMException ("Unknown decision variables");
+        decisionVariables.get(decisionVariableName).set_x_l(new DoubleMatrixND(decisionVariables.get(decisionVariableName).getSize().toArray() , x_l));
+    }
 
 	/** Sets the upper bound limit of the indicated decision variable array
 	 * @param decisionVariableName the name, as introduced with addDecisionVariable
@@ -785,7 +803,8 @@ public class OptimizationProblem
 	}	/** Returns a formatted string with some information of the optimization problem
 	 * @return The string
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		String s = "--------------------- PRINT MODEL ---\n";
 		s = s + "----------- DECISION VARIABLES: \n";
@@ -894,8 +913,8 @@ public class OptimizationProblem
 
 	private Map<String, Object> createParametersMapInitilizingDefaults(String solverName, Object[] paramValuePairs, _INTERNAL_SolverIO solverIO)
 	{
-		int numParameters = (int) (paramValuePairs.length / 2);
-		if ((((double) paramValuePairs.length) / 2) != (double) numParameters) throw new JOMException("A parameter has not assigned its value");
+		int numParameters = paramValuePairs.length / 2;
+		if ((((double) paramValuePairs.length) / 2) != numParameters) throw new JOMException("A parameter has not assigned its value");
 		Map<String, Object> params = new HashMap<String, Object>();
 		for (int contParam = 0; contParam < numParameters; contParam++)
 		{
@@ -1011,7 +1030,8 @@ public class OptimizationProblem
 
 		TimeInfo(){ reset(); }
 
-		public String toString()
+		@Override
+        public String toString()
 		{
 			double secsSettingDVs = 0;
 			for (Long num : accumTimeSettingDVs) secsSettingDVs += num * 1E-9;

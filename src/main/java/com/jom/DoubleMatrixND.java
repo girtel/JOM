@@ -676,6 +676,15 @@ public class DoubleMatrixND
 		this.x.getNonZeros(indexList, valueList);
 	}
 
+	/** Returns the number of non zero elements */
+    public int getNumberOfNonZeros()
+    {
+        final IntArrayList a = new IntArrayList();
+        final DoubleArrayList b = new DoubleArrayList();
+        this.x.getNonZeros(a, b);
+        return a.size();
+    }
+
 	/** Gets the number of dimensions of the array
 	 * @return the number of dimensions */
 	public int getNumDim()
