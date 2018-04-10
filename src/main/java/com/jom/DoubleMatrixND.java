@@ -14,6 +14,8 @@ package com.jom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import cern.colt.function.tdouble.DoubleDoubleFunction;
 import cern.colt.function.tdouble.DoubleFunction;
@@ -203,9 +205,9 @@ public class DoubleMatrixND
 		long totalNumberCells = 1;
 		for (int cont = 0; cont < size.length; cont++)
 			totalNumberCells *= size[cont];
-		if (totalNumberCells >= Integer.MAX_VALUE)
+		if (totalNumberCells >= Integer.MAX_VALUE || totalNumberCells < 0)
 			throw new RuntimeException("The size of the array is limited to " + Integer.MAX_VALUE + " cells. This limitation comes from the COLT "
-					+ "libraries");
+					+ "libraries. Requested size is: " + IntStream.of(size).mapToObj(i->""+i).collect(Collectors.joining(" x ")) + " = " + totalNumberCells);
 
 		this.size = IntFactory1D.dense.make(size).copy();
 		this.numDim = size.length;
