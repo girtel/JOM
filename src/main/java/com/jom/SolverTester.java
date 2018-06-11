@@ -14,7 +14,7 @@ package com.jom;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import by.bsu.JVmipcl.*;
-
+import cern.colt.Arrays;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 
 /** This class contains methods for performing tests in the solvers. They are not performance tests, but to check if
@@ -44,13 +44,51 @@ public class SolverTester
 //		System.out.println("GLPK: " + res);
 //		res = SolverTester.check_ipopt("c:\\windows\\system32\\ipopt.dll");
 //		System.out.println("IPOPT: " + res);
+//		res = SolverTester.check_mipclAux();
 		res = SolverTester.check_mipcl ();
 		System.out.println("MIPCL: " + res);
 	}
 
-	private static String check_mipcl ()
-	{
 
+	/** Performs the check for the solver GLPK, returns a "" String if everything ok. If not, the returned String
+	 * contains the error message including a description message the stack trace of the Exception raised.
+	 * @param solverLibraryName The name of the dynamic library file (DLL or .SO file) with the solver
+	 * @return the check String
+	 */
+	public static String check_mipcl ()
+	{
+		StringBuffer sb = new StringBuffer();
+		{
+		  	try
+		  	{
+		  		checkLinearSolver ("mipcl" , "");
+		  	} catch (java.lang.NoClassDefFoundError e)
+		  	{
+		  		sb.append("MESSAGE: Class not found. This error can correspond "
+		  				+ "to the case when a JAR file "
+		  				+ " is not accessible to JOM library. Add it to the classpath, "
+		  				+ "or in Net2Plan use the option File->Classpath editor to make it accessible to the algorithms." + RETURN);
+		  		StringWriter sw = new StringWriter ();
+		  		e.printStackTrace(new PrintWriter (sw));
+		  		sb.append(sw.toString());
+		  	} catch (JOMException e)
+			{
+		  		e.printStackTrace();
+				sb.append("MESSAGE: Solver mipcl could not be found"+ RETURN);
+				sb.append(HELP_MESSAGE + RETURN);
+			} catch (Exception e)
+		  	{
+		  		sb.append("MESSAGE: Check failed." + RETURN);
+		  		StringWriter sw = new StringWriter ();
+		  		e.printStackTrace(new PrintWriter (sw));
+		  		sb.append(sw.toString());
+		  	}
+		}
+		return sb.length() == 0? "Ok" : sb.toString();
+	}
+	
+	private static String check_mipclAux ()
+	{
 		final double[] c = {100, 64};
 		final double[] b = {250, 4};
 		final double[][] A = {{50, 31}, {-3,2}};
@@ -97,7 +135,8 @@ public class SolverTester
 		  	op.addConstraint("sum(x) <= 1.5");
 	  		op.solve(solverName , "solverLibraryName" , auxFileName);
 			DoubleMatrix1D sol = op.getPrimalSolution("x").view1D();
-		 	if (!equalWithMargin (sol.toArray() , new double [] {0 , 0.5 , 1})) throw new RuntimeException ("The solution returned by the solver is not correct");
+			final double [] trueOptimalSolution = new double [] {0 , 0.5 , 1};
+		 	if (!equalWithMargin (sol.toArray() , trueOptimalSolution)) throw new RuntimeException ("The solution returned by the solver is not correct. Solution returned: " + Arrays.toString(sol.toArray()) + ", optimal solution: " + Arrays.toString(trueOptimalSolution));
   		} catch (UnsatisfiedLinkError e)
 		{
 			throw new JOMException(e.getMessage());
@@ -109,7 +148,8 @@ public class SolverTester
 		  	op.addConstraint("sum(x) <= 1.5");
 	  		op.solve(solverName , "solverLibraryName" , auxFileName);
 			DoubleMatrix1D sol = op.getPrimalSolution("x").view1D();
-			if (!equalWithMargin (sol.toArray() , new double [] {0 , 0 , 1})) throw new RuntimeException ("The solution returned by the solver is not correct");
+			final double [] trueOptimalSolution = new double [] {0 , 0 , 1};
+		 	if (!equalWithMargin (sol.toArray() , trueOptimalSolution)) throw new RuntimeException ("The solution returned by the solver is not correct. Solution returned: " + Arrays.toString(sol.toArray()) + ", optimal solution: " + Arrays.toString(trueOptimalSolution));
   		} catch (UnsatisfiedLinkError e)
 		{
 			throw new JOMException(e.getMessage());

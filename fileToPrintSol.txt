@@ -1,0 +1,8 @@
+===========================================
+MIPCL version 1.4.0
+Solution time: 0.001
+Branch-and-Cut nodes: 1
+Objective value: 3.0000 - optimality proven
+x(2)            1.0000
+x(1)            0.0000
+x(0)            0.0000

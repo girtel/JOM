@@ -766,6 +766,10 @@ public class OptimizationProblem
 		{
 			_SOLVERWRAPPER_XPRESS solver = new _SOLVERWRAPPER_XPRESS(solverIO, params);
 			int errorCode = solver.solve();
+		} else if (solverName.equalsIgnoreCase("mipcl"))
+		{
+			_SOLVERWRAPPER_MIPCL solver = new _SOLVERWRAPPER_MIPCL(solverIO, params);
+			int errorCode = solver.solve();
 		} else
 			throw new JOMException("Unknown solver type");
 
@@ -926,7 +930,7 @@ public class OptimizationProblem
 			params.put((String) paramName, value);
 		}
 
-		if (!solverName.equalsIgnoreCase("glpk") && !solverName.equalsIgnoreCase("ipopt") && !solverName.equalsIgnoreCase("cplex") && !solverName.equalsIgnoreCase("xpress"))
+		if (!solverName.equalsIgnoreCase("glpk") && !solverName.equalsIgnoreCase("mipcl") && !solverName.equalsIgnoreCase("ipopt") && !solverName.equalsIgnoreCase("cplex") && !solverName.equalsIgnoreCase("xpress"))
 			throw new JOMException("Unknown solver name");
 
 		/* Check if the chosen solver can solve the type of problem */
