@@ -17,6 +17,7 @@ package com.jom;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import com.sun.jna.Native;
@@ -28,11 +29,11 @@ import cern.jet.math.tdouble.DoubleFunctions;
 /** @author Pablo */
 class _SOLVERWRAPPER_CPLEX
 {
-	private final HashMap<String, Object> param;
+	private final Map<String, Object> param;
 	private final _INTERNAL_SolverIO      s;
 	private final String                  solverLibraryName;
 
-	_SOLVERWRAPPER_CPLEX(_INTERNAL_SolverIO s, HashMap<String, Object> param)
+	_SOLVERWRAPPER_CPLEX(_INTERNAL_SolverIO s, Map<String, Object> param)
 	{
 		this.s = s;
 		this.solverLibraryName = (String) param.get("solverLibraryName");

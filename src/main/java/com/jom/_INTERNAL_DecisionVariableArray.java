@@ -19,12 +19,12 @@ class _INTERNAL_DecisionVariableArray
 {
 	private final int firstVarId;
 
-	private final boolean        isInteger;
+	private boolean        isInteger;
 	private final int            lastVarId;
 	private final String         name;
 	private final IntMatrixND    varIds;
-	private final DoubleMatrixND x_l;
-	private final DoubleMatrixND x_u;
+	private DoubleMatrixND x_l;
+	private DoubleMatrixND x_u;
 
 	_INTERNAL_DecisionVariableArray(String name, boolean isInteger, IntMatrix1D size, DoubleMatrixND x_l, DoubleMatrixND x_u, int firstVarId)
 	{
@@ -59,10 +59,19 @@ class _INTERNAL_DecisionVariableArray
 	{
 		return x_l;
 	}
-
+	void set_x_l(DoubleMatrixND x_l)
+	{
+		if (!x_l.getSize().equals(this.getSize())) throw new RuntimeException ("Sizes must match");
+		this.x_l = x_l;
+	}
 	DoubleMatrixND get_x_u()
 	{
 		return x_u;
+	}
+	void set_x_u(DoubleMatrixND x_u)
+	{
+		if (!x_u.getSize().equals(this.getSize())) throw new RuntimeException ("Sizes must match");
+		this.x_u = x_u;
 	}
 
 	int getFirstVarId()
@@ -73,6 +82,10 @@ class _INTERNAL_DecisionVariableArray
 	boolean getIsInteger()
 	{
 		return isInteger;
+	}
+	void setIsInteger(boolean isInteger)
+	{
+		this.isInteger = isInteger;
 	}
 
 	int getLastVarId()

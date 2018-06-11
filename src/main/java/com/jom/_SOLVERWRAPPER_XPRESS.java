@@ -16,19 +16,19 @@
 package com.jom;
 
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.jet.math.tdouble.DoubleFunctions;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map.Entry;
 
 /** @author Pablo */
 @SuppressWarnings("unchecked")
 class _SOLVERWRAPPER_XPRESS
 {
-	private final HashMap<String, Object> param;
+	private final Map<String, Object> param;
 	private final _INTERNAL_SolverIO      s;
 	private final String                  solverLibraryName;
 	private final Class c_XPRSconstants , c_XPRS , c_XPRSenumerations_ObjSense, c_XPRSprob;
@@ -42,7 +42,7 @@ class _SOLVERWRAPPER_XPRESS
 
 	
 	
-	_SOLVERWRAPPER_XPRESS(_INTERNAL_SolverIO s, HashMap<String, Object> param)
+	_SOLVERWRAPPER_XPRESS(_INTERNAL_SolverIO s, Map<String, Object> param)
 	{
 		this.s = s;
 		this.solverLibraryName = (String) param.get("solverLibraryName");

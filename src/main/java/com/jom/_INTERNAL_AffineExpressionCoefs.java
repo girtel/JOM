@@ -23,13 +23,18 @@
  */
 package com.jom;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+
 import cern.colt.matrix.tdouble.DoubleFactory2D;
+import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * @author Pablo
@@ -75,6 +80,20 @@ class _INTERNAL_AffineExpressionCoefs
 		for (int cont = 0; cont < constants.length; cont++)
 			if (constants[cont] != 0)
 				this.linearCoefs.put(cont, new Cell(constants[cont]));
+	}
+
+	_INTERNAL_AffineExpressionCoefs(OptimizationProblem model, int[] size, DoubleMatrix1D constants)
+	{
+		this.model = model;
+		this.resize(size);
+		if (constants.size() != (long) this.numCells) throw new JOMException("Affine expression operation error: Unexpected error");
+		this.linearCoefs = new LinkedHashMap<Integer, Cell>();
+		for (int cont = 0; cont < constants.size (); cont++)
+		{
+			final double val = constants.get(cont);
+			if (val != 0)
+				this.linearCoefs.put(cont, new Cell(val));
+		}
 	}
 
 	_INTERNAL_AffineExpressionCoefs(OptimizationProblem model, IntMatrixND varIds)
@@ -1145,7 +1164,7 @@ class _INTERNAL_AffineExpressionCoefs
 	final _INTERNAL_AffineExpressionCoefs reshape(int[] newSize)
 	{
 		if (prod(newSize) != prod(this.size))
-			throw new JOMException("Affine expression operation error: Reshape expression function. Wrong array size");
+			throw new JOMException("Affine expression operation error: Reshape expression function. Wrong array size. Original size: " + Arrays.toString(this.size) + ", new size: " + Arrays.toString(newSize));
 		this.resize(Arrays.copyOf(newSize, newSize.length));
 		return this;
 	}
@@ -1296,7 +1315,8 @@ class _INTERNAL_AffineExpressionCoefs
 			}
 		}
 
-		public String toString()
+		@Override
+        public String toString()
 		{
 			String s = "" + this.constantValue;
 			if (this.lCoefs != null) for (Entry<Integer, Double> e : this.lCoefs.entrySet())

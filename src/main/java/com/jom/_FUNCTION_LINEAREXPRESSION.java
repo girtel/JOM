@@ -45,8 +45,7 @@ class _FUNCTION_LINEAREXPRESSION extends Expression
 
 	_FUNCTION_LINEAREXPRESSION(OptimizationProblem model, DoubleMatrixND constant)
 	{
-		super(model, constant.getSize().toArray(), new _INTERNAL_AffineExpressionCoefs(model, constant.getSize().toArray(), constant.elements()
-				.toArray()));
+		super(model, constant.getSize().toArray(), new _INTERNAL_AffineExpressionCoefs(model, constant.getSize().toArray(), constant.elements()));
 		this.isConstant = this.affineExp.isConstant();
 	}
 

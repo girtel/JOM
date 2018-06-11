@@ -11,17 +11,17 @@
 
 package com.jom;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+
 import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 /** Expressions objects represent a function of the decision variables defined in its related OptimizationProblem object. JOM creates Expression
  * objects parsing Strings in the JOM syntax.
@@ -260,9 +260,9 @@ public abstract class Expression
 	 * @param newSize the new size of the array */
 	final void reshape(int[] newSize)
 	{
-		if (IntMatrixND.prod(this.size) != this.numScalarExpressions)
+		if (IntMatrixND.prod(newSize) != this.numScalarExpressions)
 			throw new JOMException("Reshaping an expression cannot change its number of elements");
-		this.size = newSize;
+		this.size = Arrays.copyOf(newSize , newSize.length);
 		this.numDim = this.size.length;
 		if (this.affineExp != null)
 			this.affineExp.reshape(newSize);
@@ -360,4 +360,10 @@ public abstract class Expression
 		else return this.nl_getActiveVarIds();
 	}
 
+	static final Expression getEmptyOneColumnZeroRows (OptimizationProblem model)
+	{
+	    final Expression res = new _FUNCTION_LINEAREXPRESSION(model, new int [] {0,1} , new _INTERNAL_AffineExpressionCoefs (model , new int [] {0,1}));
+	    return res;
+	}
+	
 }
