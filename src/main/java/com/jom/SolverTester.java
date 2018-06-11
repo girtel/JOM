@@ -11,10 +11,11 @@
 
 package com.jom;
 
-import cern.colt.matrix.tdouble.DoubleMatrix1D;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import by.bsu.JVmipcl.*;
+
+import cern.colt.matrix.tdouble.DoubleMatrix1D;
 
 /** This class contains methods for performing tests in the solvers. They are not performance tests, but to check if
  *  the libraries, licenses etc. are correctly installed, and then JOM can solve problems with the solver.
@@ -23,7 +24,9 @@ import java.io.StringWriter;
  */
 public class SolverTester
 {
-	final static String RETURN = System.getProperty("line.separator");
+    static { System.loadLibrary("JVmipcl"); }
+	
+    final static String RETURN = System.getProperty("line.separator");
 
 	final static String HELP_MESSAGE = "Check that the solver is correctly installed at the given location.";
 
@@ -32,16 +35,58 @@ public class SolverTester
 	 */
 	public static void main (String [] args)
 	{
-		String res = SolverTester.check_xpress("c:\\xpressmp\\xpauth.xpr");
-		System.out.println("XPRESS: " + res);
-		res = SolverTester.check_cplex("c:\\windows\\system32\\cplex.dll");
-		System.out.println("CPLEX: " + res);
-		res = SolverTester.check_glpk("c:\\windows\\system32\\glpk.dll");
-		System.out.println("GLPK: " + res);
-		res = SolverTester.check_ipopt("c:\\windows\\system32\\ipopt.dll");
-		System.out.println("IPOPT: " + res);
+		String res = null;
+//		res = SolverTester.check_xpress("c:\\xpressmp\\xpauth.xpr");
+//		System.out.println("XPRESS: " + res);
+//		res = SolverTester.check_cplex("c:\\windows\\system32\\cplex.dll");
+//		System.out.println("CPLEX: " + res);
+//		res = SolverTester.check_glpk("c:\\windows\\system32\\glpk.dll");
+//		System.out.println("GLPK: " + res);
+//		res = SolverTester.check_ipopt("c:\\windows\\system32\\ipopt.dll");
+//		System.out.println("IPOPT: " + res);
+		res = SolverTester.check_mipcl ();
+		System.out.println("MIPCL: " + res);
 	}
 
+	private static String check_mipcl ()
+	{
+
+		final double[] c = {100, 64};
+		final double[] b = {250, 4};
+		final double[][] A = {{50, 31}, {-3,2}};
+		try 
+		{
+			int m = b.length; // m - number of rows
+			int n = c.length; // n - number of columns
+			int[] ind = new int[n]; // ind - auxiliary array
+
+			MIP prob = new MIP("MIPCLtest"); // create a new MIP problem
+
+			prob.openMatrix(n,m,m*n); // open a dence mxn-matrix
+
+			for (int j=0; j < n; ++j) { // add n variables:
+				ind[j] = j;
+				prob.addVar(j,MIP.VAR_INT, c[j],0.0, LP.VAR_INF);
+			}
+
+			for (int i=0; i < m; ++i) // add m rows (constraints):
+				prob.addRow(i,0,-LP.INF,b[i],A[i],ind,true);
+
+			prob.closeMatrix(); // close the matrix
+
+			prob.optimize(); // solve the problem
+
+			prob.printSolution("primer.sol"); // print the solution to the file
+			prob.dispose(); // delete the CMIP object referenced by prob
+		}
+		catch(Throwable e) {
+			System.out.println(e);
+			return "Bad. " + e.getMessage();
+		}
+		return "Ok";
+	}
+
+	
 	private static void checkLinearSolver (String solverName , String auxFileName)
 	{
   		try

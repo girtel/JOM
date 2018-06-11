@@ -34,6 +34,8 @@ import cern.jet.math.tdouble.DoubleFunctions;
 
 public class OptimizationProblem
 {
+	static { System.loadLibrary("JVmipcl"); }
+	
 	final static int MAX_NUMBER_DIMENSIONS_INPUTPARAMETER = 10;
 	private Map<String, _INTERNAL_ConstraintArray> constraints;
 	private Map<String, _INTERNAL_DecisionVariableArray> decisionVariables;
