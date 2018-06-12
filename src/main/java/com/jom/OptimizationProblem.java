@@ -108,6 +108,7 @@ public class OptimizationProblem
 	}
 
 	/** Indicates if a constraint set with the given identifier exists in the model
+	 * @param identifier the identifier of the constraint to check
 	 * @return see above
 	 */
 	public boolean hasConstraint (String identifier)
@@ -116,6 +117,7 @@ public class OptimizationProblem
 	}
 
 	/** Indicates if a decision variable with the given identifier exists in the model
+	 * @param identifier the identifier of the constraint to check
 	 * @return see above
 	 */
 	public boolean hasDecisionVariable (String identifier)

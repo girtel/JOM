@@ -30,29 +30,27 @@ public class SolverTester
 
 	final static String HELP_MESSAGE = "Check that the solver is correctly installed at the given location.";
 
-	/** Creates an optimization problem object
-	 *
+	/** Runs the tests for all the solvers
+	 * @param args the args (not needed)
 	 */
 	public static void main (String [] args)
 	{
 		String res = null;
-//		res = SolverTester.check_xpress("c:\\xpressmp\\xpauth.xpr");
-//		System.out.println("XPRESS: " + res);
-//		res = SolverTester.check_cplex("c:\\windows\\system32\\cplex.dll");
-//		System.out.println("CPLEX: " + res);
-//		res = SolverTester.check_glpk("c:\\windows\\system32\\glpk.dll");
-//		System.out.println("GLPK: " + res);
-//		res = SolverTester.check_ipopt("c:\\windows\\system32\\ipopt.dll");
-//		System.out.println("IPOPT: " + res);
-//		res = SolverTester.check_mipclAux();
+		res = SolverTester.check_xpress("c:\\xpressmp\\xpauth.xpr");
+		System.out.println("XPRESS: " + res);
+		res = SolverTester.check_cplex("c:\\windows\\system32\\cplex.dll");
+		System.out.println("CPLEX: " + res);
+		res = SolverTester.check_glpk("c:\\windows\\system32\\glpk.dll");
+		System.out.println("GLPK: " + res);
+		res = SolverTester.check_ipopt("c:\\windows\\system32\\ipopt.dll");
+		System.out.println("IPOPT: " + res);
 		res = SolverTester.check_mipcl ();
 		System.out.println("MIPCL: " + res);
 	}
 
 
-	/** Performs the check for the solver GLPK, returns a "" String if everything ok. If not, the returned String
+	/** Performs the check for the solver MIPCL. The returned String
 	 * contains the error message including a description message the stack trace of the Exception raised.
-	 * @param solverLibraryName The name of the dynamic library file (DLL or .SO file) with the solver
 	 * @return the check String
 	 */
 	public static String check_mipcl ()
@@ -86,44 +84,6 @@ public class SolverTester
 		}
 		return sb.length() == 0? "Ok" : sb.toString();
 	}
-	
-	private static String check_mipclAux ()
-	{
-		final double[] c = {100, 64};
-		final double[] b = {250, 4};
-		final double[][] A = {{50, 31}, {-3,2}};
-		try 
-		{
-			int m = b.length; // m - number of rows
-			int n = c.length; // n - number of columns
-			int[] ind = new int[n]; // ind - auxiliary array
-
-			MIP prob = new MIP("MIPCLtest"); // create a new MIP problem
-
-			prob.openMatrix(n,m,m*n); // open a dence mxn-matrix
-
-			for (int j=0; j < n; ++j) { // add n variables:
-				ind[j] = j;
-				prob.addVar(j,MIP.VAR_INT, c[j],0.0, LP.VAR_INF);
-			}
-
-			for (int i=0; i < m; ++i) // add m rows (constraints):
-				prob.addRow(i,0,-LP.INF,b[i],A[i],ind,true);
-
-			prob.closeMatrix(); // close the matrix
-
-			prob.optimize(); // solve the problem
-
-			prob.printSolution("primer.sol"); // print the solution to the file
-			prob.dispose(); // delete the CMIP object referenced by prob
-		}
-		catch(Throwable e) {
-			System.out.println(e);
-			return "Bad. " + e.getMessage();
-		}
-		return "Ok";
-	}
-
 	
 	private static void checkLinearSolver (String solverName , String auxFileName)
 	{

@@ -678,7 +678,9 @@ public class DoubleMatrixND
 		this.x.getNonZeros(indexList, valueList);
 	}
 
-	/** Returns the number of non zero elements */
+	/** Returns the number of non zero elements
+     * @return the number of nonzero elements
+     */
     public int getNumberOfNonZeros()
     {
         final IntArrayList a = new IntArrayList();
