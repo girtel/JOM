@@ -95,7 +95,7 @@ class _SOLVERWRAPPER_MIPCL
 					rhs = -s.in.lhsMinusRhsAccumulatedConstraint.getAffineExpression().getCellConstantCoef(row); // equal to minus the constant value
 				} else
 				{
-					throw new JOMException("JOM - GLPK interface. Double bounded constraints are supposed not to exist in JOM");
+					throw new JOMException("JOM - MIPCL interface. Double bounded constraints are supposed not to exist in JOM");
 				}
 				prob.addCtr(row, 0, lhs, rhs);
 			}

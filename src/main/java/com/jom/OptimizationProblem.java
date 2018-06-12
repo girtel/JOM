@@ -52,7 +52,7 @@ public class OptimizationProblem
 
 	public enum JOMSolver
     {
-        glpk, ipopt, cplex, xpress
+        glpk, ipopt, cplex, xpress, mipcl
     }
 
 	/** Returns the list of the names of the installed solvers, in the form that is accepted as the solverName inpt parameter of solve method

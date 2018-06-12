@@ -37,15 +37,15 @@ public class SolverTester
 	{
 		String res = null;
 		res = SolverTester.check_xpress("c:\\xpressmp\\xpauth.xpr");
-		System.out.println("XPRESS: " + res);
+		System.out.println("XPRESS: " + (res.equals("")? "Ok" : res));
 		res = SolverTester.check_cplex("c:\\windows\\system32\\cplex.dll");
-		System.out.println("CPLEX: " + res);
+		System.out.println("CPLEX: " + (res.equals("")? "Ok" : res));
 		res = SolverTester.check_glpk("c:\\windows\\system32\\glpk.dll");
-		System.out.println("GLPK: " + res);
+		System.out.println("GLPK: " + (res.equals("")? "Ok" : res));
 		res = SolverTester.check_ipopt("c:\\windows\\system32\\ipopt.dll");
-		System.out.println("IPOPT: " + res);
+		System.out.println("IPOPT: " + (res.equals("")? "Ok" : res));
 		res = SolverTester.check_mipcl ();
-		System.out.println("MIPCL: " + res);
+		System.out.println("MIPCL: " + (res.equals("")? "Ok" : res));
 	}
 
 
@@ -82,7 +82,7 @@ public class SolverTester
 		  		sb.append(sw.toString());
 		  	}
 		}
-		return sb.length() == 0? "Ok" : sb.toString();
+		return sb.toString();
 	}
 	
 	private static void checkLinearSolver (String solverName , String auxFileName)
@@ -149,7 +149,7 @@ public class SolverTester
 		  		sb.append(sw.toString());
 		  	}
 		}
-		return sb.length() == 0? "Ok" : sb.toString();
+		return sb.toString();
 
 	}
 
@@ -186,7 +186,7 @@ public class SolverTester
 		  		sb.append(sw.toString());
 		  	}
 		}
-		return sb.length() == 0? "Ok" : sb.toString();
+		return sb.toString();
 	}
 
 	/** Performs the check for the solver GLPK, returns a "" String if everything ok. If not, the returned String
@@ -222,7 +222,7 @@ public class SolverTester
 		  		sb.append(sw.toString());
 		  	}
 		}
-		return sb.length() == 0? "Ok" : sb.toString();
+		return sb.toString();
 	}
 
 	/** Performs the check for the solver IPOPT, returns a "" String if everything ok. If not, the returned String
@@ -264,7 +264,7 @@ public class SolverTester
 		  		sb.append(sw.toString());
 		  	}
 		}
-		return sb.length() == 0? "Ok" : sb.toString();
+		return sb.toString();
 	}
 
 	private static boolean equalWithMargin (double [] x , double [] y)
