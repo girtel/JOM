@@ -19,6 +19,8 @@ package com.jom;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.commons.lang.SystemUtils;
+
 import by.bsu.JVmipcl.LP;
 import by.bsu.JVmipcl.MIP;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
@@ -38,7 +40,8 @@ class _SOLVERWRAPPER_MIPCL
 
 	int solve()
 	{
-		final MIP prob = new MIP(""); // create a new MIP problem
+		final boolean isIlp = s.in.hasIntegerVariables;
+		final LP prob = isIlp? new MIP ("") : new LP(""); // create a new MIP problem
 		try
 		{
             prob.beSilent(true);
@@ -106,23 +109,28 @@ class _SOLVERWRAPPER_MIPCL
             /* Closes the matrix, needed for preparing it for solving */
             prob.closeMatrix(); // close the matrix
 
-			/* Set the environment parameters, including the maxSolverTime */
-            final long maxSolverTimeInSeconds = ((Number) this.param.getOrDefault("maxSolverTimeInSeconds", new Double (10000000))).longValue();
-            final double dualityGapLimitInAbsoluteValue = ((Number) this.param.getOrDefault("dualityGapLimitInAbsoluteValue", new Double (0.0))).doubleValue();
-
             /* solves the problem */
-            prob.optimize(maxSolverTimeInSeconds , dualityGapLimitInAbsoluteValue, "NUL");
-
+            if (isIlp)
+            {
+    			/* Set the environment parameters, including the maxSolverTime */
+                final long maxSolverTimeInSeconds = ((Number) this.param.getOrDefault("maxSolverTimeInSeconds", new Double (10000000))).longValue();
+                final double dualityGapLimitInAbsoluteValue = ((Number) this.param.getOrDefault("dualityGapLimitInAbsoluteValue", new Double (0.0))).doubleValue();
+            	((MIP) prob).optimize(maxSolverTimeInSeconds , dualityGapLimitInAbsoluteValue, SystemUtils.IS_OS_WINDOWS? "NUL" : (SystemUtils.IS_OS_LINUX? "/dev/null" : null));
+//            	((MIP) prob).optimize(maxSolverTimeInSeconds , dualityGapLimitInAbsoluteValue, null); // this crashes JVM
+            	
+            }
+            else
+            	prob.optimize();
+            
             /* solves the problem */
-//            prob.optimize();
 
 			s.problemAlreadyAttemptedTobeSolved = true;
 			s.out.bestOptimalityBound = s.in.toMinimize? -Double.MAX_VALUE : Double.MAX_VALUE; 
 			s.out.statusCode = 0;
 			s.out.statusMessage = "";
-			s.out.solutionIsOptimal = prob.isSolutionOptimal();
 			s.out.solutionIsFeasible = prob.isSolution();
-			s.out.feasibleSolutionDoesNotExist = prob.isInfeasible();
+			s.out.solutionIsOptimal = isIlp? ((MIP) prob).isSolutionOptimal() : s.out.solutionIsFeasible;
+			s.out.feasibleSolutionDoesNotExist = isIlp? ((MIP)prob).isInfeasible() : prob.isLpInfeasible();
 			s.out.foundUnboundedSolution = prob.isLpUnbounded();
 
 			/* I may have a bound even if a feasible solution was not found */
@@ -165,7 +173,7 @@ class _SOLVERWRAPPER_MIPCL
 						if (Math.abs(s.out.primalSolution.get(i) - s.in.primalSolutionLowerBound.get(i)) < 1e-3)
 							s.out.multiplierOfLowerBoundConstraintToPrimalVariables.set(i, s.in.toMinimize? reducedCost : -reducedCost);
 						if (Math.abs(s.out.primalSolution.get(i) - s.in.primalSolutionUpperBound.get(i)) < 1e-3)
-							s.out.multiplierOfLowerBoundConstraintToPrimalVariables.set(i, s.in.toMinimize? -reducedCost : reducedCost);
+							s.out.multiplierOfUpperBoundConstraintToPrimalVariables.set(i, s.in.toMinimize? -reducedCost : reducedCost);
 					}
 				final double [] shadowPricesIndexedByCtrHandler = prob.getShadowPrices();
 				final int[] constrHandles = prob.getCtrHandles();
