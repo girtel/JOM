@@ -166,23 +166,30 @@ class _SOLVERWRAPPER_MIPCL
 			if (!s.in.hasIntegerVariables)
 			{
 				final double [] reducedCostsIndexedByVarHandle_var = prob.getReducedCosts();
-				if (reducedCostsIndexedByVarHandle_var != null)
-					for (int i=0; i < s.in.numDecVariables ; ++i) 
-					{
-						final double reducedCost = Math.abs(reducedCostsIndexedByVarHandle_var [varHandles [i]]);
-						if (Math.abs(s.out.primalSolution.get(i) - s.in.primalSolutionLowerBound.get(i)) < 1e-3)
-							s.out.multiplierOfLowerBoundConstraintToPrimalVariables.set(i, s.in.toMinimize? reducedCost : -reducedCost);
-						if (Math.abs(s.out.primalSolution.get(i) - s.in.primalSolutionUpperBound.get(i)) < 1e-3)
-							s.out.multiplierOfUpperBoundConstraintToPrimalVariables.set(i, s.in.toMinimize? -reducedCost : reducedCost);
-					}
+				if (reducedCostsIndexedByVarHandle_var != null && varHandles != null)
+					if (reducedCostsIndexedByVarHandle_var.length == s.in.numDecVariables && varHandles.length == s.in.numDecVariables)
+						for (int i=0; i < s.in.numDecVariables ; ++i) 
+						{
+							final int trueVarIndex = varHandles [i];
+							if (trueVarIndex >= 0 && trueVarIndex < s.in.numDecVariables)
+							{
+								final double reducedCost = Math.abs(reducedCostsIndexedByVarHandle_var [trueVarIndex]);
+								if (Math.abs(s.out.primalSolution.get(i) - s.in.primalSolutionLowerBound.get(i)) < 1e-3)
+									s.out.multiplierOfLowerBoundConstraintToPrimalVariables.set(i, s.in.toMinimize? reducedCost : -reducedCost);
+								if (Math.abs(s.out.primalSolution.get(i) - s.in.primalSolutionUpperBound.get(i)) < 1e-3)
+									s.out.multiplierOfUpperBoundConstraintToPrimalVariables.set(i, s.in.toMinimize? -reducedCost : reducedCost);
+							}
+						}
 				final double [] shadowPricesIndexedByCtrHandler = prob.getShadowPrices();
 				final int[] constrHandles = prob.getCtrHandles();
 				if (shadowPricesIndexedByCtrHandler != null && constrHandles != null)
-					for (int i=0; i < s.in.numConstraints ; ++i) 
-					{
-						final double multiplier = Math.abs(shadowPricesIndexedByCtrHandler [constrHandles [i]]);
-						s.out.multiplierOfConstraint.set (i , multiplier);
-					}
+					if (shadowPricesIndexedByCtrHandler.length == s.in.numConstraints && constrHandles.length == s.in.numConstraints)
+						for (int i=0; i < s.in.numConstraints ; ++i) 
+						{
+							final int trueConstrIndex = constrHandles [i];
+							final double multiplier = Math.abs(shadowPricesIndexedByCtrHandler [trueConstrIndex]);
+							s.out.multiplierOfConstraint.set (i , multiplier);
+						}
 			}
 			prob.dispose();
 
