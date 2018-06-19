@@ -67,8 +67,8 @@ class _SOLVERWRAPPER_MIPCL
             final double[] objectiveFunctionCoefs = s.in.objectiveFunction.getAffineExpression().getCellLinearCoefsFull(0);
 			for (int col = 0 ; col < ncols ; col ++)
 			{
-				final double dlb = s.in.primalSolutionLowerBound.get(col) == -Double.MAX_VALUE? -LP.VAR_INF : s.in.primalSolutionLowerBound.get(col);
-				final double dub = s.in.primalSolutionUpperBound.get(col) == Double.MAX_VALUE? LP.VAR_INF : s.in.primalSolutionUpperBound.get(col);
+				final double dlb = Math.max(-LP.VAR_INF , s.in.primalSolutionLowerBound.get(col));
+				final double dub = Math.min(LP.VAR_INF , s.in.primalSolutionUpperBound.get(col));
 				final int type = s.in.primalSolutionIsInteger.get(col) != 0? (dlb == 0 && dub == 1? MIP.VAR_BIN : MIP.VAR_INT) : 0;
 				prob.addVar(col, type, objectiveFunctionCoefs [col], dlb, dub);
 			}
@@ -97,7 +97,7 @@ class _SOLVERWRAPPER_MIPCL
 				{
 					throw new JOMException("JOM - MIPCL interface. Double bounded constraints are supposed not to exist in JOM");
 				}
-				prob.addCtr(row, 0, lhs, rhs);
+				prob.addCtr(row, 0, Math.max(lhs , -LP.INF) , Math.min(rhs, LP.INF));
 			}
             
             /* Add the entries of the matrix */
