@@ -24,7 +24,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
  */
 public class SolverTester
 {
-    static { System.loadLibrary("JVmipcl"); }
+    static { try {System.loadLibrary("JVmipcl"); } catch (Throwable e) {} }
 	
     final static String RETURN = System.getProperty("line.separator");
 
